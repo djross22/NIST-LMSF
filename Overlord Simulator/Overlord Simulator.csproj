@@ -7,7 +7,7 @@
     <ProjectGuid>{5C3A8EE6-DB0B-45D9-9A47-23134E700CE9}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Overlord_Simulator</RootNamespace>
-    <AssemblyName>Overlord Simulator</AssemblyName>
+    <AssemblyName>Overlord.Main</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
