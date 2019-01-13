@@ -23,20 +23,18 @@ namespace Overlord_Simulator
     {
         public MainWindow()
         {
-            Dictionary<string, string> ovpVarDictionay = new Dictionary<string, string>();
-            ovpVarDictionay.Add("testkey1", "testval1");
-            ovpVarDictionay.Add("testkey2", "testval2");
-
-            Resources["OvpVarDict"] = ovpVarDictionay;
-
-
             InitializeComponent();
 
+            //Variables for parsing input arguments
             string[] args = App.commandLineArgs;
             bool runImmediately = false;
             bool closeAutomatically = false;
             bool runMinimized = false;
             bool passVariables = false;
+
+            //Dictionary of Overlord variables to be set/displayed
+            Dictionary<string, string> ovpVarDictionay = new Dictionary<string, string>();
+            Resources["OvpVarDict"] = ovpVarDictionay;
 
             if (App.commandLineArgs.Length > 0)
             {
@@ -93,7 +91,27 @@ namespace Overlord_Simulator
                 // read in variables if passVariables
                 if (passVariables)
                 {
-
+                    bool isVarKey = false;
+                    string key = "";
+                    string val = "";
+                    int keyLength = 0;
+                    foreach (string s in args)
+                    {
+                        if ( s.StartsWith("[") & s.EndsWith("]") )
+                        {
+                            isVarKey = true;
+                            keyLength = s.Length;
+                            key = s.Substring(1, keyLength - 2);
+                        }
+                        else
+                        {
+                            if (isVarKey) {
+                                val = s;
+                                ovpVarDictionay.Add(key, val);
+                            }
+                            isVarKey = false;
+                        }
+                    }
                 }
             }
 

@@ -29,7 +29,7 @@
         <ListView x:Name="ovpVarListView" Grid.Column="1" Margin="10" Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{DynamicResource OvpVarDict}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Ovp Variable" DisplayMemberBinding="{Binding Key}"/>
+                    <GridViewColumn Header="Overlord Variable" DisplayMemberBinding="{Binding Key}"/>
                     <GridViewColumn Header="Value Set" DisplayMemberBinding="{Binding Value}"/>
                 </GridView>
             </ListView.View>
