@@ -26,10 +26,11 @@
         <TextBox x:Name="ovpPathBox" Margin="10" TextWrapping="Wrap" Text="Overlord procedure file path" Grid.ColumnSpan="3"/>
         <TextBox x:Name="ovpXmlDisplayBox" Margin="10" Grid.Row="1" Text="TextBox" Cursor="IBeam" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
         <ProgressBar x:Name="simTimeProgressBar" Margin="70,40,30,40" Grid.Row="2" Grid.ColumnSpan="2"/>
-        <ListView x:Name="ovpVarListView" Grid.Column="1" Margin="10" Grid.Row="1" Grid.ColumnSpan="2">
+        <ListView x:Name="ovpVarListView" Grid.Column="1" Margin="10" Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{DynamicResource OvpVarDict}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn/>
+                    <GridViewColumn Header="Ovp Variable" DisplayMemberBinding="{Binding Key}"/>
+                    <GridViewColumn Header="Value Set" DisplayMemberBinding="{Binding Value}"/>
                 </GridView>
             </ListView.View>
         </ListView>

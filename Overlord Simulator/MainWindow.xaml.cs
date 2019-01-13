@@ -23,6 +23,13 @@ namespace Overlord_Simulator
     {
         public MainWindow()
         {
+            Dictionary<string, string> ovpVarDictionay = new Dictionary<string, string>();
+            ovpVarDictionay.Add("testkey1", "testval1");
+            ovpVarDictionay.Add("testkey2", "testval2");
+
+            Resources["OvpVarDict"] = ovpVarDictionay;
+
+
             InitializeComponent();
 
             string[] args = App.commandLineArgs;
