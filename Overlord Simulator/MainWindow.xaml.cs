@@ -26,6 +26,10 @@ namespace Overlord_Simulator
             InitializeComponent();
 
             string[] args = App.commandLineArgs;
+            bool runImmediately = false;
+            bool closeAutomatically = false;
+            bool runMinimized = false;
+            bool passVariables = false;
 
             if (App.commandLineArgs.Length > 0)
             {
@@ -54,9 +58,33 @@ namespace Overlord_Simulator
                     ovpXmlDisplayBox.AppendText(e.Message);
                     ovpXmlDisplayBox.Foreground = Brushes.Red;
                 }
-                
 
+                // argument parsing for -r, -c, -m, -v
                 foreach (string s in args)
+                {
+                    switch (s)
+                    {
+                        case "-r":
+                            // -r = run the procedure immediately after Overlord Simulator is open
+                            runImmediately = true;
+                            break;
+                        case "-c":
+                            // -c = automatically close Overlord Simulator once the procedure has completed running. Must be used with -r
+                            closeAutomatically = true;
+                            break;
+                        case "-m":
+                            // -m = run Overlord Simulator minimized
+                            runMinimized = true;
+                            break;
+                        case "-v":
+                            // -v = pass variables into Overlord. Each variable/value must be supplied as a pair, separated by a space
+                            passVariables = true;
+                            break;
+                    }
+                }
+
+                // read in variables if passVariables
+                if (passVariables)
                 {
 
                 }
