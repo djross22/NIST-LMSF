@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -21,16 +22,21 @@ namespace Overlord_Simulator
     /// </summary>
     public partial class MainWindow : Window
     {
+        //Control Booleans set by input arguments
+        static bool closeAutomatically = false;
+        static bool runImmediately = false;
+        static bool runMinimized = false;
+        static bool passVariables = false;
+
         public MainWindow()
         {
             InitializeComponent();
 
+            //Simulation time i seconds
+            float simTime = 10;
+
             //Variables for parsing input arguments
             string[] args = App.commandLineArgs;
-            bool runImmediately = false;
-            bool closeAutomatically = false;
-            bool runMinimized = false;
-            bool passVariables = false;
 
             //Dictionary of Overlord variables to be set/displayed
             Dictionary<string, string> ovpVarDictionay = new Dictionary<string, string>();
@@ -115,7 +121,48 @@ namespace Overlord_Simulator
                 }
             }
 
-            
+            if (runImmediately)
+            {
+                //Setup and run Background worker for progress bar
+                // Code (mostly) from: https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
+                simTimeProgressBar.Value = 0;
+                BackgroundWorker worker = new BackgroundWorker();
+                worker.WorkerReportsProgress = true;
+                worker.DoWork += worker_DoWork;
+                worker.ProgressChanged += worker_ProgressChanged;
+                worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+                worker.RunWorkerAsync(simTime);
+                //End code from https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
+            }
+
         }
+
+        // More code (mostly) from: https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
+        void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            int sleepTime = Convert.ToInt32((float)e.Argument * 10);
+
+            for (int i = 0; i < 100; i++)
+            {
+                (sender as BackgroundWorker).ReportProgress(i);
+                System.Threading.Thread.Sleep(sleepTime);
+            }
+        }
+
+        void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            simTimeProgressBar.Value = e.ProgressPercentage;
+        }
+
+        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //TODO: Add code to close App if -c option
+            if (closeAutomatically)
+            {
+                MessageBox.Show("I should be closing now");
+            }
+        }
+        //End code from https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
+
     }
 }
