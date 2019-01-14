@@ -28,13 +28,16 @@ namespace Overlord_Simulator
         static bool runMinimized = false;
         static bool passVariables = false;
 
+        //Controls whether or not the progress bar Backgroundprocess runs
+        private static bool _isRunning = true;
+
         public MainWindow()
         {
             InitializeComponent();
 
             //Simulation time i seconds
             float simTime = 10;
-
+            
             //Variables for parsing input arguments
             string[] args = App.commandLineArgs;
 
@@ -141,11 +144,17 @@ namespace Overlord_Simulator
         void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             int sleepTime = Convert.ToInt32((float)e.Argument * 10);
+            int simProgress = 0;
 
-            for (int i = 0; i < 100; i++)
+            while (simProgress < 100)
             {
-                (sender as BackgroundWorker).ReportProgress(i);
+                (sender as BackgroundWorker).ReportProgress(simProgress);
                 System.Threading.Thread.Sleep(sleepTime);
+                if (_isRunning)
+                {
+                    simProgress++;
+                }
+                
             }
         }
 
@@ -159,7 +168,21 @@ namespace Overlord_Simulator
             //TODO: Add code to close App if -c option
             if (closeAutomatically)
             {
-                MessageBox.Show("I should be closing now");
+                System.Windows.Application.Current.Shutdown();
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isRunning)
+            {
+                _isRunning = false;
+                pauseButton.Content = "Resume";
+            }
+            else
+            {
+                _isRunning = true;
+                pauseButton.Content = "Pause";
             }
         }
         //End code from https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
