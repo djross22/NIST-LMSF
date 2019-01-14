@@ -40,6 +40,22 @@
                     </Button>
                 </ToolBar>
             </ToolBarTray>
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                <Button Content="Add Step" Height="25" Margin="20,10,10,10" Padding="10,2"/>
+                <Button Content="Duplicate Step" Height="25" Margin="10,10,10,10" Padding="10,2"/>
+                <Button Content="Delete Step" Height="25" Margin="40,10,10,10" Padding="10,2"/>
+                <Button Content="Move Up" Height="25" Margin="40,10,10,10" Padding="10,2"/>
+                <Button Content="Move Down" Height="25" Margin="10,10,10,10" Padding="10,2"/>
+            </StackPanel>
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <Frame Content="" Grid.Column="1" Margin="10,10,10,0" Background="White"/>
+                <ListBox Margin="10,10,10,0"/>
+            </Grid>
         </DockPanel>
 
     </Grid>
