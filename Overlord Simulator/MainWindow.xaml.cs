@@ -184,11 +184,14 @@ namespace Overlord_Simulator
 
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //TODO: Add code to close App if -c option
+            //close App if -c option
             if (closeAutomatically)
             {
                 System.Windows.Application.Current.Shutdown();
             }
+
+            //otherwise disable pauseButton if the sim pregress bar reaches 100%
+            pauseButton.IsEnabled = false;
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
