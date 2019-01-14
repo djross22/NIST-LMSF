@@ -1,0 +1,17 @@
+Overlord Simulator: add argument parsing for -r, -c, -m, -v
+
+Overlord Simulator: add scrollbars to ovp xml textbox
+
+Overlord Simulator: add ListView to display Overlord input variables
+
+Overlord Simulator: add test Dictionary object to display to variables ListView
+
+Overlord Simulator: add code to display variables set from command line to ListView
+
+Overlord Simulator: Add animation to progress bar for simTime
+
+Overlord Simulator: Add Pause/Resume button for simulation time.
+
+
+
+Overlord Simulator: Implement -r, -c, and -m options
