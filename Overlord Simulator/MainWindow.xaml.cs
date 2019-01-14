@@ -122,35 +122,41 @@ namespace Overlord_Simulator
                         }
                     }
                 }
-            }
 
-            if (runImmediately)
-            {
-                _isRunning = true;
-                pauseButton.Content = "Pause";
+                if (runImmediately)
+                {
+                    _isRunning = true;
+                    pauseButton.Content = "Pause";
+                }
+                else
+                {
+                    _isRunning = false;
+                    pauseButton.Content = "Start";
+                }
+
+                if (runMinimized)
+                {
+                    WindowState = WindowState.Minimized;
+                }
+            
+                //Setup and run Background worker for progress bar
+                // Code (mostly) from: https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
+                simTimeProgressBar.Value = 0;
+                BackgroundWorker worker = new BackgroundWorker();
+                worker.WorkerReportsProgress = true;
+                worker.DoWork += worker_DoWork;
+                worker.ProgressChanged += worker_ProgressChanged;
+                worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+                worker.RunWorkerAsync(simTime);
+                //End code from https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
             }
             else
             {
-                _isRunning = false;
-                pauseButton.Content = "Start";
+                ovpXmlDisplayBox.AppendText("No Overlord procedure file given as command line argument");
+                pauseButton.IsEnabled = false;
+                stopButton.IsEnabled = false;
             }
 
-            if (runMinimized)
-            {
-                WindowState = WindowState.Minimized;
-            }
-            
-            //Setup and run Background worker for progress bar
-            // Code (mostly) from: https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
-            simTimeProgressBar.Value = 0;
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
-            worker.DoWork += worker_DoWork;
-            worker.ProgressChanged += worker_ProgressChanged;
-            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            worker.RunWorkerAsync(simTime);
-            //End code from https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
-            
         }
 
         // More code (mostly) from: https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
