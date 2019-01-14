@@ -7,6 +7,10 @@
 *.rsuser
 *.suo
 *.user
+
+# The *.csproj.user files have project settings that I want to track in the repo for developemnt on multiple computers
+!*.csproj.user
+
 *.userosscache
 *.sln.docstates
 
