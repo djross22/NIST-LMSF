@@ -34,7 +34,9 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="pauseButton" Content="Pause" Grid.Column="2" HorizontalAlignment="Left" Margin="40,40,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+        <Button x:Name="pauseButton" Content="Pause" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="2" Margin="40,20,84,55" Grid.Row="2" Click="PauseButton_Click"/>
+        <TextBlock Margin="70,19,30,0" Grid.Row="2" TextWrapping="Wrap" Text="Simulation Time" VerticalAlignment="Top" Foreground="White" Grid.ColumnSpan="2" HorizontalAlignment="Center"/>
+        <Button x:Name="stopButton" Content="Stop Now" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="2" HorizontalAlignment="Left" Margin="40,55,0,20" Grid.Row="2" Width="75" Click="StopButton_Click"/>
 
     </Grid>
 </Window>

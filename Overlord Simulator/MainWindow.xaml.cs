@@ -172,7 +172,7 @@ namespace Overlord_Simulator
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
             if (_isRunning)
             {
@@ -184,6 +184,11 @@ namespace Overlord_Simulator
                 _isRunning = true;
                 pauseButton.Content = "Pause";
             }
+        }
+
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
         }
         //End code from https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
 
