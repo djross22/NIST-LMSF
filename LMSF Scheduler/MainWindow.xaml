@@ -13,6 +13,34 @@
         </LinearGradientBrush>
     </Window.Background>
     <Grid>
-        
+        <DockPanel Margin="0">
+            <Menu x:Name="___No_Name_" VerticalAlignment="Top" DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="New"/>
+                    <MenuItem Header="Open"/>
+                    <MenuItem Header="Save" />
+                    <MenuItem Header="Save As..." />
+                    <Separator />
+                    <MenuItem Header="Exit" />
+                </MenuItem>
+            </Menu>
+            <ToolBarTray VerticalAlignment="Top" DockPanel.Dock="Top">
+                <ToolBar HorizontalAlignment="Left">
+                    <Button x:Name="startButton" ToolTip="Start Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
+                        <Image Source="start.png" Height="25"/>
+                    </Button>
+                    <Button x:Name="pauseButton" ToolTip="Pause Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
+                        <Image Source="pause.png" Height="25"/>
+                    </Button>
+                    <Button x:Name="stepButton" ToolTip="Single Step" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
+                        <Image Source="step.png" Height="25"/>
+                    </Button>
+                    <Button x:Name="abortButton" ToolTip="Abort Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
+                        <Image Source="abort.png" Height="25"/>
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+        </DockPanel>
+
     </Grid>
 </Window>

@@ -100,5 +100,17 @@
   <ItemGroup>
     <Resource Include="LMSF icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="start.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="pause.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="step.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="abort.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
