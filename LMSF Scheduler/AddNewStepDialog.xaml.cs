@@ -19,13 +19,26 @@ namespace LMSF_Scheduler
     /// </summary>
     public partial class AddNewStepWindow : Window
     {
-        public AddNewStepWindow()
+        MainWindow mainWindow;
+
+        public AddNewStepWindow(MainWindow mainWin)
         {
+            mainWindow = mainWin;
             InitializeComponent();
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
+            //Set the newStepType equal to the string content of the selected radio button
+            List<RadioButton> buttonList = new List<RadioButton>(new RadioButton[] { ovpRadioButton, waitRadioButton, getMetaRadioButton });
+            foreach (RadioButton b in buttonList)
+            {
+                if (b.IsChecked == true)
+                {
+                    mainWindow.newStepType = (string)b.Content;
+                }
+            }
+            
             // Dialog box accepted
             this.DialogResult = true;
         }

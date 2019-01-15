@@ -33,6 +33,9 @@ namespace LMSF_Scheduler
         private AutomationStep selectedStep;
         private int selectedIndex;
 
+        //For adding new steps
+        public string newStepType;
+
         #region Properties Getters and Setters
         public int SelectedIndex
         {
@@ -80,7 +83,7 @@ namespace LMSF_Scheduler
         private void AddStepButton_Click(object sender, RoutedEventArgs e)
         {
             // Instantiate the dialog box
-            AddNewStepWindow dlg = new AddNewStepWindow();
+            AddNewStepWindow dlg = new AddNewStepWindow(this);
 
             // Configure the dialog box
             dlg.Owner = this;
@@ -90,7 +93,7 @@ namespace LMSF_Scheduler
 
             if (dialogResult==true)
             {
-                ListOfSteps.Insert(SelectedIndex + 1, new AutomationStep($"type {SelectedIndex + 1} added"));
+                ListOfSteps.Insert(SelectedIndex + 1, new AutomationStep(newStepType));
             }
             
         }
