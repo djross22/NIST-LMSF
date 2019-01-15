@@ -98,5 +98,28 @@ namespace LMSF_Scheduler
         {
             ListOfSteps.Insert(SelectedIndex + 1, (AutomationStep)SelectedStep.Clone());
         }
+
+        private void DeleteStepButton_Click(object sender, RoutedEventArgs e)
+        {
+            ListOfSteps.RemoveAt(SelectedIndex);
+        }
+
+        private void MoveUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedIndex>0)
+            {
+                ListOfSteps.Move(SelectedIndex, SelectedIndex - 1);
+
+            }
+        }
+
+        private void MoveDownButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedIndex < (ListOfSteps.Count-1) )
+            {
+                ListOfSteps.Move(SelectedIndex, SelectedIndex + 1);
+
+            }
+        }
     }
 }
