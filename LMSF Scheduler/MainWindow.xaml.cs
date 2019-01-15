@@ -93,5 +93,10 @@ namespace LMSF_Scheduler
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
+
+        private void DuplicateStepButton_Click(object sender, RoutedEventArgs e)
+        {
+            ListOfSteps.Insert(SelectedIndex + 1, (AutomationStep)SelectedStep.Clone());
+        }
     }
 }

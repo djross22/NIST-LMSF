@@ -42,10 +42,10 @@
             </ToolBarTray>
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
                 <Button x:Name="addStepButton" Content="Add Step" Height="25" Margin="20,10,10,10" Padding="10,2" Click="AddStepButton_Click"/>
-                <Button Content="Duplicate Step" Height="25" Margin="10,10,10,10" Padding="10,2"/>
-                <Button Content="Delete Step" Height="25" Margin="40,10,10,10" Padding="10,2"/>
-                <Button Content="Move Up" Height="25" Margin="40,10,10,10" Padding="10,2"/>
-                <Button Content="Move Down" Height="25" Margin="10,10,10,10" Padding="10,2"/>
+                <Button x:Name="duplicateStepButton" Content="Duplicate Step" Height="25" Margin="10,10,10,10" Padding="10,2" Click="DuplicateStepButton_Click"/>
+                <Button x:Name="deleteStepButton" Content="Delete Step" Height="25" Margin="40,10,10,10" Padding="10,2"/>
+                <Button x:Name="moveUpButton" Content="Move Up" Height="25" Margin="40,10,10,10" Padding="10,2"/>
+                <Button x:Name="moveDownButton" Content="Move Down" Height="25" Margin="10,10,10,10" Padding="10,2"/>
                 <Button x:Name="testButton" Content="Test" Width="75" Click="TestButton_Click"/>
             </StackPanel>
             <Grid Margin="10">
