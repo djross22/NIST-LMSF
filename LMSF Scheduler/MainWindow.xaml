@@ -54,7 +54,25 @@
                 </Grid.ColumnDefinitions>
 
                 <Frame Content="" Grid.Column="1" Margin="10,10,10,0" Background="White"/>
-                <ListBox Margin="10,10,10,0"/>
+                <ListBox Margin="10,10,10,0" ItemsSource="{Binding ListOfSteps}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border BorderBrush="Black" BorderThickness="1" Margin="5">
+                                    
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="5">
+                                    <TextBlock Text="{Binding Path=StepType}"/>
+                                    <TextBlock Text="{Binding Path=StepShortDetail}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Grid>
         </DockPanel>
 

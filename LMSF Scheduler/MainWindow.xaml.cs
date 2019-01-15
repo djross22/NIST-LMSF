@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,9 +21,24 @@ namespace LMSF_Scheduler
     /// </summary>
     public partial class MainWindow : Window
     {
+        public ObservableCollection<AutomationStep> ListOfSteps { get; set; }
+
         public MainWindow()
         {
+            ListOfSteps = new ObservableCollection<AutomationStep>();
+            //Add temporary list items for testing
+            TempStepInit();
+
             InitializeComponent();
+            DataContext = this;
+        }
+
+        //temporary method for debugging/testing
+        void TempStepInit()
+        {
+            ListOfSteps.Add(new AutomationStep("type 1"));
+            ListOfSteps.Add(new AutomationStep("type 2"));
+            ListOfSteps.Add(new AutomationStep("type 3"));
         }
     }
 }
