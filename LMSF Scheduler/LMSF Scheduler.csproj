@@ -113,5 +113,11 @@
   <ItemGroup>
     <Resource Include="abort.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="LMSF icon.256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="paa-automation-logo.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

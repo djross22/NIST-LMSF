@@ -63,7 +63,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Border BorderBrush="Black" BorderThickness="1" Margin="5">
-                                    
+                                    <Image Source="{Binding Path=StepIcon}" Stretch="Fill" Width="40" Height="40"/>
                                 </Border>
                                 <StackPanel Grid.Column="1" Margin="5">
                                     <TextBlock Text="{Binding Path=StepType}"/>

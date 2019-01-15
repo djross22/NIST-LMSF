@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:LMSF_Scheduler"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <BitmapImage x:Key="Overlord BMP" UriSource="/paa-automation-logo.png"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
