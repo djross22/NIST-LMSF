@@ -6,6 +6,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <BitmapImage x:Key="Overlord BMP" UriSource="/paa-automation-logo.png"/>
+            <BitmapImage x:Key="Wait BMP" UriSource="/clock.png"/>
+            <BitmapImage x:Key="Dialog BMP" UriSource="/modal_box.png"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

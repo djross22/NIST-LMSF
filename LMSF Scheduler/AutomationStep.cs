@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace LMSF_Scheduler
 {
-    public class AutomationStep : INotifyPropertyChanged
+    public class AutomationStep : INotifyPropertyChanged, ICloneable
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -19,8 +19,11 @@ namespace LMSF_Scheduler
         private BitmapImage stepIcon;
 
         //Icons for different step types
-        private static BitmapImage overlordIcon = new BitmapImage();
-        
+        //private static BitmapImage overlordIcon = new BitmapImage();
+        private static readonly BitmapImage overlordIcon = (BitmapImage)App.Current.Resources["Overlord BMP"];
+        private static readonly BitmapImage waitIcon = (BitmapImage)App.Current.Resources["Wait BMP"];
+        private static readonly BitmapImage dialogIcon = (BitmapImage)App.Current.Resources["Dialog BMP"];
+
 
         #region Properties Getters and Setters
         public string StepType
@@ -74,31 +77,42 @@ namespace LMSF_Scheduler
         }
         #endregion
 
-        public AutomationStep(string stepType, string stepShortDetail, bool isWaitUntil, bool waitCheckBoxEnabled)
+        public AutomationStep(string stepType, string stepShortDetail, bool isWaitUntil)
         {
-            InitIcons();
             this.stepType = stepType;
             this.stepShortDetail = stepShortDetail;
             this.isWaitUntil = isWaitUntil;
-            this.waitCheckBoxEnabled = waitCheckBoxEnabled;
+            InitStep();
         }
 
         public AutomationStep(string stepType)
         {
-            InitIcons();
             this.stepType = stepType;
             this.stepShortDetail = "short detail test";
             this.isWaitUntil = true;
-            this.waitCheckBoxEnabled = false;
-            this.stepIcon = overlordIcon;
+            InitStep();
         }
 
-        void InitIcons()
+        void InitStep()
         {
-            overlordIcon = (BitmapImage)App.Current.Resources["Overlord BMP"];
-            //overlordIcon.BeginInit();
-            //overlordIcon.UriSource = new Uri("c:\\plus.png");
-            //overlordIcon.EndInit();
+            switch (stepType)
+            {
+                case "Run Overlord procedure":
+                    stepIcon = overlordIcon;
+                    waitCheckBoxEnabled = true;
+                    break;
+                case "Wait step":
+                    stepIcon = waitIcon;
+                    waitCheckBoxEnabled = true;
+                    break;
+                case "Get metadata from user":
+                    stepIcon = dialogIcon;
+                    waitCheckBoxEnabled = false;
+                    isWaitUntil = true;
+                    break;
+                default:
+                    break;
+            }
         }
 
         protected void OnPropertyChanged(string name)
@@ -109,5 +123,10 @@ namespace LMSF_Scheduler
             }
         }
 
+        //TODO: revisit this once more details are filled in.
+        public object Clone()
+        {
+            return new AutomationStep(stepType, stepShortDetail, isWaitUntil);
+        }
     }
 }

@@ -119,5 +119,9 @@
   <ItemGroup>
     <Resource Include="paa-automation-logo.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="clock.png" />
+    <Resource Include="modal_box.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
