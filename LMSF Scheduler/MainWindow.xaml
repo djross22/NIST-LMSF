@@ -41,7 +41,7 @@
                 </ToolBar>
             </ToolBarTray>
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                <Button Content="Add Step" Height="25" Margin="20,10,10,10" Padding="10,2"/>
+                <Button x:Name="addStepButton" Content="Add Step" Height="25" Margin="20,10,10,10" Padding="10,2" Click="AddStepButton_Click"/>
                 <Button Content="Duplicate Step" Height="25" Margin="10,10,10,10" Padding="10,2"/>
                 <Button Content="Delete Step" Height="25" Margin="40,10,10,10" Padding="10,2"/>
                 <Button Content="Move Up" Height="25" Margin="40,10,10,10" Padding="10,2"/>

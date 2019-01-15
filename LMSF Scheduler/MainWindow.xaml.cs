@@ -40,5 +40,10 @@ namespace LMSF_Scheduler
             ListOfSteps.Add(new AutomationStep("type 2"));
             ListOfSteps.Add(new AutomationStep("type 3"));
         }
+
+        private void AddStepButton_Click(object sender, RoutedEventArgs e)
+        {
+            ListOfSteps.Add(new AutomationStep("type add button"));
+        }
     }
 }
