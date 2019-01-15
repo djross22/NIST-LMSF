@@ -22,10 +22,15 @@ namespace LMSF_Scheduler
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        //Property change notification event required for INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
+        //Fields used to keep track of list of automation steps
+        //  Note that ListOfSteps handles notifications on its own (included with ObservableCollection class)
+        //    But the other fields have Property wrappers with set methods that handle the notification.
+        //    This is necessary to get data bindings to work properly with the GUI
         public ObservableCollection<AutomationStep> ListOfSteps { get; set; }
-        public AutomationStep selectedStep;
+        private AutomationStep selectedStep;
         private int selectedIndex;
 
         #region Properties Getters and Setters
