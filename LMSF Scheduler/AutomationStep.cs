@@ -23,6 +23,7 @@ namespace LMSF_Scheduler
         private static readonly BitmapImage overlordIcon = (BitmapImage)App.Current.Resources["Overlord BMP"];
         private static readonly BitmapImage waitIcon = (BitmapImage)App.Current.Resources["Wait BMP"];
         private static readonly BitmapImage dialogIcon = (BitmapImage)App.Current.Resources["Dialog BMP"];
+        private static readonly BitmapImage defaultIcon = (BitmapImage)App.Current.Resources["LMSF BMP"];
 
 
         #region Properties Getters and Setters
@@ -77,6 +78,7 @@ namespace LMSF_Scheduler
         }
         #endregion
 
+        //This constructor is for user cloning as existing AutomationStep with the Duplicate button
         public AutomationStep(string stepType, string stepShortDetail, bool isWaitUntil)
         {
             this.stepType = stepType;
@@ -85,32 +87,44 @@ namespace LMSF_Scheduler
             InitStep();
         }
 
+        //This constructor is for user creating a new AutomationStep with the Add button
         public AutomationStep(string stepType)
         {
             this.stepType = stepType;
-            this.stepShortDetail = "short detail test";
-            this.isWaitUntil = true;
             InitStep();
+            
         }
 
+        //For setting up new steps once the step type is selected
         void InitStep()
         {
             switch (stepType)
             {
                 case "Run Overlord procedure":
                     stepIcon = overlordIcon;
+                    stepShortDetail = "short detail test";
+                    isWaitUntil = true;
                     waitCheckBoxEnabled = true;
                     break;
                 case "Wait step":
                     stepIcon = waitIcon;
+                    stepShortDetail = "short detail test";
+                    isWaitUntil = true;
                     waitCheckBoxEnabled = true;
                     break;
                 case "Get metadata from user":
                     stepIcon = dialogIcon;
+                    stepShortDetail = "short detail test";
+                    isWaitUntil = true;
                     waitCheckBoxEnabled = false;
                     isWaitUntil = true;
                     break;
                 default:
+                    stepIcon = defaultIcon;
+                    stepShortDetail = "default short detail...";
+                    isWaitUntil = false;
+                    waitCheckBoxEnabled = false;
+                    isWaitUntil = false;
                     break;
             }
         }

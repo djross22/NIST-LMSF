@@ -8,6 +8,7 @@
             <BitmapImage x:Key="Overlord BMP" UriSource="/paa-automation-logo.png"/>
             <BitmapImage x:Key="Wait BMP" UriSource="/clock.png"/>
             <BitmapImage x:Key="Dialog BMP" UriSource="/modal_box.png"/>
+            <BitmapImage x:Key="LMSF BMP" UriSource="/LMSF icon.256.png"/>
             <LinearGradientBrush x:Key="PurpleBackgroundBrush" EndPoint="0.5,1" StartPoint="0.5,0">
                 <GradientStop Color="Black" Offset="0"/>
                 <GradientStop Color="#FF2C0D51" Offset="1"/>
