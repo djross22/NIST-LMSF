@@ -79,7 +79,20 @@ namespace LMSF_Scheduler
 
         private void AddStepButton_Click(object sender, RoutedEventArgs e)
         {
-            ListOfSteps.Insert(SelectedIndex + 1, new AutomationStep($"type {SelectedIndex + 1} added"));
+            // Instantiate the dialog box
+            AddNewStepWindow dlg = new AddNewStepWindow();
+
+            // Configure the dialog box
+            dlg.Owner = this;
+
+            // Open the dialog box modally 
+            bool? dialogResult = dlg.ShowDialog();
+
+            if (dialogResult==true)
+            {
+                ListOfSteps.Insert(SelectedIndex + 1, new AutomationStep($"type {SelectedIndex + 1} added"));
+            }
+            
         }
 
         //temporary method for debugging/testing
