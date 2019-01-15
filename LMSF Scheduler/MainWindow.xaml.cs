@@ -61,39 +61,35 @@ namespace LMSF_Scheduler
         public MainWindow()
         {
             ListOfSteps = new ObservableCollection<AutomationStep>();
-            //Add temporary list items for testing
-            TempStepInit();
 
             InitializeComponent();
             DataContext = this;
         }
 
-        //temporary method for debugging/testing
-        void TempStepInit()
-        {
-            ListOfSteps.Add(new AutomationStep("type 1"));
-            ListOfSteps.Add(new AutomationStep("type 2"));
-            ListOfSteps.Add(new AutomationStep("type 3"));
-
-            SelectedStep = ListOfSteps.First();
-
-            SelectedIndex = 1;
-        }
-
         private void AddStepButton_Click(object sender, RoutedEventArgs e)
         {
+            //First dialog to get the step type
             // Instantiate the dialog box
             AddNewStepWindow dlg = new AddNewStepWindow(this);
-
             // Configure the dialog box
             dlg.Owner = this;
-
             // Open the dialog box modally 
             bool? dialogResult = dlg.ShowDialog();
-
+            // If dialog returns true ('OK'), create the new step
             if (dialogResult==true)
             {
-                ListOfSteps.Insert(SelectedIndex + 1, new AutomationStep(newStepType));
+                if (ListOfSteps.Count>0)
+                {
+                    ListOfSteps.Insert(SelectedIndex + 1, new AutomationStep(newStepType));
+                    //Set selectedStep to be the new step
+                    SelectedIndex++;
+                }
+                else
+                {
+                    ListOfSteps.Add(new AutomationStep(newStepType));
+                    //Set selectedStep to be the new step
+                    SelectedIndex = 0;
+                }
             }
             
         }
@@ -117,12 +113,20 @@ namespace LMSF_Scheduler
 
         private void DuplicateStepButton_Click(object sender, RoutedEventArgs e)
         {
-            ListOfSteps.Insert(SelectedIndex + 1, (AutomationStep)SelectedStep.Clone());
+            if (ListOfSteps.Count > 0)
+            {
+                ListOfSteps.Insert(SelectedIndex + 1, (AutomationStep)SelectedStep.Clone());
+                //Set selectedStep to be the new step
+                SelectedIndex++;
+            }
         }
 
         private void DeleteStepButton_Click(object sender, RoutedEventArgs e)
         {
-            ListOfSteps.RemoveAt(SelectedIndex);
+            if (ListOfSteps.Count > 0)
+            {
+                ListOfSteps.RemoveAt(SelectedIndex);
+            }
         }
 
         private void MoveUpButton_Click(object sender, RoutedEventArgs e)
@@ -130,7 +134,6 @@ namespace LMSF_Scheduler
             if (SelectedIndex>0)
             {
                 ListOfSteps.Move(SelectedIndex, SelectedIndex - 1);
-
             }
         }
 
@@ -139,7 +142,6 @@ namespace LMSF_Scheduler
             if (SelectedIndex < (ListOfSteps.Count-1) )
             {
                 ListOfSteps.Move(SelectedIndex, SelectedIndex + 1);
-
             }
         }
     }
