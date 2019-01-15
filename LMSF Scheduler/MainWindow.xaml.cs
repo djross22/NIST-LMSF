@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,10 +20,35 @@ namespace LMSF_Scheduler
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public ObservableCollection<AutomationStep> ListOfSteps { get; set; }
-        public AutomationStep selectedStep { get; set; }
+        public AutomationStep selectedStep;
+        private int selectedIndex;
+
+        #region Properties Getters and Setters
+        public int SelectedIndex
+        {
+            get { return this.selectedIndex; }
+            set
+            {
+                this.selectedIndex = value;
+                OnPropertyChanged("SelectedIndex");
+            }
+        }
+
+        public AutomationStep SelectedStep
+        {
+            get { return this.selectedStep; }
+            set
+            {
+                this.selectedStep = value;
+                OnPropertyChanged("SelectedStep");
+            }
+        }
+        #endregion
 
         public MainWindow()
         {
@@ -41,12 +67,31 @@ namespace LMSF_Scheduler
             ListOfSteps.Add(new AutomationStep("type 2"));
             ListOfSteps.Add(new AutomationStep("type 3"));
 
-            selectedStep = ListOfSteps.First();
+            SelectedStep = ListOfSteps.First();
+
+            SelectedIndex = 1;
         }
 
         private void AddStepButton_Click(object sender, RoutedEventArgs e)
         {
             ListOfSteps.Add(new AutomationStep("type add button"));
+        }
+
+        //temporary method for debugging/testing
+        private void TestButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Configure message box
+            string message = $"SelectedIndex = {SelectedIndex}";
+            // Show message box
+            MessageBoxResult result = MessageBox.Show(message);
+        }
+
+        protected void OnPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
         }
     }
 }
