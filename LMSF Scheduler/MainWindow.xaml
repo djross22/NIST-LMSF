@@ -52,9 +52,7 @@
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-
-                <Frame Content="" Grid.Column="1" Margin="10,10,10,0" Background="White"/>
-                <ListBox Margin="10,10,10,0" ItemsSource="{Binding ListOfSteps}">
+                <ListBox Margin="10,10,10,0" ItemsSource="{Binding ListOfSteps}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding selectedStep, Mode=TwoWay}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -73,6 +71,25 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+                <ContentControl Content="{Binding ListOfSteps}" Grid.Column="1" HorizontalAlignment="Left" Margin="20,28,0,0" VerticalAlignment="Top" Width="270" Height="150" Background="White">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border BorderBrush="Black" BorderThickness="1" Margin="5">
+                                    <Image Source="{Binding Path=StepIcon}" Stretch="Fill" Width="40" Height="40"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" Margin="5">
+                                    <TextBlock Text="{Binding Path=StepType}" Background="White"/>
+                                    <TextBlock Text="{Binding Path=StepShortDetail}" Background="White"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
             </Grid>
         </DockPanel>
 

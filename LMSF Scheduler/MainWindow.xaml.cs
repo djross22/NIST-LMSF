@@ -22,6 +22,7 @@ namespace LMSF_Scheduler
     public partial class MainWindow : Window
     {
         public ObservableCollection<AutomationStep> ListOfSteps { get; set; }
+        public AutomationStep selectedStep { get; set; }
 
         public MainWindow()
         {
@@ -39,6 +40,8 @@ namespace LMSF_Scheduler
             ListOfSteps.Add(new AutomationStep("type 1"));
             ListOfSteps.Add(new AutomationStep("type 2"));
             ListOfSteps.Add(new AutomationStep("type 3"));
+
+            selectedStep = ListOfSteps.First();
         }
 
         private void AddStepButton_Click(object sender, RoutedEventArgs e)
