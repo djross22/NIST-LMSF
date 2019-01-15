@@ -10,8 +10,65 @@ Overlord Simulator: add code to display variables set from command line to ListV
 
 Overlord Simulator: Add animation to progress bar for simTime
 
-Overlord Simulator: Add Pause/Resume button for simulation time.
+Overlord Simulator: Add Pause/Resume button for simulation time; Implement -c option (close when done)
+
+Overlord Simulator: Add Stop Now button for simulation time;
+
+Overlord Simulator: Implement -r (run immediately), and -m (run minimized) options
+
+Overlord Simulator: Implement code to handle when no command line arguments are passed
+
+Overlord Simulator: Disable Pause button when sim progress finishes (if -c option not given)
+
+Overlord Simulator: Add LMSF icon
+
+
+LMSF Scheduler: Setup App layout, menu bar, and tool bar
+
+LMSF Scheduler: Add ListView and Panel to display experiment steps, and buttons (Add, Duplicate, Delete, Move Up, Move Down) to organize steps
+
+LMSF Scheduler: Add AutomationStep class to hold info about each automation step
+
+LMSF Scheduler: Add ListOfSteps ObservableCollection and have it displayed in the ListBox with a DataTemplate
+
+LMSF Scheduler: Add StepIcon as property for AutomationStep class and display icon in ListBox w/ DataTemplate
+
+LMSF Scheduler: Add event handling for addStep Button with place-holder ListOfSteps.Add()
+
+LMSF Scheduler: Add ContentControl on right hand side of main Window to display details of selected text, and implement place-holder code for data Binding
+
+LMSF Scheduler: Add INotifyPropertyChanged interface to Main Window class, also add test buttons and text boxes to test data binding
+
+LMSF Scheduler: Change Add Step code to add step after selected step )instead of at end of Collection 
+
+LMSF Scheduler: Implement code for Duplicate Step button 
+
+LMSF Scheduler: Add wait and dialog icons to AutomationStep class 
+
+LMSF Scheduler: Implement code for Delete Step, Move Up, and Move Down buttons 
+
+LMSF Scheduler: Add Dialog box for Add New Step 
+
+LMSF Scheduler: Add Rodio buttons to select step type for Add New Step 
+
+LMSF Scheduler: Take out temporary ListOfSteps initialization code, and edit Add, Duplicate, Delete, ect methods to deal appropriately with empty list
+
+LMSF Scheduler: Add LMSF icon bitmap as default image for steps
 
 
 
-Overlord Simulator: Implement -r, -c, and -m options
+Enumeration of step types
+
+radio buttons from step types
+
+
+
+
+
+
+
+LMSF Scheduler: Save/Load with Serialization: https://stackoverflow.com/questions/1463548/c-sharp-serializing-a-collection-of-objects
+
+
+
+"C:\Program Files (x86)\PAA\Overlord3\Procedures\Common\Peel Plate.ovp" -r -c -v [Plates] 10 [Barcode] "12345678" [Gen5.Protocol.Path] "C:\Gen5 Path..."

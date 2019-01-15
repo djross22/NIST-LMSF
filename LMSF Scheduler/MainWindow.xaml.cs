@@ -26,80 +26,43 @@ namespace LMSF_Scheduler
         public event PropertyChangedEventHandler PropertyChanged;
 
         //Fields used to keep track of list of automation steps
-        //  Note that ListOfSteps handles notifications on its own (included with ObservableCollection class)
-        //    But the other fields have Property wrappers with set methods that handle the notification.
-        //    This is necessary to get data bindings to work properly with the GUI
-        public ObservableCollection<AutomationStep> ListOfSteps { get; set; }
-        private AutomationStep selectedStep;
-        private int selectedIndex;
-
-        //For adding new steps
-        public string newStepType;
+        private string inputText;
+        private string outputText;
 
         #region Properties Getters and Setters
-        public int SelectedIndex
+        public string InputText
         {
-            get { return this.selectedIndex; }
+            get { return this.inputText; }
             set
             {
-                this.selectedIndex = value;
-                OnPropertyChanged("SelectedIndex");
+                this.inputText = value;
+                OnPropertyChanged("InputText");
             }
         }
-
-        public AutomationStep SelectedStep
+        public string OutputText
         {
-            get { return this.selectedStep; }
+            get { return this.outputText; }
             set
             {
-                this.selectedStep = value;
-                OnPropertyChanged("SelectedStep");
+                this.outputText = value;
+                OnPropertyChanged("OutputText");
             }
         }
         #endregion
 
         public MainWindow()
         {
-            ListOfSteps = new ObservableCollection<AutomationStep>();
 
             InitializeComponent();
             DataContext = this;
         }
 
-        private void AddStepButton_Click(object sender, RoutedEventArgs e)
-        {
-            //First dialog to get the step type
-            // Instantiate the dialog box
-            AddNewStepWindow dlg = new AddNewStepWindow(this);
-            // Configure the dialog box
-            dlg.Owner = this;
-            // Open the dialog box modally 
-            bool? dialogResult = dlg.ShowDialog();
-            // If dialog returns true ('OK'), create the new step
-            if (dialogResult==true)
-            {
-                if (ListOfSteps.Count>0)
-                {
-                    ListOfSteps.Insert(SelectedIndex + 1, new AutomationStep(newStepType));
-                    //Set selectedStep to be the new step
-                    SelectedIndex++;
-                }
-                else
-                {
-                    ListOfSteps.Add(new AutomationStep(newStepType));
-                    //Set selectedStep to be the new step
-                    SelectedIndex = 0;
-                }
-            }
-            
-        }
 
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            // Configure message box
-            string message = $"SelectedIndex = {SelectedIndex}";
-            // Show message box
+            testTextBox.Text = "button pushed";
+            string message = InputText + ", " + OutputText;
             MessageBoxResult result = MessageBox.Show(message);
         }
 
@@ -111,38 +74,12 @@ namespace LMSF_Scheduler
             }
         }
 
-        private void DuplicateStepButton_Click(object sender, RoutedEventArgs e)
+        private void TestWriteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ListOfSteps.Count > 0)
-            {
-                ListOfSteps.Insert(SelectedIndex + 1, (AutomationStep)SelectedStep.Clone());
-                //Set selectedStep to be the new step
-                SelectedIndex++;
-            }
-        }
-
-        private void DeleteStepButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (ListOfSteps.Count > 0)
-            {
-                ListOfSteps.RemoveAt(SelectedIndex);
-            }
-        }
-
-        private void MoveUpButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (SelectedIndex>0)
-            {
-                ListOfSteps.Move(SelectedIndex, SelectedIndex - 1);
-            }
-        }
-
-        private void MoveDownButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (SelectedIndex < (ListOfSteps.Count-1) )
-            {
-                ListOfSteps.Move(SelectedIndex, SelectedIndex + 1);
-            }
+            string addon = " test add text";
+            InputText += addon;
+            addon = " test add out text";
+            OutputText += addon;
         }
     }
 }
