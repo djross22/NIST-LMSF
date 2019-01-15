@@ -74,7 +74,7 @@ namespace LMSF_Scheduler
 
         private void AddStepButton_Click(object sender, RoutedEventArgs e)
         {
-            ListOfSteps.Add(new AutomationStep("type add button"));
+            ListOfSteps.Insert(SelectedIndex + 1, new AutomationStep($"type {SelectedIndex + 1} added"));
         }
 
         //temporary method for debugging/testing
