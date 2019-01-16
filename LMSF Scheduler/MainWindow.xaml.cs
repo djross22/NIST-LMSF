@@ -34,7 +34,32 @@ namespace LMSF_Scheduler
         private string outputText;
         private string experimentFileName = "";
 
+        //Window title, app name, plus file name, plus * to indicate unsaved changes
+        private static string appName = "LMSF Scheduler";
+        private string displayTitle = appName + " - ";
+
         #region Properties Getters and Setters
+        public string ExperimentFileName
+        {
+            get { return this.experimentFileName; }
+            set
+            {
+                this.experimentFileName = value;
+                UpdateTitle();
+                OnPropertyChanged("ExperimentFileName");
+            }
+        }
+
+        public string DisplayTitle
+        {
+            get { return this.displayTitle; }
+            set
+            {
+                this.displayTitle = value;
+                OnPropertyChanged("DisplayTitle");
+            }
+        }
+
         public string InputText
         {
             get { return this.inputText; }
@@ -52,6 +77,7 @@ namespace LMSF_Scheduler
             set
             {
                 this.inputChanged = value;
+                UpdateTitle();
                 OnPropertyChanged("InputChanged");
             }
         }
@@ -69,7 +95,6 @@ namespace LMSF_Scheduler
 
         public MainWindow()
         {
-
             InitializeComponent();
             DataContext = this;
         }
@@ -78,7 +103,7 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            testTextBox.Text = $"{InputChanged}";
+            testTextBox.Text = DisplayTitle;
             string message = InputText + ", " + OutputText;
         }
 
@@ -96,6 +121,15 @@ namespace LMSF_Scheduler
             InputText += addon;
             addon = " test add out text";
             OutputText += addon;
+        }
+
+        private void UpdateTitle()
+        {
+            DisplayTitle = appName + " - " + ExperimentFileName;
+            if (InputChanged)
+            {
+                DisplayTitle += "*";
+            }
         }
 
         private bool SaveFirstQuery()
@@ -133,7 +167,7 @@ namespace LMSF_Scheduler
             if (!InputChanged || SaveFirstQuery())
             {
                 InputText = "";
-                experimentFileName = "";
+                ExperimentFileName = "";
             }
             inputTextBox.Focus();
         }
@@ -154,7 +188,7 @@ namespace LMSF_Scheduler
             if (openFileDialog.ShowDialog() == true)
             {
                 InputText = File.ReadAllText(openFileDialog.FileName);
-                experimentFileName = openFileDialog.FileName;
+                ExperimentFileName = openFileDialog.FileName;
                 InputChanged = false;
             }
         }
@@ -167,9 +201,9 @@ namespace LMSF_Scheduler
 
         private void Save()
         {
-            if (experimentFileName != "")
+            if (ExperimentFileName != "")
             {
-                File.WriteAllText(experimentFileName, InputText);
+                File.WriteAllText(ExperimentFileName, InputText);
                 InputChanged = false;
             }
             else
@@ -191,7 +225,7 @@ namespace LMSF_Scheduler
             if (saveFileDialog.ShowDialog() == true)
             {
                 File.WriteAllText(saveFileDialog.FileName, InputText);
-                experimentFileName = saveFileDialog.FileName;
+                ExperimentFileName = saveFileDialog.FileName;
                 InputChanged = false;
             }
         }
