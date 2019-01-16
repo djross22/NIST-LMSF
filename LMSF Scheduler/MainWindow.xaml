@@ -19,8 +19,8 @@
                 </MenuItem>
             </Menu>
             <ToolBarTray VerticalAlignment="Top" DockPanel.Dock="Top">
-                <ToolBar HorizontalAlignment="Left">
-                    <Button x:Name="startButton" ToolTip="Start Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
+                <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False">
+                    <Button x:Name="startButton" ToolTip="Start Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="StartButton_Click">
                         <Image Source="start.png" Height="25"/>
                     </Button>
                     <Button x:Name="pauseButton" ToolTip="Pause Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
@@ -49,10 +49,10 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="inputTextBox" Margin="10,10,10,0" TextWrapping="Wrap" Text="{Binding InputText, Mode=TwoWay}" Grid.Row="1"/>
+                <TextBox x:Name="inputTextBox" Margin="10,10,10,0" TextWrapping="NoWrap"  Text="{Binding InputText, Mode=TwoWay}" Grid.Row="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
                 <TextBlock Margin="10,5,10,0" TextWrapping="Wrap" Text="    Steps Input:" Background="White" FontWeight="Bold" VerticalAlignment="Bottom" Height="20"/>
-                <TextBox x:Name="outputTextBox" Grid.Column="1" Margin="10,10,10,0" Grid.Row="1" TextWrapping="Wrap" Text="{Binding OutputText, Mode=TwoWay}"/>
-                <TextBlock Grid.Column="1" Margin="10,5,10,0" TextWrapping="Wrap" Text="    Steps Output:" Background="White" FontWeight="Bold" VerticalAlignment="Bottom" Height="20"/>
+                <TextBox x:Name="outputTextBox" Grid.Column="1" Margin="10,10,10,0" Grid.Row="1" TextWrapping="NoWrap" Text="{Binding OutputText, Mode=TwoWay}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" Background="#FFCBCBCB"/>
+                <TextBlock Grid.Column="1" Margin="10,5,10,0" TextWrapping="Wrap" Text="    Steps Output:" Background="#FFCBCBCB" FontWeight="Bold" VerticalAlignment="Bottom" Height="20"/>
             </Grid>
         </DockPanel>
 

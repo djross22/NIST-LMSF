@@ -143,5 +143,10 @@ namespace LMSF_Scheduler
                 InputText += openFileDialog.FileName;
             }
         }
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            OutputText = InputText;
+        }
     }
 }
