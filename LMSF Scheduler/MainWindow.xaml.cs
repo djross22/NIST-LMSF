@@ -135,7 +135,7 @@ namespace LMSF_Scheduler
                 InputText = "";
                 experimentFileName = "";
             }
-            
+            inputTextBox.Focus();
         }
 
         private void OpenMenuItme_Click(object sender, RoutedEventArgs e)
@@ -144,6 +144,7 @@ namespace LMSF_Scheduler
             {
                 Open();
             }
+            inputTextBox.Focus();
         }
 
         private void Open()
@@ -161,6 +162,7 @@ namespace LMSF_Scheduler
         private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Save();
+            inputTextBox.Focus();
         }
 
         private void Save()
@@ -179,6 +181,7 @@ namespace LMSF_Scheduler
         private void SaveAsMenuItem_Click(object sender, RoutedEventArgs e)
         {
             SaveAs();
+            inputTextBox.Focus();
         }
 
         private void SaveAs()
@@ -195,7 +198,7 @@ namespace LMSF_Scheduler
 
         private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
         {
-
+            inputTextBox.Focus();
         }
 
         private void InsertFileButton_Click(object sender, RoutedEventArgs e)
