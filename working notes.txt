@@ -55,11 +55,28 @@ LMSF Scheduler: Take out temporary ListOfSteps initialization code, and edit Add
 
 LMSF Scheduler: Add LMSF icon bitmap as default image for steps
 
+LMSF Scheduler: Switch to purely text-based step editing and specification; make new branch, graphicStepEditor, for old GUI
+                  In new method, replace ListBox with TextBox, and remove buttons for manipulating steps (Add, Duplicate, etc.)
+
+LMSF Scheduler: Add code for Open/Save/SaveAs, and deal with Focus issue for menu items (IsFocusScope="False")
+
+LMSF Scheduler: Add button and code for "Insert File Path" - to insert the selected file path into the InputText
+
+LMSF Scheduler: Make input and output Text Boxes accept enter, nowrap, auto scroll bars; fix Binding/Focus issue for Toolbar items (IsFocusScope="False")
+
+LMSF Scheduler: Finish File menu functions, and add code to prompt for file save when inputText has changed as appropriately
 
 
-Enumeration of step types
 
-radio buttons from step types
+
+
+Finish adding steps based on type of step. Sub-class for different step types?
+
+Need an edit step dialog for each step type.
+
+User input steps: need C# metadata -> xml?
+
+Copy functionality from Venus LMSF Utilities library
 
 
 
