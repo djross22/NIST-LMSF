@@ -399,5 +399,10 @@ namespace LMSF_Scheduler
             IsRunning = false;
             IsPaused = true;
         }
+
+        private void ValidateButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

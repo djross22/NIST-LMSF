@@ -125,5 +125,8 @@
   <ItemGroup>
     <Resource Include="rewind.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="checkmark-128.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
