@@ -122,5 +122,8 @@
     <Resource Include="clock.png" />
     <Resource Include="modal_box.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="rewind.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

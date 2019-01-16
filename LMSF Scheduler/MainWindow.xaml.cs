@@ -28,8 +28,9 @@ namespace LMSF_Scheduler
         public event PropertyChangedEventHandler PropertyChanged;
 
         //Fields used to keep track of list of automation steps
-        private string inputText;
+        private string inputText = "";
         private bool inputChanged = false;
+        private string[] inputSteps;
         private string outputText;
         private string experimentFileName = "";
 
@@ -201,15 +202,58 @@ namespace LMSF_Scheduler
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Title = "Select File Path to Insert";
+
             if (openFileDialog.ShowDialog() == true)
             {
-                InputText += openFileDialog.FileName;
+                int caretPos = inputTextBox.SelectionStart;
+                string newText = openFileDialog.FileName;
+
+                InputText = InputText.Insert(caretPos, newText);
+
+                inputTextBox.SelectionStart = caretPos + newText.Length;
+                inputTextBox.SelectionLength = 0;
             }
+            inputTextBox.Focus();
+        }
+
+        //Breaks the InputText into steps/lines
+        private void ParseSteps()
+        {
+            inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            OutputText = InputText;
+            ParseSteps();
+            OutputText = "";
+            int stepNum = 1;
+            foreach (string s in inputSteps)
+            {
+                OutputText += $"{stepNum}. " + s + "\r\n";
+                stepNum++;
+                System.Threading.Thread.Sleep(100);
+            }
+            inputTextBox.Focus();
+        }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void StepButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RewindButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AbortButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -23,18 +23,21 @@
                     <Button x:Name="startButton" ToolTip="Start Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="StartButton_Click">
                         <Image Source="start.png" Height="25"/>
                     </Button>
-                    <Button x:Name="pauseButton" ToolTip="Pause Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
+                    <Button x:Name="pauseButton" ToolTip="Pause Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="PauseButton_Click">
                         <Image Source="pause.png" Height="25"/>
                     </Button>
-                    <Button x:Name="stepButton" ToolTip="Single Step" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
+                    <Button x:Name="stepButton" ToolTip="Single Step" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="StepButton_Click">
                         <Image Source="step.png" Height="25"/>
                     </Button>
-                    <Button x:Name="abortButton" ToolTip="Abort Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black">
+                    <Button x:Name="rewindButton" ToolTip="Single Step" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="RewindButton_Click">
+                        <Image Source="rewind.png" Height="25"/>
+                    </Button>
+                    <Button x:Name="abortButton" ToolTip="Abort Experiment" VerticalAlignment="Top" Margin="20,0,5,0" BorderBrush="Black" Click="AbortButton_Click">
                         <Image Source="abort.png" Height="25"/>
                     </Button>
                 </ToolBar>
             </ToolBarTray>
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Height="30">
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Height="30" FocusManager.IsFocusScope="False">
                 <Button x:Name="insertFileButton" Content="Insert File Path" Margin="30,4,20,4" VerticalAlignment="Center" Width="107" Click="InsertFileButton_Click" />
                 <Button x:Name="testButton" Content="Test" Width="75" Click="TestButton_Click" Margin="10,0,20,10"/>
                 <TextBox x:Name="testTextBox" TextWrapping="Wrap" Text="TextBox" Margin="0,0,0,10" Width="223"/>
