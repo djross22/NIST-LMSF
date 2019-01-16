@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -14,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace LMSF_Scheduler
 {
@@ -28,6 +30,7 @@ namespace LMSF_Scheduler
         //Fields used to keep track of list of automation steps
         private string inputText;
         private string outputText;
+        private string experimentFileName ="";
 
         #region Properties Getters and Setters
         public string InputText
@@ -80,6 +83,55 @@ namespace LMSF_Scheduler
             InputText += addon;
             addon = " test add out text";
             OutputText += addon;
+        }
+
+        private void NewMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            testTextBox.Text = "New...";
+        }
+
+        private void OpenMenuItme_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Text file (*.txt)|*.txt";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                InputText = File.ReadAllText(openFileDialog.FileName);
+            }
+                
+        }
+
+        private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (experimentFileName!="")
+            {
+                File.WriteAllText(experimentFileName, InputText);
+            }
+            else
+            {
+                SaveAs();
+            }
+        }
+
+        private void SaveAsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveAs();
+        }
+
+        private void SaveAs()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Text file (*.txt)|*.txt";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                File.WriteAllText(saveFileDialog.FileName, InputText);
+                experimentFileName = saveFileDialog.FileName;
+            }
+        }
+
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

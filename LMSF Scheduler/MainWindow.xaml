@@ -8,14 +8,14 @@
         Title="LMSF Scheduler" Height="450" Width="800" Background="{DynamicResource PurpleBackgroundBrush}">
     <Grid>
         <DockPanel Margin="0">
-            <Menu x:Name="___No_Name_" VerticalAlignment="Top" DockPanel.Dock="Top">
+            <Menu x:Name="___No_Name_" VerticalAlignment="Top" DockPanel.Dock="Top" FocusManager.IsFocusScope="False">
                 <MenuItem Header="_File">
-                    <MenuItem Header="New"/>
-                    <MenuItem Header="Open"/>
-                    <MenuItem Header="Save" />
-                    <MenuItem Header="Save As..." />
+                    <MenuItem x:Name="newMenuItem" Header="New" Click="NewMenuItem_Click"/>
+                    <MenuItem x:Name="openMenuItme" Header="Open" Click="OpenMenuItme_Click"/>
+                    <MenuItem x:Name="saveMenuItem" Header="Save" Click="SaveMenuItem_Click" />
+                    <MenuItem x:Name="saveAsMenuItem" Header="Save As..." Click="SaveAsMenuItem_Click" />
                     <Separator />
-                    <MenuItem Header="Exit" />
+                    <MenuItem x:Name="exitMenuItem" Header="Exit" Click="ExitMenuItem_Click" />
                 </MenuItem>
             </Menu>
             <ToolBarTray VerticalAlignment="Top" DockPanel.Dock="Top">
