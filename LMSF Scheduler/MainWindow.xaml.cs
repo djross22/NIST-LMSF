@@ -39,6 +39,8 @@ namespace LMSF_Scheduler
         private int totalSteps;
         private bool isRunning = false;
         private bool isPaused = true;
+        private bool isValidating = false;
+        private List<int> valFailed;
 
         //Window title, app name, plus file name, plus * to indicate unsaved changes
         private static string appName = "LMSF Scheduler";
@@ -325,17 +327,22 @@ namespace LMSF_Scheduler
             OutputText = "";
         }
 
-        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        private void Play()
         {
             InitSteps();
-            OutputText = "";
-            int stepNum = 1;
-            foreach (string s in inputSteps)
+            IsRunning = true;
+            IsPaused = false;
+
+            while (IsRunning && !IsPaused)
             {
-                OutputText += $"{stepNum}. " + s + "\r\n";
-                stepNum++;
-                System.Threading.Thread.Sleep(100);
+                Step();
             }
+        }
+
+        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            Play();
+
             inputTextBox.Focus();
         }
 
@@ -373,14 +380,45 @@ namespace LMSF_Scheduler
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
             stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
-            outString += "++";
-            foreach (string s in stepArgs)
-            {
-                outString += s + ", ";
-            }
-            outString += "++";
+            int numArgs = stepArgs.Length;
 
-            outString += "\r\n";
+            if (numArgs>0)
+            {
+                string stepType = stepArgs[0];
+
+                switch (stepType)
+                {
+                    case "Overlord":
+                        outString += "Running Overlord proccedure: ";
+                        if (numArgs<2)
+                        {
+                            outString += "No procedure path give.";
+                            valFailed.Add(stepNum);
+                        }
+                        else
+                        {
+                            outString += stepArgs[1];
+
+                            if (!isValidating)
+                            {
+                                RunOverlord(stepArgs[1]);
+                            }
+                            
+                        }
+                        break;
+                    default:
+                        valFailed.Add(stepNum);
+                        outString += "Step type not recongnized: ";
+                        foreach (string s in stepArgs)
+                        {
+                            outString += s + ", ";
+                        }
+                        break;
+                }
+                outString += "\r\n";
+            }
+
+            
             return outString;
         }
 
@@ -401,6 +439,23 @@ namespace LMSF_Scheduler
         }
 
         private void ValidateButton_Click(object sender, RoutedEventArgs e)
+        {
+            isValidating = true;
+            valFailed = new List<int>();
+            Play();
+            if (valFailed.Count>0)
+            {
+                OutputText += "\r\n";
+                OutputText += "Validation failed on the following steps:\r\n";
+                foreach (int i in valFailed)
+                {
+                    OutputText += $"{i}, ";
+                }
+            }
+            isValidating = false;
+        }
+
+        private void RunOverlord(string file)
         {
 
         }
