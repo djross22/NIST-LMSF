@@ -29,8 +29,9 @@ namespace LMSF_Scheduler
 
         //Fields used to keep track of list of automation steps
         private string inputText;
+        private bool inputChanged = false;
         private string outputText;
-        private string experimentFileName ="";
+        private string experimentFileName = "";
 
         #region Properties Getters and Setters
         public string InputText
@@ -39,9 +40,21 @@ namespace LMSF_Scheduler
             set
             {
                 this.inputText = value;
+                InputChanged = true;
                 OnPropertyChanged("InputText");
             }
         }
+
+        public bool InputChanged
+        {
+            get { return this.inputChanged; }
+            set
+            {
+                this.inputChanged = value;
+                OnPropertyChanged("InputChanged");
+            }
+        }
+
         public string OutputText
         {
             get { return this.outputText; }
@@ -64,9 +77,8 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            testTextBox.Text = "button pushed";
+            testTextBox.Text = $"{InputChanged}";
             string message = InputText + ", " + OutputText;
-            MessageBoxResult result = MessageBox.Show(message);
         }
 
         protected void OnPropertyChanged(string name)
@@ -85,27 +97,77 @@ namespace LMSF_Scheduler
             OutputText += addon;
         }
 
+        private bool SaveFirstQuery()
+        {
+            string messageBoxText = "Do you want to save changes first?";
+            string caption = "Save File?";
+            MessageBoxButton button = MessageBoxButton.YesNoCancel;
+            MessageBoxImage icon = MessageBoxImage.Warning;
+
+            bool okToGo = false;
+
+            MessageBoxResult result = MessageBox.Show(messageBoxText, caption, button, icon);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    // User pressed Yes button
+                    Save();
+                    okToGo = true;
+                    break;
+                case MessageBoxResult.No:
+                    // User pressed No button
+                    // do nothing (go ahead without saving)
+                    okToGo = true;
+                    break;
+                case MessageBoxResult.Cancel:
+                    // User pressed Cancel button
+                    okToGo = false;
+                    break;
+            }
+            return okToGo;
+        }
+
         private void NewMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            testTextBox.Text = "New...";
+            if (!InputChanged || SaveFirstQuery())
+            {
+                InputText = "";
+                experimentFileName = "";
+            }
+            
         }
 
         private void OpenMenuItme_Click(object sender, RoutedEventArgs e)
+        {
+            if (!InputChanged || SaveFirstQuery())
+            {
+                Open();
+            }
+        }
+
+        private void Open()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Text file (*.txt)|*.txt";
             if (openFileDialog.ShowDialog() == true)
             {
                 InputText = File.ReadAllText(openFileDialog.FileName);
+                experimentFileName = openFileDialog.FileName;
+                InputChanged = false;
             }
-                
         }
 
         private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (experimentFileName!="")
+            Save();
+        }
+
+        private void Save()
+        {
+            if (experimentFileName != "")
             {
                 File.WriteAllText(experimentFileName, InputText);
+                InputChanged = false;
             }
             else
             {
@@ -126,6 +188,7 @@ namespace LMSF_Scheduler
             {
                 File.WriteAllText(saveFileDialog.FileName, InputText);
                 experimentFileName = saveFileDialog.FileName;
+                InputChanged = false;
             }
         }
 
