@@ -133,5 +133,15 @@ namespace LMSF_Scheduler
         {
 
         }
+
+        private void InsertFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Select File Path to Insert";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                InputText += openFileDialog.FileName;
+            }
+        }
     }
 }
