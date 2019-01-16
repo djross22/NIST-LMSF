@@ -30,15 +30,43 @@ namespace LMSF_Scheduler
         //Fields used to keep track of list of automation steps
         private string inputText = "";
         private bool inputChanged = false;
-        private string[] inputSteps;
         private string outputText;
         private string experimentFileName = "";
+
+        //For parsing and running steps
+        private string[] inputSteps;
+        private int stepNum;
+        private int totalSteps;
+        private bool isRunning = false;
+        private bool isPaused = true;
 
         //Window title, app name, plus file name, plus * to indicate unsaved changes
         private static string appName = "LMSF Scheduler";
         private string displayTitle = appName + " - ";
 
         #region Properties Getters and Setters
+        public bool IsPaused
+        {
+            get { return this.isPaused; }
+            set
+            {
+                this.isPaused = value;
+                UpdateEnabledState();
+                OnPropertyChanged("IsPaused");
+            }
+        }
+
+        public bool IsRunning
+        {
+            get { return this.isRunning; }
+            set
+            {
+                this.isRunning = value;
+                UpdateEnabledState();
+                OnPropertyChanged("IsPaused");
+            }
+        }
+
         public string ExperimentFileName
         {
             get { return this.experimentFileName; }
@@ -93,12 +121,41 @@ namespace LMSF_Scheduler
         }
         #endregion
 
+        private void UpdateEnabledState()
+        {
+            //The UpdateEnabledState method is called by property Setters to maintain the appropriate enabled state of the GUI controls
+            // Use private fields (instead of properties) here to avoid property update feedback loop (e.g. isPaused instead of IsPaused)
+            if (this.isRunning)
+            {
+                playButton.IsEnabled = isPaused;
+                pauseButton.IsEnabled = !isPaused;
+                stepButton.IsEnabled = isPaused;
+                rewindButton.IsEnabled = isPaused;
+                abortButton.IsEnabled = true;
+
+                inputTextBox.IsEnabled = false;
+                insertFileButton.IsEnabled = false;
+                mainMenu.IsEnabled = false;
+            }
+            else
+            {
+                playButton.IsEnabled = true;
+                pauseButton.IsEnabled = false;
+                stepButton.IsEnabled = true;
+                rewindButton.IsEnabled = true;
+                abortButton.IsEnabled = false;
+
+                inputTextBox.IsEnabled = true;
+                insertFileButton.IsEnabled = true;
+                mainMenu.IsEnabled = true;
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
         }
-
 
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
@@ -254,14 +311,23 @@ namespace LMSF_Scheduler
         }
 
         //Breaks the InputText into steps/lines
-        private void ParseSteps()
+        private void InitSteps()
         {
-            inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            //remove leading and trailing white space from each line
+            inputSteps = inputSteps.Select(s => s.Trim()).ToArray();
+            //then delete any lines that were just white space (are now empty)
+            inputSteps = inputSteps.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            stepNum = 0;
+            totalSteps = inputSteps.Length;
+            OutputText = "";
         }
 
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            ParseSteps();
+            InitSteps();
             OutputText = "";
             int stepNum = 1;
             foreach (string s in inputSteps)
@@ -275,12 +341,52 @@ namespace LMSF_Scheduler
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
+            IsRunning = true;
+        }
 
+        private void Step()
+        {
+            //Initialize steps if starting a new run
+            if (!IsRunning)
+            {
+                IsRunning = true;
+                InitSteps();
+            }
+
+            if (stepNum<totalSteps)
+            {
+                OutputText += ParseStep(inputSteps[stepNum]);
+                stepNum++;
+            }
+            else
+            {
+                IsRunning = false;
+                IsPaused = true;
+            }
+        }
+
+        private string ParseStep(string step)
+        {
+            string outString = $"{stepNum}. ";
+            string[] stepArgs = step.Split(new[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+
+            stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
+            stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            outString += "++";
+            foreach (string s in stepArgs)
+            {
+                outString += s + ", ";
+            }
+            outString += "++";
+
+            outString += "\r\n";
+            return outString;
         }
 
         private void StepButton_Click(object sender, RoutedEventArgs e)
         {
-
+            Step();
         }
 
         private void RewindButton_Click(object sender, RoutedEventArgs e)
@@ -290,7 +396,8 @@ namespace LMSF_Scheduler
 
         private void AbortButton_Click(object sender, RoutedEventArgs e)
         {
-
+            IsRunning = false;
+            IsPaused = true;
         }
     }
 }

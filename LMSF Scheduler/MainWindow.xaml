@@ -8,7 +8,7 @@
         Title="{Binding DisplayTitle}" Height="450" Width="800" Background="{DynamicResource PurpleBackgroundBrush}">
     <Grid>
         <DockPanel Margin="0">
-            <Menu x:Name="___No_Name_" VerticalAlignment="Top" DockPanel.Dock="Top" FocusManager.IsFocusScope="False">
+            <Menu x:Name="mainMenu" VerticalAlignment="Top" DockPanel.Dock="Top" FocusManager.IsFocusScope="False">
                 <MenuItem Header="_File">
                     <MenuItem x:Name="newMenuItem" Header="New" Click="NewMenuItem_Click"/>
                     <MenuItem x:Name="openMenuItme" Header="Open" Click="OpenMenuItme_Click"/>
@@ -20,13 +20,13 @@
             </Menu>
             <ToolBarTray VerticalAlignment="Top" DockPanel.Dock="Top">
                 <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False">
-                    <Button x:Name="startButton" ToolTip="Start Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="StartButton_Click">
+                    <Button x:Name="playButton" ToolTip="Run/Continue Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="PlayButton_Click">
                         <Image Source="start.png" Height="25"/>
                     </Button>
                     <Button x:Name="pauseButton" ToolTip="Pause Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="PauseButton_Click">
                         <Image Source="pause.png" Height="25"/>
                     </Button>
-                    <Button x:Name="stepButton" ToolTip="Single Step" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="StepButton_Click">
+                    <Button x:Name="stepButton" ToolTip="Run Single Step" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="StepButton_Click">
                         <Image Source="step.png" Height="25"/>
                     </Button>
                     <Button x:Name="rewindButton" ToolTip="Single Step" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="RewindButton_Click">
