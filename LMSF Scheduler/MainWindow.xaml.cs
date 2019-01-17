@@ -459,7 +459,8 @@ namespace LMSF_Scheduler
         private void RunOverlord(string file)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"C:\Users\djross\source\repos\NIST LMSF\Overlord Simulator\bin\Release\Overlord.Main.exe";
+            //startInfo.FileName = @"C:\Users\djross\source\repos\NIST LMSF\Overlord Simulator\bin\Release\Overlord.Main.exe";
+            startInfo.FileName = @"C:\Program Files (x86)\PAA\Overlord3\Overlord.Main.exe";
             startInfo.Arguments = "\"" + file + "\"" + " -r -c";
             Process ovProcess = Process.Start(startInfo);
             
