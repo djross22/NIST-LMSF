@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -457,7 +458,11 @@ namespace LMSF_Scheduler
 
         private void RunOverlord(string file)
         {
-
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = @"C:\Users\djross\source\repos\NIST LMSF\Overlord Simulator\bin\Release\Overlord.Main.exe";
+            startInfo.Arguments = "\"" + file + "\"" + " -r -c";
+            Process ovProcess = Process.Start(startInfo);
+            
         }
     }
 }
