@@ -66,13 +66,29 @@ LMSF Scheduler: Make input and output Text Boxes accept enter, nowrap, auto scro
 
 LMSF Scheduler: Finish File menu functions, and add code to prompt for file save when inputText has changed as appropriately
 
+LMSF Scheduler: Fix code for "Insert File Path" so that file path string is inserted at the textBox caret location; 
+    insert ParseSteps() method to break up inputText into lines; Add Rewind button; Add blank button click handlers for Play, Step, Pause, etc.
+
+LMSF Scheduler: Add inputTextBox.Focus() at the end of each menu item action to return focus to the text box
+
+LMSF Scheduler: Add filename to main window title, with * to indicate unsaved changes
+
+LMSF Scheduler: Rename "startButton" -> "playButton"; add fields for parsing and running steps; and add test code for line/step parsing
+
+LMSF Scheduler: Add validate button to test string parsing; fix tooltip text for other buttons
+
+LMSF Scheduler: Add Overlord to step parser; Add basic validation method run when validateButton clicked (same as Play, but sets isValidating flag so actual actions can be turned off)
+
+LMSF Scheduler: Add System.Diagnostics.Process code to run Overlord.Main.exe
+
+Overlord Simulator: Set Main window icon =  LMSF icon
 
 
 
+Make it wait until each step is done-
 
-Finish adding steps based on type of step. Sub-class for different step types?
 
-Need an edit step dialog for each step type.
+
 
 User input steps: need C# metadata -> xml?
 
