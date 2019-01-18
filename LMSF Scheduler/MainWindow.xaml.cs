@@ -36,6 +36,8 @@ namespace LMSF_Scheduler
 
         //For parsing and running steps
         private string[] inputSteps;
+        private bool[] stepsRunning;
+        private bool waitingForStepCompletion;
         private int stepNum;
         private int totalSteps;
         private bool isRunning = false;
@@ -325,6 +327,10 @@ namespace LMSF_Scheduler
 
             stepNum = 0;
             totalSteps = inputSteps.Length;
+
+            //init running state for each step
+            stepsRunning = Enumerable.Repeat(false, totalSteps).ToArray();
+
             OutputText = "";
         }
 
@@ -363,7 +369,7 @@ namespace LMSF_Scheduler
 
             if (stepNum<totalSteps)
             {
-                OutputText += ParseStep(inputSteps[stepNum]);
+                OutputText += ParseStep(stepNum, inputSteps[stepNum]);
                 stepNum++;
             }
             else
@@ -373,9 +379,9 @@ namespace LMSF_Scheduler
             }
         }
 
-        private string ParseStep(string step)
+        private string ParseStep(int num, string step)
         {
-            string outString = $"{stepNum}. ";
+            string outString = $"{num}. ";
             string[] stepArgs = step.Split(new[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
 
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
@@ -394,7 +400,7 @@ namespace LMSF_Scheduler
                         if (numArgs<2)
                         {
                             outString += "No procedure path give.";
-                            valFailed.Add(stepNum);
+                            valFailed.Add(num);
                         }
                         else
                         {
@@ -402,13 +408,13 @@ namespace LMSF_Scheduler
 
                             if (!isValidating)
                             {
-                                RunOverlord(stepArgs[1]);
+                                RunOverlord(num, stepArgs[1]);
                             }
                             
                         }
                         break;
                     default:
-                        valFailed.Add(stepNum);
+                        valFailed.Add(num);
                         outString += "Step type not recongnized: ";
                         foreach (string s in stepArgs)
                         {
@@ -456,14 +462,53 @@ namespace LMSF_Scheduler
             isValidating = false;
         }
 
-        private void RunOverlord(string file)
+        private void RunOverlord(int num, string file)
         {
+            waitingForStepCompletion = true;
+            stepsRunning[num] = true;
+
             ProcessStartInfo startInfo = new ProcessStartInfo();
             //startInfo.FileName = @"C:\Users\djross\source\repos\NIST LMSF\Overlord Simulator\bin\Release\Overlord.Main.exe";
             startInfo.FileName = @"C:\Program Files (x86)\PAA\Overlord3\Overlord.Main.exe";
             startInfo.Arguments = "\"" + file + "\"" + " -r -c";
             Process ovProcess = Process.Start(startInfo);
-            
+
+            //TODO: replace "if (true)" with "if (waitUntilFinished)
+            if (true)
+            {
+                BackgroundWorker ovWorker = new BackgroundWorker();
+                ovWorker.WorkerReportsProgress = false;
+                ovWorker.DoWork += OutsideProcessMonitor_DoWork;
+
+                List<object> arguments = new List<object>();
+                arguments.Add(num);
+                arguments.Add(ovProcess);
+                ovWorker.RunWorkerAsync(arguments);
+            }
+            else
+            {
+                waitingForStepCompletion = false;
+            }
+
+            while (waitingForStepCompletion)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
         }
+
+        void OutsideProcessMonitor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            List<object> argsList = e.Argument as List<object>;
+            int num = (int)argsList[0];
+            Process outside_Process = argsList[1] as Process;
+
+            while (!outside_Process.HasExited)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+
+            waitingForStepCompletion = false;
+        }
+
     }
 }
