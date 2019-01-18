@@ -144,9 +144,9 @@ namespace Overlord_Simulator
                 simTimeProgressBar.Value = 0;
                 BackgroundWorker worker = new BackgroundWorker();
                 worker.WorkerReportsProgress = true;
-                worker.DoWork += worker_DoWork;
-                worker.ProgressChanged += worker_ProgressChanged;
-                worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+                worker.DoWork += Worker_DoWork;
+                worker.ProgressChanged += Worker_ProgressChanged;
+                worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
                 worker.RunWorkerAsync(simTime);
                 //End code from https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
             }
@@ -160,7 +160,7 @@ namespace Overlord_Simulator
         }
 
         // More code (mostly) from: https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
-        void worker_DoWork(object sender, DoWorkEventArgs e)
+        void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             int sleepTime = Convert.ToInt32((float)e.Argument * 10);
             int simProgress = 0;
@@ -177,12 +177,12 @@ namespace Overlord_Simulator
             }
         }
 
-        void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             simTimeProgressBar.Value = e.ProgressPercentage;
         }
 
-        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             //close App if -c option
             if (closeAutomatically)
