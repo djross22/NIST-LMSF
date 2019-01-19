@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -50,6 +51,19 @@ namespace LMSF_Scheduler
         private string displayTitle = appName + " - ";
 
         #region Properties Getters and Setters
+        private bool WaitingForStepCompletion
+        {
+            get
+            {
+                return this.waitingForStepCompletion;
+            }
+            set
+            {
+                this.waitingForStepCompletion = value;
+                //OnPropertyChanged("WaitingForStepCompletion");
+            }
+        }
+
         public bool IsPaused
         {
             get { return this.isPaused; }
@@ -355,6 +369,7 @@ namespace LMSF_Scheduler
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO: ???
             IsRunning = true;
         }
 
@@ -464,7 +479,7 @@ namespace LMSF_Scheduler
 
         private void RunOverlord(int num, string file)
         {
-            waitingForStepCompletion = true;
+            WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -487,10 +502,10 @@ namespace LMSF_Scheduler
             }
             else
             {
-                waitingForStepCompletion = false;
+                WaitingForStepCompletion = false;
             }
 
-            while (waitingForStepCompletion)
+            while (WaitingForStepCompletion)
             {
                 System.Threading.Thread.Sleep(100);
             }
@@ -504,10 +519,10 @@ namespace LMSF_Scheduler
 
             while (!outside_Process.HasExited)
             {
-                System.Threading.Thread.Sleep(100);
+                Thread.Sleep(100);
             }
 
-            waitingForStepCompletion = false;
+            WaitingForStepCompletion = false;
         }
 
     }
