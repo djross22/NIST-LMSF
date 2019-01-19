@@ -58,7 +58,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBox x:Name="inputTextBox" Margin="10,10,10,0" TextWrapping="NoWrap"  Text="{Binding InputText, Mode=TwoWay}" Grid.Row="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
                 <TextBlock Margin="10,5,10,0" TextWrapping="Wrap" Text="    Steps Input:" Background="White" FontWeight="Bold" VerticalAlignment="Bottom" Height="20"/>
-                <TextBox x:Name="outputTextBox" Grid.Column="1" Margin="10,10,10,0" Grid.Row="1" TextWrapping="NoWrap" Text="{Binding OutputText, Mode=TwoWay}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" Background="#FFCBCBCB"/>
+                <TextBox x:Name="outputTextBox" Grid.Column="1" Margin="10,10,10,0" Grid.Row="1" TextWrapping="Wrap"  Text="{Binding OutputText, Mode=TwoWay}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" Background="#FFCBCBCB"/>
                 <TextBlock Grid.Column="1" Margin="10,5,10,0" TextWrapping="Wrap" Text="    Steps Output:" Background="#FFCBCBCB" FontWeight="Bold" VerticalAlignment="Bottom" Height="20"/>
             </Grid>
         </DockPanel>
