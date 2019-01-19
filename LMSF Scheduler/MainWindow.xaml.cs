@@ -431,7 +431,7 @@ namespace LMSF_Scheduler
                         bool isOvpFileName = false;
                         if (numArgs < 2)
                         {
-                            outString += "No procedure path give.";
+                            outString += "No procedure path given.";
                             valFailed.Add(num);
                         }
                         else
@@ -465,6 +465,37 @@ namespace LMSF_Scheduler
                                 outString += "Procedure file not found: ";
                                 outString += stepArgs[1];
                                 valFailed.Add(num);
+                            }
+                        }
+                        break;
+                    case "Wait":
+                        outString += "Running Wait step: ";
+                        int waitTime = 0;
+                        bool isInteger = false;
+                        if (numArgs < 2)
+                        {
+                            outString += "No wait time given.";
+                            valFailed.Add(num);
+                        }
+                        else
+                        {
+                            if (int.TryParse(stepArgs[1], out waitTime))
+                            {
+                                isInteger = true;
+                            }
+                            else
+                            {
+                                outString += "Wait time parameter is not an integer: ";
+                                outString += stepArgs[1];
+                                valFailed.Add(num);
+                            }
+                        }
+
+                        if (isInteger)
+                        {
+                            if (!isValidating)
+                            {
+                                RunWaitStep(num, waitTime);
                             }
                         }
                         break;
@@ -623,6 +654,48 @@ namespace LMSF_Scheduler
             while (!outside_Process.HasExited)
             {
                 Thread.Sleep(100);
+            }
+
+            WaitingForStepCompletion = false;
+        }
+        
+        private void RunWaitStep(int num, int waitSeconds)
+        {
+            WaitingForStepCompletion = true;
+            stepsRunning[num] = true;
+            
+            //TODO: replace "if (true)" with "if (waitUntilFinished)
+            if (true)
+            {
+                BackgroundWorker waitWorker = new BackgroundWorker();
+                waitWorker.WorkerReportsProgress = false;
+                waitWorker.DoWork += WaitWorker_DoWork;
+
+                waitWorker.RunWorkerAsync(waitSeconds);
+            }
+            else
+            {
+                WaitingForStepCompletion = false;
+            }
+
+            while (WaitingForStepCompletion)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+        }
+
+        void WaitWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            int waitTime = (int)e.Argument;
+
+            DateTime startTime = DateTime.Now;
+
+            double diffInSeconds = (DateTime.Now - startTime).TotalSeconds;
+
+            while (diffInSeconds < waitTime)
+            {
+                Thread.Sleep(100);
+                diffInSeconds = (DateTime.Now - startTime).TotalSeconds;
             }
 
             WaitingForStepCompletion = false;
