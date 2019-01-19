@@ -486,14 +486,18 @@ namespace LMSF_Scheduler
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            //Change the IsPaused property to false
-            IsPaused = false;
-            IsRunning = true;
-            isValidating = false;
-            valFailed = new List<int>();
+            //Run validation check before ruanning actual experiment
+            if (Validate())
+            {
+                //Change the IsPaused property to false
+                IsPaused = false;
+                IsRunning = true;
+                isValidating = false;
+                valFailed = new List<int>();
 
-            Play();
-
+                Play();
+            }
+            
             inputTextBox.Focus();
         }
 
@@ -533,12 +537,14 @@ namespace LMSF_Scheduler
             IsPaused = true;
         }
 
-        private void ValidateButton_Click(object sender, RoutedEventArgs e)
+        private bool Validate()
         {
             IsPaused = false;
             IsRunning = true;
             isValidating = true;
             valFailed = new List<int>();
+
+            bool valReturn = false;
 
             // For validation, run in the main thread...
             StepRunner_DoWork(this, new DoWorkEventArgs(this));
@@ -547,7 +553,7 @@ namespace LMSF_Scheduler
             IsRunning = false;
             //###
 
-            if (valFailed.Count>0)
+            if (valFailed.Count > 0)
             {
                 OutputText += "\r\n";
                 OutputText += "Validation failed on the following steps:\r\n";
@@ -560,8 +566,16 @@ namespace LMSF_Scheduler
             {
                 OutputText += "\r\n";
                 OutputText += "Validation sucessful.\r\n";
+                valReturn = true;
             }
             isValidating = false;
+
+            return valReturn;
+        }
+
+        private void ValidateButton_Click(object sender, RoutedEventArgs e)
+        {
+            Validate();
 
             inputTextBox.Focus();
         }
