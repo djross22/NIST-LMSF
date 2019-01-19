@@ -46,6 +46,9 @@ namespace LMSF_Scheduler
         private bool isValidating = false;
         private List<int> valFailed;
 
+        //Background worker to run steps
+        private BackgroundWorker runStepsWorker = new BackgroundWorker();
+
         //Window title, app name, plus file name, plus * to indicate unsaved changes
         private static string appName = "LMSF Scheduler";
         private string displayTitle = appName + " - ";
@@ -348,41 +351,55 @@ namespace LMSF_Scheduler
             OutputText = "";
         }
 
-        private void Play()
+        private void StepRunner_DoWork(object sender, DoWorkEventArgs e)
         {
             InitSteps();
-            IsRunning = true;
-            IsPaused = false;
-
-            while (IsRunning && !IsPaused)
+            
+            while (IsRunning)
             {
-                Step();
+                if (IsPaused)
+                {
+                    Thread.Sleep(100);
+                }
+                else
+                {
+                    Step();
+                }
+                
             }
+
         }
 
-        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        private void StepRunner_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Play();
-
-            inputTextBox.Focus();
+            
         }
 
-        private void PauseButton_Click(object sender, RoutedEventArgs e)
+        private void StepRunner_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //TODO: ???
-            IsRunning = true;
+            IsPaused = true;
+            IsRunning = false;
+        }
+
+        private void RunSteps()
+        {
+            testTextBox.Text = "RunSteps()...";
+
+            //Set up the BackgroundWorker
+            runStepsWorker = new BackgroundWorker();
+            runStepsWorker.WorkerReportsProgress = false;
+            //runStepsWorker.WorkerReportsProgress = true;
+            runStepsWorker.DoWork += StepRunner_DoWork;
+            //runStepsWorker.ProgressChanged += StepRunner_ProgressChanged;
+            runStepsWorker.RunWorkerCompleted += StepRunner_RunWorkerCompleted;
+
+            //Start the BackgroundWorker
+            runStepsWorker.RunWorkerAsync();
         }
 
         private void Step()
         {
-            //Initialize steps if starting a new run
-            if (!IsRunning)
-            {
-                IsRunning = true;
-                InitSteps();
-            }
-
-            if (stepNum<totalSteps)
+            if (stepNum < totalSteps)
             {
                 OutputText += ParseStep(stepNum, inputSteps[stepNum]);
                 stepNum++;
@@ -390,7 +407,6 @@ namespace LMSF_Scheduler
             else
             {
                 IsRunning = false;
-                IsPaused = true;
             }
         }
 
@@ -404,7 +420,7 @@ namespace LMSF_Scheduler
 
             int numArgs = stepArgs.Length;
 
-            if (numArgs>0)
+            if (numArgs > 0)
             {
                 string stepType = stepArgs[0];
 
@@ -412,7 +428,7 @@ namespace LMSF_Scheduler
                 {
                     case "Overlord":
                         outString += "Running Overlord proccedure: ";
-                        if (numArgs<2)
+                        if (numArgs < 2)
                         {
                             outString += "No procedure path give.";
                             valFailed.Add(num);
@@ -425,7 +441,7 @@ namespace LMSF_Scheduler
                             {
                                 RunOverlord(num, stepArgs[1]);
                             }
-                            
+
                         }
                         break;
                     default:
@@ -440,13 +456,44 @@ namespace LMSF_Scheduler
                 outString += "\r\n";
             }
 
-            
             return outString;
+        }
+
+        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            //Change the IsPaused property to false
+            IsPaused = false;
+            IsRunning = true;
+
+            Play();
+
+            inputTextBox.Focus();
         }
 
         private void StepButton_Click(object sender, RoutedEventArgs e)
         {
-            Step();
+            //TODO: This is not right
+            //Change the IsPaused property to true
+            IsPaused = true;
+            IsRunning = true;
+
+            Play();
+        }
+
+        private void Play()
+        {
+            testTextBox.Text = "Play()...";
+            if (!runStepsWorker.IsBusy)
+            {
+                //If runStepsWorker is not already running, start it from the begining 
+                RunSteps();
+            }
+        }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: ???
+            IsPaused = true;
         }
 
         private void RewindButton_Click(object sender, RoutedEventArgs e)
@@ -464,7 +511,7 @@ namespace LMSF_Scheduler
         {
             isValidating = true;
             valFailed = new List<int>();
-            Play();
+            RunSteps();
             if (valFailed.Count>0)
             {
                 OutputText += "\r\n";
