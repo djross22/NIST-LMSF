@@ -82,7 +82,7 @@ namespace LMSF_Scheduler
             {
                 this.isRunning = value;
                 UpdateEnabledState();
-                OnPropertyChanged("IsPaused");
+                OnPropertyChanged("IsRunning");
             }
         }
 
