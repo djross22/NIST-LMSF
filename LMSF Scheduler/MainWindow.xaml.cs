@@ -464,6 +464,7 @@ namespace LMSF_Scheduler
             //Change the IsPaused property to false
             IsPaused = false;
             IsRunning = true;
+            isValidating = false;
 
             Play();
 
@@ -482,7 +483,6 @@ namespace LMSF_Scheduler
 
         private void Play()
         {
-            testTextBox.Text = "Play()...";
             if (!runStepsWorker.IsBusy)
             {
                 //If runStepsWorker is not already running, start it from the begining 
@@ -509,9 +509,18 @@ namespace LMSF_Scheduler
 
         private void ValidateButton_Click(object sender, RoutedEventArgs e)
         {
+            IsPaused = false;
+            IsRunning = true;
             isValidating = true;
             valFailed = new List<int>();
-            RunSteps();
+
+            // For validation, run in the main thread...
+            StepRunner_DoWork(this, new DoWorkEventArgs(this));
+            //### Copy code from StepRunner_RunWorkerCompleted
+            IsPaused = true;
+            IsRunning = false;
+            //###
+
             if (valFailed.Count>0)
             {
                 OutputText += "\r\n";
@@ -521,7 +530,14 @@ namespace LMSF_Scheduler
                     OutputText += $"{i}, ";
                 }
             }
+            else
+            {
+                OutputText += "\r\n";
+                OutputText += "Validation sucessful.\r\n";
+            }
             isValidating = false;
+
+            inputTextBox.Focus();
         }
 
         private void RunOverlord(int num, string file)
