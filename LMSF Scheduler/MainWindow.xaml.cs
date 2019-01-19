@@ -428,6 +428,7 @@ namespace LMSF_Scheduler
                 {
                     case "Overlord":
                         outString += "Running Overlord proccedure: ";
+                        bool isOvpFileName = false;
                         if (numArgs < 2)
                         {
                             outString += "No procedure path give.";
@@ -435,13 +436,36 @@ namespace LMSF_Scheduler
                         }
                         else
                         {
-                            outString += stepArgs[1];
-
-                            if (!isValidating)
+                            if (stepArgs[1].EndsWith(".ovp"))
                             {
-                                RunOverlord(num, stepArgs[1]);
+                                isOvpFileName = true;
                             }
+                            else
+                            {
+                                outString += "Not a valid Overlord procedure filename: ";
+                                outString += stepArgs[1];
+                                valFailed.Add(num);
+                            }
+                        }
 
+                        if (isOvpFileName)
+                        {
+                            bool ovpExists = File.Exists(stepArgs[1]);
+                            if (ovpExists)
+                            {
+                                outString += stepArgs[1];
+
+                                if (!isValidating)
+                                {
+                                    RunOverlord(num, stepArgs[1]);
+                                }
+                            }
+                            else
+                            {
+                                outString += "Procedure file not found: ";
+                                outString += stepArgs[1];
+                                valFailed.Add(num);
+                            }
                         }
                         break;
                     default:
@@ -454,6 +478,7 @@ namespace LMSF_Scheduler
                         break;
                 }
                 outString += "\r\n";
+                outString += "\r\n";
             }
 
             return outString;
@@ -465,6 +490,7 @@ namespace LMSF_Scheduler
             IsPaused = false;
             IsRunning = true;
             isValidating = false;
+            valFailed = new List<int>();
 
             Play();
 
