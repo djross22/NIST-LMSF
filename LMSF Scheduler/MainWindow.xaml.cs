@@ -53,6 +53,9 @@ namespace LMSF_Scheduler
         //Overlord process (runs Overlord.Main.exe)
         private Process ovProcess;
 
+        //Timer dialog window
+        private TimerDialog stepTimerDialog;
+
         //Window title, app name, plus file name, plus * to indicate unsaved changes
         private static string appName = "LMSF Scheduler";
         private string displayTitle = appName + " - ";
@@ -186,9 +189,9 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            TimerDialog timerDialog = new TimerDialog("LMSF Timer", 10);
-            timerDialog.Owner = this;
-            timerDialog.ShowDialog();
+            stepTimerDialog = new TimerDialog("LMSF Timer", 10);
+            stepTimerDialog.Owner = this;
+            stepTimerDialog.ShowDialog();
         }
 
         protected void OnPropertyChanged(string name)
@@ -201,10 +204,7 @@ namespace LMSF_Scheduler
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
         {
-            string addon = " test add text";
-            InputText += addon;
-            addon = " test add out text";
-            OutputText += addon;
+            RunTimer(1, 10);
         }
 
         private void UpdateTitle()
@@ -499,13 +499,13 @@ namespace LMSF_Scheduler
                             }
                         }
                         break;
-                    case "Wait":
-                        outString += "Running Wait step: ";
+                    case "Timer":
+                        outString += "Running Timer: ";
                         int waitTime = 0;
                         bool isInteger = false;
                         if (numArgs < 2)
                         {
-                            outString += "No wait time given.";
+                            outString += "No time given for the timer.";
                             valFailed.Add(num);
                         }
                         else
@@ -516,7 +516,7 @@ namespace LMSF_Scheduler
                             }
                             else
                             {
-                                outString += "Wait time parameter is not an integer: ";
+                                outString += "Timer time parameter is not an integer: ";
                                 outString += stepArgs[1];
                                 valFailed.Add(num);
                             }
@@ -526,7 +526,7 @@ namespace LMSF_Scheduler
                         {
                             if (!isValidating)
                             {
-                                RunWaitStep(num, waitTime);
+                                RunTimer(num, waitTime);
                             }
                         }
                         break;
@@ -712,52 +712,41 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = false;
         }
 
-        void WaitWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void RunTimer(int num, int waitTime)
         {
-            WaitingForStepCompletion = false;
-        }
+            //TODO: re-evaluate the need for these variables-
+            //WaitingForStepCompletion = true;
+            //stepsRunning[num] = true;
 
-        private void RunWaitStep(int num, int waitSeconds)
-        {
-            WaitingForStepCompletion = true;
-            stepsRunning[num] = true;
-
-            //This part starts the Wait process
-            BackgroundWorker waitWorker = new BackgroundWorker();
-            waitWorker.WorkerReportsProgress = true;
-            waitWorker.DoWork += WaitWorker_DoWork;
-            waitWorker.RunWorkerCompleted += WaitWorker_RunWorkerCompleted;
-
-            waitWorker.RunWorkerAsync(waitSeconds);
-
-            //This part monitors it and waits until its finished (if waitUntilFinished)
-            //TODO: replace "if (true)" with "if (waitUntilFinished)
-            if (true)
+            if (stepTimerDialog is null)
             {
-                //nothing else to do to monitor the Wait process, since it reports out with WaitingForStepCompletion = false
+                MessageBox.Show("timer Dialog is null");
             }
             else
             {
-                WaitingForStepCompletion = false;
+                MessageBox.Show("timer Dialog is NOT null");
+                if (stepTimerDialog.IsClosed)
+                {
+                    MessageBox.Show("... but it is closed.");
+                }
             }
 
-            while (WaitingForStepCompletion)
-            {
-                System.Threading.Thread.Sleep(100);
-            }
-        }
+            //if (!(timerDialog is null))
+            //{
+            //    if (timerDialog.IsActive)
+            //    {
+            //        OutputText += "... waiting for last Timer to finish.";
+            //        while (timerDialog.IsActive)
+            //        {
+            //            Thread.Sleep(100);
+            //        }
+            //    }
+            //}
 
-        void WaitWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            int waitTime = (int)e.Argument;
-
-            DateTime startTime = DateTime.Now;
-            double diffInSeconds = (DateTime.Now - startTime).TotalSeconds;
-            while (diffInSeconds < waitTime)
-            {
-                Thread.Sleep(100);
-                diffInSeconds = (DateTime.Now - startTime).TotalSeconds;
-            }
+            //This part starts the Timer
+            stepTimerDialog = new TimerDialog("LMSF Timer", waitTime);
+            stepTimerDialog.Owner = this;
+            stepTimerDialog.Show();
 
         }
 
