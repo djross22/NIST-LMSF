@@ -43,6 +43,7 @@ namespace LMSF_Scheduler
         private int stepNum;
         private int totalSteps;
         private bool isRunning = false;
+        private bool abortCalled = false;
         private bool isPaused = true;
         private bool isOneStep = false;
         private bool isValidating = false;
@@ -62,6 +63,18 @@ namespace LMSF_Scheduler
         private string displayTitle = appName + " - ";
 
         #region Properties Getters and Setters
+
+        public bool AbortCalled
+        {
+            get { return this.abortCalled; }
+            set
+            {
+                this.abortCalled = value;
+                UpdateEnabledState();
+                OnPropertyChanged("AbortCalled");
+            }
+        }
+
         private bool WaitingForStepCompletion
         {
             get
@@ -184,7 +197,7 @@ namespace LMSF_Scheduler
                 pauseButton.IsEnabled = false;
                 stepButton.IsEnabled = true;
                 rewindButton.IsEnabled = true;
-                abortButton.IsEnabled = false;
+                abortButton.IsEnabled = true;
 
                 inputTextBox.IsEnabled = true;
                 insertFileButton.IsEnabled = true;
@@ -400,18 +413,27 @@ namespace LMSF_Scheduler
 
         private void Step()
         {
-            if (stepNum < totalSteps)
+            if (AbortCalled)
             {
-                OutputText += ParseStep(stepNum, inputSteps[stepNum]);
-                stepNum++;
+                OutputText += "Method Aborted.\n";
+                this.Dispatcher.Invoke(() => { IsRunning = false;  });
             }
             else
             {
-                OutputText += "Done.\n";
-                this.Dispatcher.Invoke(() => { IsRunning = false; });
-            }
+                if (stepNum < totalSteps)
+                {
+                    OutputText += ParseStep(stepNum, inputSteps[stepNum]);
+                    stepNum++;
+                }
+                else
+                {
+                    OutputText += "Done.\n";
+                    this.Dispatcher.Invoke(() => { IsRunning = false; });
+                }
 
-            this.Dispatcher.Invoke(() => { IsOneStep = false; });
+                this.Dispatcher.Invoke(() => { IsOneStep = false; });
+            }
+            
         }
 
         private string ParseStep(int num, string step)
@@ -550,18 +572,25 @@ namespace LMSF_Scheduler
             //Make sure that any edits in the inputTextBox are updated to the InputTest property
             inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
-            //Run validation check before ruanning actual experiment
-            if (Validate())
+            if (runStepsThread.IsAlive)
             {
-                //Change the IsPaused property to false
+                //If the steps are already running, take it out of the paused state
                 IsPaused = false;
-                IsRunning = true;
-                isValidating = false;
-                valFailed = new List<int>();
-
-                Play();
             }
-            
+            else
+            {
+                //if the step-runner thread is not already running, start it up
+
+                //Run validation check before ruanning actual experiment
+                if (Validate())
+                {
+                    //Change the IsPaused property to false
+                    IsPaused = false;
+
+                    Play();
+                }
+            }
+
         }
 
         private void StepButton_Click(object sender, RoutedEventArgs e)
@@ -582,9 +611,6 @@ namespace LMSF_Scheduler
                 {
                     IsPaused = true;
                     IsOneStep = true;
-                    IsRunning = true;
-                    isValidating = false;
-                    valFailed = new List<int>();
 
                     Play();
                 }
@@ -594,6 +620,11 @@ namespace LMSF_Scheduler
 
         private void Play()
         {
+            AbortCalled = false;
+            IsRunning = true;
+            isValidating = false;
+            valFailed = new List<int>();
+
             //If runStepsThread is not already running, start it from the begining
             if (!runStepsThread.IsAlive)
             {
@@ -606,7 +637,6 @@ namespace LMSF_Scheduler
             //Make sure that any edits in the inputTextBox are updated to the InputTest property
             inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
-            //TODO: ???
             IsPaused = true;
         }
 
@@ -620,8 +650,11 @@ namespace LMSF_Scheduler
         {
             //Make sure that any edits in the inputTextBox are updated to the InputTest property
             inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            IsRunning = false;
-            IsPaused = true;
+
+            AbortCalled = true;
+
+            //Set IsPaused = true, so that StepsThreadProc() will go ahead to the next step where the Abort action happens
+            IsPaused = false;
         }
 
         private bool Validate()
