@@ -49,6 +49,9 @@ namespace LMSF_Scheduler
         //Background worker to run steps
         private BackgroundWorker runStepsWorker = new BackgroundWorker();
 
+        //Overlord process (runs Overlord.Main.exe)
+        private Process ovProcess;
+
         //Window title, app name, plus file name, plus * to indicate unsaved changes
         private static string appName = "LMSF Scheduler";
         private string displayTitle = appName + " - ";
@@ -468,6 +471,32 @@ namespace LMSF_Scheduler
                             }
                         }
                         break;
+                    case "WaitFor":
+                        outString += "WaitFor: ";
+                        if (numArgs < 2)
+                        {
+                            outString += "Must specify the process to WaitFor (Overlord or Timer)";
+                            valFailed.Add(num);
+                        }
+                        else
+                        {
+                            switch (stepArgs[1])
+                            {
+                                case "Overlord":
+                                    outString += "Overlord.";
+                                    if (!isValidating)
+                                    {
+                                        WaitForOverlord(num);
+                                    }
+                                    break;
+                                default:
+                                    outString += "WaitFor process not recognized: ";
+                                    outString += stepArgs[1];
+                                    valFailed.Add(num);
+                                    break;
+                            }
+                        }
+                        break;
                     case "Wait":
                         outString += "Running Wait step: ";
                         int waitTime = 0;
@@ -613,39 +642,54 @@ namespace LMSF_Scheduler
 
         private void RunOverlord(int num, string file)
         {
+            //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
+
+            if ( !(ovProcess is null) )
+            {
+                if (!ovProcess.HasExited)
+                {
+                    OutputText += "... waiting for last Overlord Process to exit.";
+                    while (!ovProcess.HasExited)
+                    {
+                        Thread.Sleep(100);
+                    }
+                }
+            }
 
             //This part starts the Overlord process
             ProcessStartInfo startInfo = new ProcessStartInfo();
             //startInfo.FileName = @"C:\Users\djross\source\repos\NIST LMSF\Overlord Simulator\bin\Release\Overlord.Main.exe";
             startInfo.FileName = @"C:\Program Files (x86)\PAA\Overlord3\Overlord.Main.exe";
             startInfo.Arguments = "\"" + file + "\"" + " -r -c";
-            Process ovProcess = Process.Start(startInfo);
+            ovProcess = Process.Start(startInfo);
 
-            //This part monitors it and waits until its finished (if waitUntilFinished)
-            //TODO: replace "if (true)" with "if (waitUntilFinished)
-            if (true)
-            {
-                BackgroundWorker ovMonitorWorker = new BackgroundWorker();
-                ovMonitorWorker.WorkerReportsProgress = false;
-                ovMonitorWorker.DoWork += OutsideProcessMonitor_DoWork;
-                ovMonitorWorker.RunWorkerCompleted += OutsideProcessMonitor_RunWorkerCompleted;
+        }
 
-                List<object> arguments = new List<object>();
-                arguments.Add(num);
-                arguments.Add(ovProcess);
-                ovMonitorWorker.RunWorkerAsync(arguments);
-            }
-            else
-            {
-                WaitingForStepCompletion = false;
-            }
+        private void WaitForOverlord(int num)
+        {
+            //TODO: re-evaluate the need for these variables-
+            WaitingForStepCompletion = true;
+            stepsRunning[num] = true;
+
+            OutputText += "... waiting for Overlord Process to exit.";
+
+            BackgroundWorker ovMonitorWorker = new BackgroundWorker();
+            ovMonitorWorker.WorkerReportsProgress = false;
+            ovMonitorWorker.DoWork += OutsideProcessMonitor_DoWork;
+            ovMonitorWorker.RunWorkerCompleted += OutsideProcessMonitor_RunWorkerCompleted;
+
+            List<object> arguments = new List<object>();
+            arguments.Add(num);
+            arguments.Add(ovProcess);
+            ovMonitorWorker.RunWorkerAsync(arguments);
 
             while (WaitingForStepCompletion)
             {
                 System.Threading.Thread.Sleep(100);
             }
+
         }
 
         void OutsideProcessMonitor_DoWork(object sender, DoWorkEventArgs e)
