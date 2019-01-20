@@ -71,7 +71,15 @@ namespace LMSF_Scheduler
             {
                 this.abortCalled = value;
                 UpdateEnabledState();
-                OnPropertyChanged("AbortCalled");
+                if (this.abortCalled)
+                {
+                    abortButton.Background = new SolidColorBrush(Colors.Red);
+                }
+                else
+                {
+                    abortButton.Background = new SolidColorBrush(Colors.White);
+                }
+                //OnPropertyChanged("AbortCalled");
             }
         }
 
@@ -187,6 +195,17 @@ namespace LMSF_Scheduler
                 rewindButton.IsEnabled = isPaused;
                 abortButton.IsEnabled = true;
 
+                if (isPaused)
+                {
+                    statusBorder.Background = new SolidColorBrush(Colors.Yellow);
+                    statusTextBlock.Text = "Paused";
+                }
+                else
+                {
+                    statusBorder.Background = new SolidColorBrush(Colors.LimeGreen);
+                    statusTextBlock.Text = "Running";
+                }
+                
                 inputTextBox.IsEnabled = false;
                 insertFileButton.IsEnabled = false;
                 mainMenu.IsEnabled = false;
@@ -198,6 +217,9 @@ namespace LMSF_Scheduler
                 stepButton.IsEnabled = true;
                 rewindButton.IsEnabled = true;
                 abortButton.IsEnabled = true;
+
+                statusBorder.Background = new SolidColorBrush(Colors.Red);
+                statusTextBlock.Text = "Stopped";
 
                 inputTextBox.IsEnabled = true;
                 insertFileButton.IsEnabled = true;
