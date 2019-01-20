@@ -20,6 +20,9 @@ namespace LMSF_Utilities
     /// </summary>
     public partial class TimerDialog : Window
     {
+        //Used to detect whether or not the TimerDialog has closed
+        public bool IsClosed { get; private set; } = false;
+
         //Controls whether or not the progress bar Backgroundprocess runs
         private static bool _isRunning = true;
 
@@ -71,7 +74,7 @@ namespace LMSF_Utilities
         {
             this.Close();
         }
-
+        
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
             if (_isRunning)
@@ -89,6 +92,11 @@ namespace LMSF_Utilities
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            IsClosed = true;
         }
     }
 }
