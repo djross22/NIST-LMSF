@@ -48,7 +48,7 @@ namespace LMSF_Scheduler
         private List<int> valFailed;
 
         //Background worker to run steps
-        private BackgroundWorker runStepsWorker = new BackgroundWorker();
+        private Thread runStepsThread;
 
         //Overlord process (runs Overlord.Main.exe)
         private Process ovProcess;
@@ -183,6 +183,7 @@ namespace LMSF_Scheduler
         public MainWindow()
         {
             InitializeComponent();
+            runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
             DataContext = this;
         }
 
@@ -204,7 +205,8 @@ namespace LMSF_Scheduler
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
         {
-            RunTimer(1, 10);
+            //RunTimer(1, 10);
+            IsRunning = false;
         }
 
         private void UpdateTitle()
@@ -356,10 +358,10 @@ namespace LMSF_Scheduler
             OutputText = "";
         }
 
-        private void StepRunner_DoWork(object sender, DoWorkEventArgs e)
+        private void StepsThreadProc()
         {
             InitSteps();
-            
+
             while (IsRunning)
             {
                 if (IsPaused)
@@ -370,36 +372,17 @@ namespace LMSF_Scheduler
                 {
                     Step();
                 }
-                
             }
-
-        }
-
-        private void StepRunner_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            
-        }
-
-        private void StepRunner_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            IsPaused = true;
-            IsRunning = false;
         }
 
         private void RunSteps()
         {
             testTextBox.Text = "RunSteps()...";
 
-            //Set up the BackgroundWorker
-            runStepsWorker = new BackgroundWorker();
-            runStepsWorker.WorkerReportsProgress = false;
-            //runStepsWorker.WorkerReportsProgress = true;
-            runStepsWorker.DoWork += StepRunner_DoWork;
-            //runStepsWorker.ProgressChanged += StepRunner_ProgressChanged;
-            runStepsWorker.RunWorkerCompleted += StepRunner_RunWorkerCompleted;
+            runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
+            //runStepsThread.SetApartmentState(ApartmentState.STA);
 
-            //Start the BackgroundWorker
-            runStepsWorker.RunWorkerAsync();
+            runStepsThread.Start();
         }
 
         private void Step()
@@ -411,7 +394,7 @@ namespace LMSF_Scheduler
             }
             else
             {
-                IsRunning = false;
+                this.Dispatcher.Invoke(() => { IsRunning = false; });
             }
         }
 
@@ -575,9 +558,9 @@ namespace LMSF_Scheduler
 
         private void Play()
         {
-            if (!runStepsWorker.IsBusy)
+            //If runStepsThread is not already running, start it from the begining
+            if (!runStepsThread.IsAlive)
             {
-                //If runStepsWorker is not already running, start it from the begining 
                 RunSteps();
             }
         }
@@ -609,11 +592,7 @@ namespace LMSF_Scheduler
             bool valReturn = false;
 
             // For validation, run in the main thread...
-            StepRunner_DoWork(this, new DoWorkEventArgs(this));
-            //### Copy code from StepRunner_RunWorkerCompleted
-            IsPaused = true;
-            IsRunning = false;
-            //###
+            StepsThreadProc();
 
             if (valFailed.Count > 0)
             {
@@ -715,38 +694,28 @@ namespace LMSF_Scheduler
         private void RunTimer(int num, int waitTime)
         {
             //TODO: re-evaluate the need for these variables-
-            //WaitingForStepCompletion = true;
-            //stepsRunning[num] = true;
+            WaitingForStepCompletion = true;
+            stepsRunning[num] = true;
 
-            if (stepTimerDialog is null)
+            if (!(stepTimerDialog is null))
             {
-                MessageBox.Show("timer Dialog is null");
-            }
-            else
-            {
-                MessageBox.Show("timer Dialog is NOT null");
-                if (stepTimerDialog.IsClosed)
+                if (!stepTimerDialog.IsClosed)
                 {
-                    MessageBox.Show("... but it is closed.");
+                    OutputText += "... waiting for last Timer to finish.";
+                    while (!stepTimerDialog.IsClosed)
+                    {
+                        Thread.Sleep(100);
+                    }
                 }
             }
 
-            //if (!(timerDialog is null))
-            //{
-            //    if (timerDialog.IsActive)
-            //    {
-            //        OutputText += "... waiting for last Timer to finish.";
-            //        while (timerDialog.IsActive)
-            //        {
-            //            Thread.Sleep(100);
-            //        }
-            //    }
-            //}
-
-            //This part starts the Timer
-            stepTimerDialog = new TimerDialog("LMSF Timer", waitTime);
-            stepTimerDialog.Owner = this;
-            stepTimerDialog.Show();
+            //This part starts the Timer, which needs to be handled via a Dispatcher 
+            //    becasue the runStepsThread cannot directly handle GUI components
+            this.Dispatcher.Invoke(() => {
+                stepTimerDialog = new TimerDialog("LMSF Timer", waitTime);
+                stepTimerDialog.Owner = this;
+                stepTimerDialog.Show();
+            });
 
         }
 
