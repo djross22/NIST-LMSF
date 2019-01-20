@@ -616,23 +616,26 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
+            //This part starts the Overlord process
             ProcessStartInfo startInfo = new ProcessStartInfo();
             //startInfo.FileName = @"C:\Users\djross\source\repos\NIST LMSF\Overlord Simulator\bin\Release\Overlord.Main.exe";
             startInfo.FileName = @"C:\Program Files (x86)\PAA\Overlord3\Overlord.Main.exe";
             startInfo.Arguments = "\"" + file + "\"" + " -r -c";
             Process ovProcess = Process.Start(startInfo);
 
+            //This part monitors it and waits until its finished (if waitUntilFinished)
             //TODO: replace "if (true)" with "if (waitUntilFinished)
             if (true)
             {
-                BackgroundWorker ovWorker = new BackgroundWorker();
-                ovWorker.WorkerReportsProgress = false;
-                ovWorker.DoWork += OutsideProcessMonitor_DoWork;
+                BackgroundWorker ovMonitorWorker = new BackgroundWorker();
+                ovMonitorWorker.WorkerReportsProgress = false;
+                ovMonitorWorker.DoWork += OutsideProcessMonitor_DoWork;
+                ovMonitorWorker.RunWorkerCompleted += OutsideProcessMonitor_RunWorkerCompleted;
 
                 List<object> arguments = new List<object>();
                 arguments.Add(num);
                 arguments.Add(ovProcess);
-                ovWorker.RunWorkerAsync(arguments);
+                ovMonitorWorker.RunWorkerAsync(arguments);
             }
             else
             {
@@ -656,22 +659,36 @@ namespace LMSF_Scheduler
                 Thread.Sleep(100);
             }
 
+        }
+
+        void OutsideProcessMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
             WaitingForStepCompletion = false;
         }
-        
+
+        void WaitWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            WaitingForStepCompletion = false;
+        }
+
         private void RunWaitStep(int num, int waitSeconds)
         {
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
-            
+
+            //This part starts the Wait process
+            BackgroundWorker waitWorker = new BackgroundWorker();
+            waitWorker.WorkerReportsProgress = true;
+            waitWorker.DoWork += WaitWorker_DoWork;
+            waitWorker.RunWorkerCompleted += WaitWorker_RunWorkerCompleted;
+
+            waitWorker.RunWorkerAsync(waitSeconds);
+
+            //This part monitors it and waits until its finished (if waitUntilFinished)
             //TODO: replace "if (true)" with "if (waitUntilFinished)
             if (true)
             {
-                BackgroundWorker waitWorker = new BackgroundWorker();
-                waitWorker.WorkerReportsProgress = false;
-                waitWorker.DoWork += WaitWorker_DoWork;
-
-                waitWorker.RunWorkerAsync(waitSeconds);
+                //nothing else to do to monitor the Wait process, since it reports out with WaitingForStepCompletion = false
             }
             else
             {
@@ -689,16 +706,13 @@ namespace LMSF_Scheduler
             int waitTime = (int)e.Argument;
 
             DateTime startTime = DateTime.Now;
-
             double diffInSeconds = (DateTime.Now - startTime).TotalSeconds;
-
             while (diffInSeconds < waitTime)
             {
                 Thread.Sleep(100);
                 diffInSeconds = (DateTime.Now - startTime).TotalSeconds;
             }
 
-            WaitingForStepCompletion = false;
         }
 
     }
