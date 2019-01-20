@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using LMSF_Utilities;
 
 namespace LMSF_Scheduler
 {
@@ -185,8 +186,9 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            testTextBox.Text = DisplayTitle;
-            string message = InputText + ", " + OutputText;
+            TimerDialog timerDialog = new TimerDialog("LMSF Timer", 10);
+            timerDialog.Owner = this;
+            timerDialog.ShowDialog();
         }
 
         protected void OnPropertyChanged(string name)

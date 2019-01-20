@@ -5,8 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Utilities"
         mc:Ignorable="d"
-        Title="TimerDialog" Height="150" Width="600" ResizeMode="NoResize">
+        Title="TimerDialog" Height="133" Width="800" ResizeMode="NoResize">
+    <Window.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="Black" Offset="0"/>
+            <GradientStop Color="#FF2C0D51" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <ProgressBar x:Name="simTimeProgressBar" Margin="70,40,26,0" Width="500" Height="20" VerticalAlignment="Top"/>
+        <Button x:Name="pauseButton" Content="Pause" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Margin="40,20,84,45" Click="PauseButton_Click" Width="75" Height="25"/>
+        <Button x:Name="stopButton" Content="Stop Now" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" HorizontalAlignment="Left" Margin="40,55,0,10" Width="75" Click="StopButton_Click" Height="25"/>
+
     </Grid>
 </Window>
