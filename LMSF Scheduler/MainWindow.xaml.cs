@@ -528,10 +528,17 @@ namespace LMSF_Scheduler
                             switch (stepArgs[1])
                             {
                                 case "Overlord":
-                                    outString += "Overlord.";
+                                    outString += "Overlord, Done.";
                                     if (!isValidating)
                                     {
                                         WaitForOverlord(num);
+                                    }
+                                    break;
+                                case "Timer":
+                                    outString += "Timer, Done.";
+                                    if (!isValidating)
+                                    {
+                                        WaitForTimer(num);
                                     }
                                     break;
                                 default:
@@ -814,6 +821,41 @@ namespace LMSF_Scheduler
                 stepTimerDialog.Show();
             });
 
+        }
+
+        private void WaitForTimer(int num)
+        {
+            //TODO: re-evaluate the need for these variables-
+            WaitingForStepCompletion = true;
+            stepsRunning[num] = true;
+
+            OutputText += "... waiting for Timer to finish.";
+
+            BackgroundWorker timerMonitorWorker = new BackgroundWorker();
+            timerMonitorWorker.WorkerReportsProgress = false;
+            timerMonitorWorker.DoWork += TimerMonitor_DoWork;
+            timerMonitorWorker.RunWorkerCompleted += TimerMonitor_RunWorkerCompleted;
+
+            timerMonitorWorker.RunWorkerAsync();
+
+            while (WaitingForStepCompletion)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+
+        }
+
+        void TimerMonitor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (!stepTimerDialog.IsClosed)
+            {
+                Thread.Sleep(100);
+            }
+        }
+
+        void TimerMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            WaitingForStepCompletion = false;
         }
 
     }
