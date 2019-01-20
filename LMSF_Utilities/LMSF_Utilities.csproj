@@ -4,19 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{94345287-0318-460D-9AE8-46FE39EEDA7B}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>LMSF_Scheduler</RootNamespace>
-    <AssemblyName>LMSF Scheduler</AssemblyName>
+    <ProjectGuid>{2C18FA64-2458-4788-901A-7D7FB8C7E513}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <RootNamespace>LMSF_Utilities</RootNamespace>
+    <AssemblyName>LMSF_Utilities</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,7 +24,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,13 +31,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>LMSF icon.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LMSF_Utilities">
-      <HintPath>bin\LMSF_Utilities.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -57,21 +48,12 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="TimerDialog.xaml">
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
+    <Compile Include="TimerDialog.xaml.cs">
+      <DependentUpon>TimerDialog.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -97,44 +79,5 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="LMSF icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="start.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="pause.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="step.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="abort.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="LMSF icon.256.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="paa-automation-logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="clock.png" />
-    <Resource Include="modal_box.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="rewind.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="checkmark-128.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Utilities\bin\$(Configuration)\LMSF_Utilities.dll" "$(ProjectDir)bin\LMSF_Utilities.dll"
-
-copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Utilities\bin\$(Configuration)\LMSF_Utilities.dll" "$(ProjectDir)bin\$(Configuration)\LMSF_Utilities.dll"</PostBuildEvent>
-  </PropertyGroup>
 </Project>
