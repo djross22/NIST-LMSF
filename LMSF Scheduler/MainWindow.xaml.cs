@@ -44,6 +44,7 @@ namespace LMSF_Scheduler
         private int totalSteps;
         private bool isRunning = false;
         private bool isPaused = true;
+        private bool isOneStep = false;
         private bool isValidating = false;
         private List<int> valFailed;
 
@@ -71,6 +72,17 @@ namespace LMSF_Scheduler
             {
                 this.waitingForStepCompletion = value;
                 //OnPropertyChanged("WaitingForStepCompletion");
+            }
+        }
+
+        public bool IsOneStep
+        {
+            get { return this.isOneStep; }
+            set
+            {
+                this.isOneStep = value;
+                UpdateEnabledState();
+                OnPropertyChanged("IsOneStep");
             }
         }
 
@@ -190,9 +202,7 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            stepTimerDialog = new TimerDialog("LMSF Timer", 10);
-            stepTimerDialog.Owner = this;
-            stepTimerDialog.ShowDialog();
+            MessageBox.Show($"runStepsThread.IsAlive = {runStepsThread.IsAlive}");
         }
 
         protected void OnPropertyChanged(string name)
@@ -364,14 +374,17 @@ namespace LMSF_Scheduler
 
             while (IsRunning)
             {
-                if (IsPaused)
+                while (IsPaused)
                 {
+                    //MessageBox.Show("In pause loop");
+                    if (IsOneStep)
+                    {
+                        break;
+                    }
                     Thread.Sleep(100);
                 }
-                else
-                {
-                    Step();
-                }
+
+                Step();
             }
         }
 
@@ -394,8 +407,11 @@ namespace LMSF_Scheduler
             }
             else
             {
+                OutputText += "Done.\n";
                 this.Dispatcher.Invoke(() => { IsRunning = false; });
             }
+
+            this.Dispatcher.Invoke(() => { IsOneStep = false; });
         }
 
         private string ParseStep(int num, string step)
@@ -531,6 +547,9 @@ namespace LMSF_Scheduler
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
+            //Make sure that any edits in the inputTextBox are updated to the InputTest property
+            inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+
             //Run validation check before ruanning actual experiment
             if (Validate())
             {
@@ -543,17 +562,34 @@ namespace LMSF_Scheduler
                 Play();
             }
             
-            inputTextBox.Focus();
         }
 
         private void StepButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: This is not right
-            //Change the IsPaused property to true
-            IsPaused = true;
-            IsRunning = true;
+            //Make sure that any edits in the inputTextBox are updated to the InputTest property
+            inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
-            Play();
+            if (runStepsThread.IsAlive)
+            {
+                //If the steps are already running, let it go on to the next step
+                IsOneStep = true;
+            }
+            else
+            {
+                //if the step-runner thread is not already running, start it up the same as with PlayButton_Click
+                //    but with IsPaused = true and IsOneStep = true, so that it just runs one step
+                if (Validate())
+                {
+                    IsPaused = true;
+                    IsOneStep = true;
+                    IsRunning = true;
+                    isValidating = false;
+                    valFailed = new List<int>();
+
+                    Play();
+                }
+            }
+            
         }
 
         private void Play()
@@ -567,17 +603,23 @@ namespace LMSF_Scheduler
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
+            //Make sure that any edits in the inputTextBox are updated to the InputTest property
+            inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+
             //TODO: ???
             IsPaused = true;
         }
 
         private void RewindButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //Make sure that any edits in the inputTextBox are updated to the InputTest property
+            inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
         }
 
         private void AbortButton_Click(object sender, RoutedEventArgs e)
         {
+            //Make sure that any edits in the inputTextBox are updated to the InputTest property
+            inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
             IsRunning = false;
             IsPaused = true;
         }
@@ -616,9 +658,10 @@ namespace LMSF_Scheduler
 
         private void ValidateButton_Click(object sender, RoutedEventArgs e)
         {
-            Validate();
+            //Make sure that any edits in the inputTextBox are updated to the InputTest property
+            inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
-            inputTextBox.Focus();
+            Validate();
         }
 
         private void RunOverlord(int num, string file)
