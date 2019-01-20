@@ -645,7 +645,6 @@ namespace LMSF_Scheduler
             startInfo.FileName = @"C:\Program Files (x86)\PAA\Overlord3\Overlord.Main.exe";
             startInfo.Arguments = "\"" + file + "\"" + " -r -c";
             ovProcess = Process.Start(startInfo);
-
         }
 
         private void WaitForOverlord(int num)
