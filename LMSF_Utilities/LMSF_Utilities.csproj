@@ -52,6 +52,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Compile Include="MetaItem.cs" />
     <Compile Include="SharedParameters.cs" />
     <Compile Include="TimerDialog.xaml.cs">
       <DependentUpon>TimerDialog.xaml</DependentUpon>
