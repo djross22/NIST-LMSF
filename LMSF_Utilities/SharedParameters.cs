@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace LMSF_Utilities
 {
@@ -166,5 +167,71 @@ namespace LMSF_Utilities
 
         }
 
+        private static string CheckNewIdentifier(string metaType, string newID)
+        {
+            string notValidReason = "";
+            ObservableCollection<MetaItem> metaList = GetMetaList(metaType);
+
+            foreach (MetaItem m in metaList)
+            {
+                if (newID == m.ShortID)
+                {
+                    notValidReason = "That identifier has already been used.";
+                }
+            }
+
+            return notValidReason;
+        }
+
+        public static string GetMetaIdentifier(string metaType, string selectPrompt)
+        {
+            string metaID="";
+            ObservableCollection<MetaItem> metaList = GetMetaList(metaType);
+
+            string createNewText = "Create New " + char.ToUpper(metaType[0]) + metaType.Substring(1) + " Identifier";
+            string selectTitle = "Select " + char.ToUpper(metaType[0]) + metaType.Substring(1);
+            string defaultPrompt = "Select the " + metaType + " used for the method:";
+
+            if ( (selectPrompt is null) || (selectPrompt == "") )
+            {
+                selectPrompt = defaultPrompt;
+            }
+
+            int metaIndex = metaList.Count;
+            while (metaIndex > metaList.Count - 1)
+            {
+                ObservableCollection<MetaItem> listPlusNew = new ObservableCollection<MetaItem>(metaList);
+                listPlusNew.Add(new MetaItem(createNewText, 0, ""));
+
+                // Instantiate the dialog box
+                SelectMetaIdentDialog dlg = new SelectMetaIdentDialog();
+                // Configure the dialog box
+                dlg.ItemList = listPlusNew;
+                dlg.Title = selectTitle;
+                dlg.PromptText = selectPrompt;
+                // Open the dialog box modally and abort if it does not returns true
+                if (dlg.ShowDialog() != true)
+                {
+                    //TODO: abort the experiment in the Scheduler
+                }
+                metaIndex = dlg.SelectedIndex;
+                metaID = dlg.SelectedItem.ShortID;
+                if (metaIndex>metaList.Count)
+                {
+                    if (metaType=="media")
+                    {
+                        //This CreateNew method is a bit different from the others
+                        //CreateNewMediaIdentifier();
+                    }
+                    else
+                    {
+                        //CreateNewMetaIdentifier(metaType);
+                    }
+                    metaList = GetMetaList(metaType);
+                }
+            }
+
+            return metaID;
+        }
     }
 }

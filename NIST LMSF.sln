@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Overlord Simulator", "Overlord Simulator\Overlord Simulator.csproj", "{5C3A8EE6-DB0B-45D9-9A47-23134E700CE9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMSF Scheduler", "LMSF Scheduler\LMSF Scheduler.csproj", "{94345287-0318-460D-9AE8-46FE39EEDA7B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2C18FA64-2458-4788-901A-7D7FB8C7E513} = {2C18FA64-2458-4788-901A-7D7FB8C7E513}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMSF_Utilities", "LMSF_Utilities\LMSF_Utilities.csproj", "{2C18FA64-2458-4788-901A-7D7FB8C7E513}"
 EndProject

@@ -48,11 +48,18 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="SelectMetaIdentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="TimerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="MetaItem.cs" />
+    <Compile Include="SelectMetaIdentDialog.xaml.cs">
+      <DependentUpon>SelectMetaIdentDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SharedParameters.cs" />
     <Compile Include="TimerDialog.xaml.cs">
       <DependentUpon>TimerDialog.xaml</DependentUpon>
@@ -80,6 +87,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="LMSF icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
