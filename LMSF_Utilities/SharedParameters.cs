@@ -167,6 +167,7 @@ namespace LMSF_Utilities
 
         }
 
+        //If the proposed new Identifier is valid, this method returns an empty string.
         private static string CheckNewIdentifier(string metaType, string newID)
         {
             string notValidReason = "";
@@ -188,8 +189,8 @@ namespace LMSF_Utilities
             string metaID="";
             ObservableCollection<MetaItem> metaList = GetMetaList(metaType);
 
-            string createNewText = "Create New " + char.ToUpper(metaType[0]) + metaType.Substring(1) + " Identifier";
-            string selectTitle = "Select " + char.ToUpper(metaType[0]) + metaType.Substring(1);
+            string createNewText = "Create New " + ToTitleCase(metaType) + " Identifier";
+            string selectTitle = "Select " + ToTitleCase(metaType);
             string defaultPrompt = "Select the " + metaType + " used for the method:";
 
             if ( (selectPrompt is null) || (selectPrompt == "") )
@@ -200,6 +201,7 @@ namespace LMSF_Utilities
             int metaIndex = metaList.Count;
             while (metaIndex > metaList.Count - 1)
             {
+                metaList = GetMetaList(metaType);
                 ObservableCollection<MetaItem> listPlusNew = new ObservableCollection<MetaItem>(metaList);
                 listPlusNew.Add(new MetaItem(createNewText, 0, ""));
 
@@ -214,24 +216,132 @@ namespace LMSF_Utilities
                 {
                     //TODO: abort the experiment in the Scheduler
                 }
-                metaIndex = dlg.SelectedIndex;
-                metaID = dlg.SelectedItem.ShortID;
-                if (metaIndex>metaList.Count)
+                else
                 {
-                    if (metaType=="media")
+                    metaIndex = dlg.SelectedIndex;
+                    metaID = dlg.SelectedItem.ShortID;
+                    if (metaIndex == metaList.Count)
                     {
-                        //This CreateNew method is a bit different from the others
-                        //CreateNewMediaIdentifier();
+                        if (metaType == "media")
+                        {
+                            //This CreateNew method is a bit different from the others
+                            //CreateNewMediaIdentifier();
+                        }
+                        else
+                        {
+                            CreateNewMetaIdentifier(metaType);
+                        }
+                        
+                    }
+                }
+                
+            }
+
+            SortAndSaveMetaList(metaList, metaType, metaIndex);
+
+            return metaID;
+        }
+
+        private static void CreateNewMetaIdentifier(string metaType)
+        {
+            string newIdent = "";
+            string newLongName = "";
+            string notValidReason = "Something unexpected happened in CreateNewMetaIdentifier().";
+            ObservableCollection<MetaItem> metaList = GetMetaList(metaType);
+
+            string titleText = "New " + ToTitleCase(metaType) + " Identifier";
+            string promptText = "Enter new " + metaType + " short identifier:";
+            string longPrompt = "Enter long name for new " + metaType + ":";
+
+            while (notValidReason != "")
+            {
+                // Instantiate the dialog box
+                NewMetaIdentDialog dlg = new NewMetaIdentDialog();
+                // Configure the dialog box
+                dlg.ItemList = metaList;
+                dlg.Title = titleText;
+                dlg.PromptText = promptText;
+                // Open the dialog box modally and leave newIdent="" if it does not return true
+                if (dlg.ShowDialog() == true)
+                {
+                    newIdent = dlg.NewIdent;
+                    notValidReason = CheckNewIdentifier(metaType, newIdent);
+                    if (notValidReason != "")
+                    {
+                        string messageTest = newIdent + "\n  is not a valid identifier.\n  " + notValidReason + "\n\n    Try again.";
+                        MessageBox.Show(messageTest, "Identifier Not Valid", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (notValidReason=="")
+            {
+                //TODO: Custom dialog for long name
+
+                string parentMessage = "";
+                if (metaType=="strain")
+                {
+                    parentMessage = "To create a new strain definition, you will need to specify the parent strain, or 'none'.\n\nThe parent strain is the strain that the new strain was derived from (via knock -out or knock-in, etc.).";
+                }
+                if (metaType=="plasmid")
+                {
+                    parentMessage = "To create a new plasmid definition, you will need to specify the parent plasmid, or 'none'.\n\nThe parent plasmid is the plasmid that the new plasmid was derived from.";
+                }
+
+                if (parentMessage != "")
+                {
+                    MessageBox.Show(parentMessage, "Identifier Parent", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    ObservableCollection<MetaItem> listPlusNone = new ObservableCollection<MetaItem>(metaList);
+                    listPlusNone.Add(new MetaItem("none", 0, ""));
+
+                    string selectTitle = "Select Parent " + ToTitleCase(metaType) + " For " + ToTitleCase(metaType) + " " + newIdent;
+                    string selectPrompt = "Select the parent " + metaType + " for new " + metaType + ": " + newIdent;
+
+                    // Instantiate the dialog box
+                    SelectMetaIdentDialog dlg = new SelectMetaIdentDialog();
+                    // Configure the dialog box
+                    dlg.ItemList = metaList;
+                    dlg.Title = selectTitle;
+                    dlg.PromptText = selectPrompt;
+                    // Open the dialog box modally and abort if it does not returns true
+                    if (dlg.ShowDialog() != true)
+                    {
+                        newIdent = "";
                     }
                     else
                     {
-                        //CreateNewMetaIdentifier(metaType);
+                        int parentIndex = dlg.SelectedIndex;
+                        string parentID = dlg.SelectedItem.ShortID;
+
+                        //TODO: Get notes for new strain/plasmid and save to new strain/plasmid file
                     }
-                    metaList = GetMetaList(metaType);
+
+
                 }
+
+
+            }
+            else
+            {
+                newIdent = "";
             }
 
-            return metaID;
+            if (newIdent != "")
+            {
+                ObservableCollection<MetaItem> listPlusNew = new ObservableCollection<MetaItem>(metaList);
+                listPlusNew.Add(new MetaItem(newIdent, 0, newLongName));
+
+                SortAndSaveMetaList(listPlusNew, metaType, -1);
+            }
+        }
+
+        private static string ToTitleCase(string inString)
+        {
+            return char.ToUpper(inString[0]) + inString.Substring(1);
         }
     }
 }

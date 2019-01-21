@@ -48,6 +48,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="NewMetaIdentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="SelectMetaIdentDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -57,6 +61,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="MetaItem.cs" />
+    <Compile Include="NewMetaIdentDialog.xaml.cs">
+      <DependentUpon>NewMetaIdentDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SelectMetaIdentDialog.xaml.cs">
       <DependentUpon>SelectMetaIdentDialog.xaml</DependentUpon>
     </Compile>
