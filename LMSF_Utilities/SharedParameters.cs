@@ -281,7 +281,20 @@ namespace LMSF_Utilities
             }
             if (notValidReason=="")
             {
-                //TODO: Custom dialog for long name
+                //Custom dialog for long name
+                // Instantiate the dialog box
+                NewLongNameDialog dlg = new NewLongNameDialog();
+                // Configure the dialog box
+                dlg.Title = "Long Name";
+                dlg.PromptText = longPrompt;
+                if (dlg.ShowDialog() == true)
+                {
+                    newLongName = dlg.NewLongName;
+                }
+                else
+                {
+                    newLongName = "Long Name Place-Holder";
+                }
 
                 string parentMessage = "";
                 if (metaType=="strain")
@@ -304,22 +317,30 @@ namespace LMSF_Utilities
                     string selectPrompt = "Select the parent " + metaType + " for new " + metaType + ": " + newIdent;
 
                     // Instantiate the dialog box
-                    SelectMetaIdentDialog dlg = new SelectMetaIdentDialog();
+                    SelectMetaIdentDialog dlg2 = new SelectMetaIdentDialog();
                     // Configure the dialog box
-                    dlg.ItemList = metaList;
-                    dlg.Title = selectTitle;
-                    dlg.PromptText = selectPrompt;
+                    dlg2.ItemList = metaList;
+                    dlg2.Title = selectTitle;
+                    dlg2.PromptText = selectPrompt;
                     // Open the dialog box modally and abort if it does not returns true
-                    if (dlg.ShowDialog() != true)
+                    if (dlg2.ShowDialog() != true)
                     {
                         newIdent = "";
                     }
                     else
                     {
-                        int parentIndex = dlg.SelectedIndex;
-                        string parentID = dlg.SelectedItem.ShortID;
+                        int parentIndex = dlg2.SelectedIndex;
+                        string parentID = dlg2.SelectedItem.ShortID;
 
-                        //TODO: Get notes for new strain/plasmid and save to new strain/plasmid file
+                        //Get notes for new strain/plasmid and save to new strain/plasmid file
+                        string notesPrompt = "Enter Notes for New " + ToTitleCase(metaType) + ": ";
+                        titleText = "New " + ToTitleCase(metaType) + " Notes";
+                        string newDefinitionFilePath = StrainFolderPath + newIdent + "-" + metaType + ".txt";
+                        string newDefinitionString = ToTitleCase(metaType) + " identifier: \t" + newIdent;
+
+                        notesPrompt += newIdent;
+
+
                     }
 
 
