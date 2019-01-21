@@ -248,6 +248,7 @@ namespace LMSF_Utilities
         {
             string newIdent = "";
             string newLongName = "";
+            string newNotes = "";
             string notValidReason = "Something unexpected happened in CreateNewMetaIdentifier().";
             ObservableCollection<MetaItem> metaList = GetMetaList(metaType);
 
@@ -322,14 +323,14 @@ namespace LMSF_Utilities
                     dlg2.ItemList = metaList;
                     dlg2.Title = selectTitle;
                     dlg2.PromptText = selectPrompt;
-                    // Open the dialog box modally and abort if it does not returns true
+                    // Open the dialog box modally and set newIdent = "" if it does not returns true
                     if (dlg2.ShowDialog() != true)
                     {
                         newIdent = "";
                     }
                     else
                     {
-                        int parentIndex = dlg2.SelectedIndex;
+                        //int parentIndex = dlg2.SelectedIndex;
                         string parentID = dlg2.SelectedItem.ShortID;
 
                         //Get notes for new strain/plasmid and save to new strain/plasmid file
@@ -340,13 +341,29 @@ namespace LMSF_Utilities
 
                         notesPrompt += newIdent;
 
+                        // Instantiate the dialog box
+                        NotesDialog notesDlg = new NotesDialog();
+                        // Configure the dialog box
+                        notesDlg.Title = titleText;
+                        notesDlg.PromptText = notesPrompt;
+                        // Open the dialog box modally and abort if it does not returns true
+                        if (notesDlg.ShowDialog() != true)
+                        {
+                            newNotes = "";
+                        }
+                        else
+                        {
+                            newNotes = notesDlg.Notes;
+                        }
 
+                        newDefinitionString += "\n\n";
+                        newDefinitionString += "Parent identifier: \t" + parentID + "\n\n";
+                        newDefinitionString += "Notes:\n" + newNotes + "\n";
+
+                        //Write out newDefinitionString to text file (newDefinitionFilePath)
+                        System.IO.File.WriteAllText(newDefinitionFilePath, newDefinitionString);
                     }
-
-
                 }
-
-
             }
             else
             {
