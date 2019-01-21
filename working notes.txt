@@ -83,24 +83,86 @@ LMSF Scheduler: Add System.Diagnostics.Process code to run Overlord.Main.exe
 
 Overlord Simulator: Set Main window icon =  LMSF icon
 
+LMSF Scheduler: Switch path to Ovderlord.Main.exe to actual location (C:\Program Files (x86)\PAA\Overlord3)
+
+Overlord Simulator: Capitalize method names to conform with reccomended C# style
+
+LMSF Scheduler: Add code to wait between steps (clunky right now since it runs on the main thread, TODO: set it up to run steps on a separate thread)
+
+LMSF Scheduler: Wrap waitingForStepCompletion in a propety with getter and setter
+
+LMSF Scheduler: Run Steps on separate (BackgroundWorker) thread so that GUI updates are maintained
+
+LMSF Scheduler: Modifiy ValidateButton_Click() to work with new multi-thread methods (validation runs like play but on main thread)
+
+LMSF Scheduler: Add code to check for existence of ovp files during validation/running
+
+LMSF Scheduler: Add Validation before every run
+
+LMSF Scheduler: Change output text box to have line wrapping
+
+LMSF Scheduler: Add Wait step to step parser; also add RunWaitStep() method, TODO: re-write RunWaitStep() with pop-up progress bar + cancel button
+
+LMSF Scheduler: Rearange RunWaitStep() method; move WaitingForStepCompletion = false to OutsideProcessMonitor_RunWorkerCompleted; Rename ovWorker -> ovMonitorWorker
+
+LMSF Scheduler: Move Background worker that waits for Overlord into a different step.
+    So now, Overlord steps start Overord and go on to the next step;
+	The new "WaitFor" step is then used to specifically wait for the Overlord step to finish; 
+	Also included code to prevent two Overlord processes from running at the same time
+
+Add new LMSF_Utilities library to solution
+
+LMSF_Utilities: Add TimerDialog
+LMSF Scheduler: Add test code for TimerDialog (on TestButton_Click)
+
+LMSF_Utilities.TimerDialog: Add IsClosed Property to allow Scheduler to check if the TimerDialog has closed.
+
+LMSF Scheduler: In StepParser(), replace Wait step with Timer step; Also replace RunWaitStep() with RunTimer()
+
+Switch from "BackgroundWorker runStepsWorker" to "Thread runStepsThread" to create the thread that handles running steps,
+    Why? Since I thought "thread.SetApartmentState(ApartmentState.STA)" would be necessary to access GUI components (like the TimerDialog)
+	    from the step-runner thread. It turns out that is not true (program seems to run just fin with the SetApartmentState commented out).
+		What is actually needed is to use a Dispatcher for lines of code in the step-runner methods that interact with the GUI,
+    		e.g., this.Dispatcher.Invoke(() => { IsRunning = false; });  
+			    "IsRunning" calls "UpdateEnabledState" which sets the enabled state of GUI components appropriatly
+	Anyway, I'm not sure if the Dispatcher thing would have worked in a background thread, and I don't want to take the time to find out, since the code now works.
+
+LMSF Scheduler: Make play, pause, etc. buttons not focusable, and then insert "inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();"
+    at the beginning of each button clicked method to makse sure the inputText gets updated appropriately.
+
+LMSF Scheduler: Finish single-step button method, and implement abort button method
+
+LMSF Scheduler: On main page, add visual indicator of run/paused state and abort called - with red/yellow/green colors
+
+LMSF Scheduler: Add WaitForTimer() method and code to ParseSteps()
 
 
-Make it wait until each step is done-
-
-
-
-
-User input steps: need C# metadata -> xml?
 
 Copy functionality from Venus LMSF Utilities library
 
+User input steps: need C# metadata -> xml?
 
 
 
 
 
 
-LMSF Scheduler: Save/Load with Serialization: https://stackoverflow.com/questions/1463548/c-sharp-serializing-a-collection-of-objects
+Add code to make sure Overlord is started before leaving RunOverlord() - since it is a bit slow to start up
+    Couldn't figure out how to do that- tabling it for now.
+
+
+
+
+
+
+Control where windows open?
+
+
+
+
+
+
+
 
 
 
