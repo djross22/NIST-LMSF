@@ -96,5 +96,28 @@ namespace LMSF_Utilities
             return outList;
         }
 
+        public static void SortMetaList(ObservableCollection<MetaItem> listToSort)
+        {
+            bool switched = true;
+            int keyLoopLength = listToSort.Count - 1;
+            int value1;
+            int value2;
+
+            while (switched)
+            {
+                switched = false;
+                for (int i=0; i < keyLoopLength; i++)
+                {
+                    value1 = listToSort.ElementAt(i).TimesUsed;
+                    value2 = listToSort.ElementAt(i+1).TimesUsed;
+                    if (value2>value1)
+                    {
+                        switched = true;
+                        listToSort.Move(i + 1, i);
+                    }
+                }
+            }
+        }
+
     }
 }
