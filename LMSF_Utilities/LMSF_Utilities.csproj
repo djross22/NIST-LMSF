@@ -64,6 +64,7 @@
     <Compile Include="NewMetaIdentDialog.xaml.cs">
       <DependentUpon>NewMetaIdentDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RegexValidationRule.cs" />
     <Compile Include="SelectMetaIdentDialog.xaml.cs">
       <DependentUpon>SelectMetaIdentDialog.xaml</DependentUpon>
     </Compile>

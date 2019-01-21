@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Text.RegularExpressions;
 
 namespace LMSF_Utilities
 {
@@ -71,7 +72,14 @@ namespace LMSF_Utilities
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            if (SharedParameters.IsValid(this))
+            {
+                this.DialogResult = true;
+            }
+            else
+            {
+                return;
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
