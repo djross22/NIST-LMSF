@@ -23,5 +23,10 @@ namespace LMSF_Utilities
         {
             return ShortID;
         }
+
+        public string SaveString()
+        {
+            return ShortID + SharedParameters.Delimeter + $"{TimesUsed}" + SharedParameters.Delimeter + Name;
+        }
     }
 }

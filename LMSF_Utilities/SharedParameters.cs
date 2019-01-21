@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -42,33 +43,17 @@ namespace LMSF_Utilities
 
         public static ObservableCollection<MetaItem> GetMetaList(string metaType)
         {
-            string filePath = "";
+            string filePath = GetFilePath(metaType);
+            if (filePath is null)
+            {
+                return null;
+            }
             string line;
             int counter = 0;
             ObservableCollection<MetaItem> outList = new ObservableCollection<MetaItem>();
 
-            switch (metaType)
-            {
-                case "media":
-                    filePath = MediaFilePath;
-                    break;
-                case "strain":
-                    filePath = StrainFilePath;
-                    break;
-                case "plasmid":
-                    filePath = PlasmidFilePath;
-                    break;
-                case "additive":
-                    filePath = AdditiveFilePath;
-                    break;
-                case "antibiotic":
-                    filePath = AntibioticFilePath;
-                    break;
-                default:
-                    return null;
-            }
-
-            System.IO.StreamReader file = new System.IO.StreamReader(filePath, System.Text.Encoding.UTF8);
+            //System.IO.StreamReader file = new System.IO.StreamReader(filePath, System.Text.Encoding.UTF8);
+            System.IO.StreamReader file = new System.IO.StreamReader(filePath);
             string[] lineStrings;
             string newID;
             int newNum;
@@ -96,6 +81,34 @@ namespace LMSF_Utilities
             return outList;
         }
 
+        private static string GetFilePath(string metaType)
+        {
+            string filePath = "";
+
+            switch (metaType)
+            {
+                case "media":
+                    filePath = MediaFilePath;
+                    break;
+                case "strain":
+                    filePath = StrainFilePath;
+                    break;
+                case "plasmid":
+                    filePath = PlasmidFilePath;
+                    break;
+                case "additive":
+                    filePath = AdditiveFilePath;
+                    break;
+                case "antibiotic":
+                    filePath = AntibioticFilePath;
+                    break;
+                default:
+                    return null;
+            }
+
+            return filePath;
+        }
+
         public static void SortMetaList(ObservableCollection<MetaItem> listToSort)
         {
             bool switched = true;
@@ -117,6 +130,40 @@ namespace LMSF_Utilities
                     }
                 }
             }
+        }
+
+        public static void SortAndSaveMetaList(ObservableCollection<MetaItem> listToSort, string metaType, int selectedIndex)
+        {
+            string filePath = GetFilePath(metaType);
+            if (filePath is null)
+            {
+                return;
+            }
+
+            if (selectedIndex >= 0)
+            {
+                listToSort.ElementAt(selectedIndex).TimesUsed += 1;
+            }
+            SortMetaList(listToSort);
+
+            //get the header line with a read
+            //System.IO.StreamReader readFile = new System.IO.StreamReader(filePath, System.Text.Encoding.UTF8);
+            System.IO.StreamReader readFile = new System.IO.StreamReader(filePath);
+            string headerLine = readFile.ReadLine();
+            readFile.Close();
+
+            //then re-Save the list...
+            FileStream fs = new FileStream(filePath, FileMode.Create);
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter(fs, System.Text.Encoding.UTF8))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(fs))
+            {
+                file.WriteLine(headerLine);
+                foreach (MetaItem item in listToSort)
+                {
+                    file.WriteLine(item.SaveString());
+                }
+            }
+
         }
 
     }
