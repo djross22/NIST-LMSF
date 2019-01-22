@@ -211,6 +211,7 @@ namespace LMSF_Utilities
                 SelectMetaIdentDialog dlg = new SelectMetaIdentDialog();
                 // Configure the dialog box
                 dlg.ItemList = listPlusNew;
+                dlg.SelectedIndex = -1;
                 dlg.Title = selectTitle;
                 dlg.PromptText = selectPrompt;
                 // Open the dialog box modally and abort if it does not returns true
@@ -321,6 +322,7 @@ namespace LMSF_Utilities
                     SelectMetaIdentDialog dlg2 = new SelectMetaIdentDialog();
                     // Configure the dialog box
                     dlg2.ItemList = metaList;
+                    dlg2.SelectedIndex = -1;
                     dlg2.Title = selectTitle;
                     dlg2.PromptText = selectPrompt;
                     // Open the dialog box modally and set newIdent = "" if it does not returns true
@@ -383,11 +385,10 @@ namespace LMSF_Utilities
         {
             return char.ToUpper(inString[0]) + inString.Substring(1);
         }
-
-
+        
+        public static bool IsValid(DependencyObject node)
         //IsValid() method copied from: https://docs.microsoft.com/en-us/dotnet/framework/wpf/app-development/dialog-boxes-overview
         // Validate all dependency objects in a window
-        public static bool IsValid(DependencyObject node)
         {
             // Check if dependency object was passed
             if (node != null)

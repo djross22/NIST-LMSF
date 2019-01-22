@@ -237,7 +237,14 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show($"runStepsThread.IsAlive = {runStepsThread.IsAlive}");
+            string metaType = "strain";
+
+            //OutputText = "";
+
+            string metaID = SharedParameters.GetMetaIdentifier(metaType, "");
+
+            OutputText += metaID + "\n";
+            
         }
 
         protected void OnPropertyChanged(string name)
@@ -250,8 +257,8 @@ namespace LMSF_Scheduler
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
         {
-            //RunTimer(1, 10);
-            IsRunning = false;
+            OutputText += "β\n";
+            OutputText += "\n";
         }
 
         private void UpdateTitle()

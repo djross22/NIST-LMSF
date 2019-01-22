@@ -82,7 +82,14 @@ namespace LMSF_Utilities
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            if (SelectedIndex<0)
+            {
+                return;
+            }
+            else
+            {
+                this.DialogResult = true;
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
