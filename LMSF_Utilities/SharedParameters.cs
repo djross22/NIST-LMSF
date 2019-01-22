@@ -207,17 +207,21 @@ namespace LMSF_Utilities
                 ObservableCollection<MetaItem> listPlusNew = new ObservableCollection<MetaItem>(metaList);
                 listPlusNew.Add(new MetaItem(createNewText, 0, ""));
 
-                // Instantiate the dialog box
+                // Instantiate the dialog box to select the Meta Identifier
                 SelectMetaIdentDialog dlg = new SelectMetaIdentDialog();
                 // Configure the dialog box
                 dlg.ItemList = listPlusNew;
                 dlg.SelectedIndex = -1;
                 dlg.Title = selectTitle;
                 dlg.PromptText = selectPrompt;
-                // Open the dialog box modally and abort if it does not returns true
+                // Open the dialog box modally set metaID = "" if it does not return true
                 if (dlg.ShowDialog() != true)
                 {
-                    //TODO: abort the experiment in the Scheduler
+                    metaID = "";
+                    metaIndex = -1;
+                    //break here to exit from the while loop, leaving metaID = ""
+                    //    calling code can handle blank identifer as appropriate
+                    break;
                 }
                 else
                 {
@@ -237,9 +241,9 @@ namespace LMSF_Utilities
                         
                     }
                 }
-                
             }
 
+            //Re-sort the MetaList to keep most used identifiers at the top
             SortAndSaveMetaList(metaList, metaType, metaIndex);
 
             return metaID;
