@@ -44,7 +44,9 @@ namespace LMSF_Utilities
         //Units
         public static ObservableCollection<string> UnitsList => new ObservableCollection<string>() { "mmol/L", "umol/L", "mg/mL", "ug/mL", "ug/L", "%" };
 
-        public static ObservableCollection<MetaItem> GetMetaList(string metaType)
+
+        //Utility methods
+        private static ObservableCollection<MetaItem> GetMetaList(string metaType)
         {
             string filePath = GetFilePath(metaType);
             if (filePath is null)
@@ -112,7 +114,7 @@ namespace LMSF_Utilities
             return filePath;
         }
 
-        public static void SortMetaList(ObservableCollection<MetaItem> listToSort)
+        private static void SortMetaList(ObservableCollection<MetaItem> listToSort)
         {
             bool switched = true;
             int keyLoopLength = listToSort.Count - 1;
@@ -137,7 +139,7 @@ namespace LMSF_Utilities
 
         //In SortAndSaveMetaList, the selectedIndex has its TimesUsed property incremented to account for it just being used again
         //    if selectedIndex < 0, the method does not increment, but just sorts and saves.
-        public static void SortAndSaveMetaList(ObservableCollection<MetaItem> listToSort, string metaType, int selectedIndex)
+        private static void SortAndSaveMetaList(ObservableCollection<MetaItem> listToSort, string metaType, int selectedIndex)
         {
             string filePath = GetFilePath(metaType);
             if (filePath is null)
