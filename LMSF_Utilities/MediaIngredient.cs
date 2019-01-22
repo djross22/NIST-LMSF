@@ -45,21 +45,4 @@ namespace LMSF_Utilities
             return "Ingredient,Concentration,Units";
         }
     }
-
-    public class Concentration
-    {
-        public double ConcValue { get; set; }
-        public string Units { get; set; }
-
-        public Concentration(double concValue, string units)
-        {
-            ConcValue = concValue;
-            Units = units;
-        }
-
-        public override string ToString()
-        {
-            return $"{ConcValue} {Units}";
-        }
-    }
 }

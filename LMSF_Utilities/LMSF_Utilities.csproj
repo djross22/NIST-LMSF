@@ -76,6 +76,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Compile Include="Concentration.cs" />
     <Compile Include="MediaIngredient.cs" />
     <Compile Include="ConcentrationDialog.xaml.cs">
       <DependentUpon>ConcentrationDialog.xaml</DependentUpon>
