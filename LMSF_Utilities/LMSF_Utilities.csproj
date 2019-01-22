@@ -48,6 +48,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ConcentrationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MediaIngredientsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -73,6 +77,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="MediaIngredient.cs" />
+    <Compile Include="ConcentrationDialog.xaml.cs">
+      <DependentUpon>ConcentrationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MetaItem.cs" />
     <Compile Include="MediaIngredientsDialog.xaml.cs">
       <DependentUpon>MediaIngredientsDialog.xaml</DependentUpon>
