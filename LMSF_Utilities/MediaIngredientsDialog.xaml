@@ -18,7 +18,7 @@
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
         <TextBlock x:Name="promptTextBlock" HorizontalAlignment="Left" Margin="40,29,0,0" TextWrapping="Wrap" Text="Enter next media ingredient (or hit 'Done' if there are no more ingredients):" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="68" Width="213"/>
-        <ComboBox x:Name="selectComboBox" HorizontalAlignment="Left" Margin="65,310,0,0" VerticalAlignment="Top" Width="200" Height="25" ItemsSource="{Binding UnitsList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedUnits, Mode=TwoWay}"/>
+        <ComboBox x:Name="selectComboBox" HorizontalAlignment="Left" Margin="65,301,0,0" VerticalAlignment="Top" Width="200" Height="25" ItemsSource="{Binding UnitsList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedUnits, Mode=TwoWay}"/>
         <Button x:Name="doneButton" Content="Done" HorizontalAlignment="Left" Margin="275,0,0,0" VerticalAlignment="Center" Width="75" Grid.Row="1" Height="25" IsDefault="True" Click="DoneButton_Click"/>
         <Button x:Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="175,37.5,0,37.5" VerticalAlignment="Center" Width="75" Grid.Row="1" Height="25" Click="CancelButton_Click"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ingredient name:" VerticalAlignment="Top" Margin="65,123,0,0" Foreground="White" FontSize="14"/>
@@ -39,10 +39,10 @@
                 </Binding.ValidationRules>
             </Binding>
         </TextBox>
-        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Units:" VerticalAlignment="Top" Margin="65,286,0,0" Foreground="White" FontSize="14"/>
+        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Units:" VerticalAlignment="Top" Margin="65,277,0,0" Foreground="White" FontSize="14"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ingredients list:" VerticalAlignment="Top" Margin="328,123,0,0" Foreground="White" FontSize="14"/>
         <ListBox Margin="338,147,40,40" ItemsSource="{Binding IngredientsList}" />
-        <Button x:Name="nextButton" Content="Next" HorizontalAlignment="Left" Margin="75,37.5,0,37.5" VerticalAlignment="Center" Width="75" Grid.Row="1" Height="25" IsDefault="True" Click="NextButton_Click"/>
+        <Button x:Name="nextButton" Content="Add Ingredient to List" HorizontalAlignment="Left" Margin="87,376,0,119" VerticalAlignment="Center" Width="144" Height="25" IsDefault="True" Click="NextButton_Click"/>
 
 
     </Grid>
