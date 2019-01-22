@@ -33,8 +33,10 @@ namespace LMSF_Utilities
         private string promptText;
         private string ingredientName;
         //in this dialog, the concentration is a string, making sure it is a valid number is handled by the NumberValidationRule
-        private string concValue;
+        private string concString;
         private string selectedUnits;
+
+        public double ConcDouble { get; set; }
 
         #region Properties Getters and Setters
         public string SelectedUnits
@@ -47,13 +49,13 @@ namespace LMSF_Utilities
             }
         }
 
-        public string ConcValue
+        public string ConcString
         {
-            get { return this.concValue; }
+            get { return this.concString; }
             set
             {
-                this.concValue = value;
-                OnPropertyChanged("ConcValue");
+                this.concString = value;
+                OnPropertyChanged("ConcString");
             }
         }
 
@@ -129,9 +131,18 @@ namespace LMSF_Utilities
         
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SharedParameters.IsValid(this) && !(ConcValue is null))
+            if (SharedParameters.IsValid(this) && !(ConcString is null))
             {
-                this.DialogResult = true;
+                double doubVal;
+                if (double.TryParse(ConcString, out doubVal))
+                {
+                    ConcDouble = doubVal;
+                    this.DialogResult = true;
+                }
+                else
+                {
+                    return;
+                }
             }
             else
             {

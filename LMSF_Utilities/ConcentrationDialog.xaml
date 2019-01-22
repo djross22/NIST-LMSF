@@ -22,7 +22,7 @@
         <ComboBox x:Name="selectComboBox" HorizontalAlignment="Left" Margin="65,226,0,0" VerticalAlignment="Top" Width="200" Height="25" ItemsSource="{Binding UnitsList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedUnits, Mode=TwoWay}"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Concentration:" VerticalAlignment="Top" Margin="65,123,0,0" Foreground="White" FontSize="14"/>
         <TextBox HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="200" Margin="65,147,0,0">
-            <Binding Path="ConcValue" UpdateSourceTrigger="PropertyChanged">
+            <Binding Path="ConcString" UpdateSourceTrigger="PropertyChanged">
                 <Binding.ValidationRules>
                     <local:NumberValidationRule NumberMin="0" NumberMax="1000000"/>
                 </Binding.ValidationRules>
