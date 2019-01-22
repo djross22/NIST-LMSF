@@ -135,6 +135,8 @@ namespace LMSF_Utilities
             }
         }
 
+        //In SortAndSaveMetaList, the selectedIndex has its TimesUsed property incremented to account for it just being used again
+        //    if selectedIndex < 0, the method does not increment, but just sorts and saves.
         public static void SortAndSaveMetaList(ObservableCollection<MetaItem> listToSort, string metaType, int selectedIndex)
         {
             string filePath = GetFilePath(metaType);
