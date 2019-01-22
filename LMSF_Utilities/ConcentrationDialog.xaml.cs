@@ -86,7 +86,7 @@ namespace LMSF_Utilities
             DataContext = this;
 
             IngredientName = "additive";
-            PromptText = "Enter concentration and units for :" + IngredientName;
+            PromptText = "Enter concentration and units for: " + IngredientName;
             Title = "Concentration?";
 
             UnitsList = SharedParameters.UnitsList;
@@ -98,7 +98,7 @@ namespace LMSF_Utilities
             DataContext = this;
 
             IngredientName = name;
-            PromptText = "Enter concentration and units for :" + IngredientName;
+            PromptText = "Enter concentration and units for: " + IngredientName;
             Title = "Concentration?";
 
             UnitsList = SharedParameters.UnitsList;

@@ -456,10 +456,10 @@ namespace LMSF_Utilities
         {
             return char.ToUpper(inString[0]) + inString.Substring(1);
         }
-        
-        public static bool IsValid(DependencyObject node)
+
         //IsValid() method copied from: https://docs.microsoft.com/en-us/dotnet/framework/wpf/app-development/dialog-boxes-overview
         // Validate all dependency objects in a window
+        public static bool IsValid(DependencyObject node)
         {
             // Check if dependency object was passed
             if (node != null)
@@ -489,6 +489,36 @@ namespace LMSF_Utilities
 
             // All dependency objects are valid
             return true;
+        }
+
+        public static Concentration GetAdditiveConcentration(string name, string prompt)
+        {
+            ConcentrationDialog dlg;
+
+            string title = ToTitleCase(name) + " Concentration?";
+            //Dialog for selecting conentration
+            // Instantiate the dialog box; configuration done in constructor
+            if (prompt == "")
+            {
+                dlg = new ConcentrationDialog(name);
+            }
+            else
+            {
+                dlg = new ConcentrationDialog(name, prompt, title);
+            }
+            
+
+            // Open the dialog box modally and return concentration if dialog returns true (OK)
+            if (dlg.ShowDialog() == true)
+            {
+                return new Concentration(dlg.ConcDouble, dlg.SelectedUnits);
+            }
+            else
+            {
+                return null;
+            }
+
+                
         }
 
     }

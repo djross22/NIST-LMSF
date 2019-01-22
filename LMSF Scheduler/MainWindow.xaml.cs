@@ -234,6 +234,14 @@ namespace LMSF_Scheduler
             DataContext = this;
         }
 
+        protected void OnPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
@@ -244,21 +252,25 @@ namespace LMSF_Scheduler
             string metaID = SharedParameters.GetMetaIdentifier(metaType, "");
 
             OutputText += metaID + "\n";
-            
-        }
-
-        protected void OnPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
         }
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
         {
-            OutputText += "β\n";
-            OutputText += "\n";
+            string name = "kan";
+
+            //OutputText = "";
+
+            Concentration con = SharedParameters.GetAdditiveConcentration(name, "");
+
+            if (con is null)
+            {
+                OutputText += "null... \n";
+            }
+            else
+            {
+                OutputText += con + "\n";
+            }
+            
         }
 
         private void UpdateTitle()
