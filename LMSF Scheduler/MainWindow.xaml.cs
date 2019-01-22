@@ -237,7 +237,7 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            string metaType = "strain";
+            string metaType = "media";
 
             //OutputText = "";
 

@@ -29,12 +29,35 @@ namespace LMSF_Utilities
         //Note that ItemList handles notifications on its own (included with ObservableCollection class)
         //    But the other fields have Property wrappers with set methods that handle the notification.
         //    This is necessary to get data bindings to work properly with the GUI
-        public ObservableCollection<MetaItem> UnitsList { get; set; }
-        public ObservableCollection<MetaItem> IngredientsList { get; set; }
+        public ObservableCollection<string> UnitsList { get; set; }
+        public ObservableCollection<MediaIngredient> IngredientsList { get; set; }
         private string promptText;
-        private string name;
+        private string ingredientName;
+        //in this dialog, the concentration is a string, making sure it is a valid number is handled by the NumberValidationRule
+        private string concentration;
+        private string selectedUnits;
 
         #region Properties Getters and Setters
+        public string SelectedUnits
+        {
+            get { return this.selectedUnits; }
+            set
+            {
+                this.selectedUnits = value;
+                OnPropertyChanged("SelectedUnits");
+            }
+        }
+
+        public string Concentration
+        {
+            get { return this.concentration; }
+            set
+            {
+                this.concentration = value;
+                OnPropertyChanged("Concentration");
+            }
+        }
+
         public string PromptText
         {
             get { return this.promptText; }
@@ -45,13 +68,13 @@ namespace LMSF_Utilities
             }
         }
 
-        public string Name
+        public string IngredientName
         {
-            get { return this.name; }
+            get { return this.ingredientName; }
             set
             {
-                this.name = value;
-                OnPropertyChanged("Name");
+                this.ingredientName = value;
+                OnPropertyChanged("IngredientName");
             }
         }
         #endregion
@@ -60,6 +83,8 @@ namespace LMSF_Utilities
         {
             InitializeComponent();
             DataContext = this;
+
+            IngredientsList = new ObservableCollection<MediaIngredient>();
         }
 
         protected void OnPropertyChanged(string name)
@@ -70,9 +95,9 @@ namespace LMSF_Utilities
             }
         }
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private void DoneButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SharedParameters.IsValid(this))
+            if (SharedParameters.IsValid(this) && (MessageBox.Show("Click 'OK' to save new media definition, or 'Cancel' to enter more ingredients.", "Save Media Definition?", MessageBoxButton.OKCancel) == MessageBoxResult.OK) )
             {
                 this.DialogResult = true;
             }
@@ -84,7 +109,24 @@ namespace LMSF_Utilities
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO: decide what to do if user Cancels, probably promprt for Ok,and move on without saving
+            if (MessageBox.Show("Click 'OK' to continue without saving new media definition, or 'Cancel' to enter more ingredients.", "Cancel Save Media Definiiton?", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                this.DialogResult = false;
+            }
+        }
 
+        private void NextButton_Click(object sender, RoutedEventArgs e)
+        {
+            //MessageBox.Show(IngredientName);
+            if (SharedParameters.IsValid(this) && !(IngredientName is null) && !(Concentration is null) )
+            {
+                IngredientsList.Add(new MediaIngredient(IngredientName, double.Parse(Concentration), SelectedUnits));
+            }
+            else
+            {
+                return;
+            }
         }
     }
 }

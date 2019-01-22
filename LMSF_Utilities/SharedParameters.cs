@@ -231,15 +231,16 @@ namespace LMSF_Utilities
                     metaID = dlg.SelectedItem.ShortID;
                     if (metaIndex == metaList.Count)
                     {
-                        if (metaType == "media")
-                        {
-                            //This CreateNew method is a bit different from the others
-                            //CreateNewMediaIdentifier();
-                        }
-                        else
-                        {
-                            CreateNewMetaIdentifier(metaType);
-                        }
+                        CreateNewMetaIdentifier(metaType);
+                        //if (metaType == "media")
+                        //{
+                        //    //This CreateNew method is a bit different from the others
+                        //    //CreateNewMediaIdentifier();
+                        //}
+                        //else
+                        //{
+                        //    CreateNewMetaIdentifier(metaType);
+                        //}
                         
                     }
                 }
@@ -326,9 +327,7 @@ namespace LMSF_Utilities
 
                     if (metaType=="media")
                     {
-                        GetAndSaveMediaIngredients();
-                        //TODO:
-                        
+                        GetAndSaveMediaIngredients(newIdent);
                     }
                     else
                     {
@@ -358,7 +357,21 @@ namespace LMSF_Utilities
                             //Get notes for new strain/plasmid and save to new strain/plasmid file
                             string notesPrompt = "Enter Notes for New " + ToTitleCase(metaType) + ": ";
                             titleText = "New " + ToTitleCase(metaType) + " Notes";
-                            string newDefinitionFilePath = StrainFolderPath + newIdent + "-" + metaType + ".txt";
+
+                            string newDefinitionFilePath;
+                            switch (metaType)
+                            {
+                                case "strain":
+                                    newDefinitionFilePath = StrainFolderPath;
+                                    break;
+                                case "plsmid":
+                                    newDefinitionFilePath = PlasmidFolderPath;
+                                    break;
+                                default:
+                                    newDefinitionFilePath = MetadataFolderPath;
+                                    break;
+                            }
+                            newDefinitionFilePath += newIdent + "-" + metaType + ".txt";
                             string newDefinitionString = ToTitleCase(metaType) + " identifier: \t" + newIdent;
 
                             notesPrompt += newIdent;
@@ -403,16 +416,38 @@ namespace LMSF_Utilities
             }
         }
 
-        private static void GetAndSaveMediaIngredients()
+        private static void GetAndSaveMediaIngredients(string newIdent)
         {
             //Set up Empty list of ingredients
             ObservableCollection<MediaIngredient> ingredientsList = new ObservableCollection<MediaIngredient>();
 
-            //Loop over add ingredients step until Done
-            bool userDone = false;
-            while (!userDone)
+            string newDefinitionFilePath = MediaFolderPath + newIdent + "-" + "media" + ".txt";
+
+            //Custom dialog to enter media ingredients
+            // Instantiate the dialog box
+            MediaIngredientsDialog dlg = new MediaIngredientsDialog();
+            // Configure the dialog box
+            dlg.Title = "Define New Media Composition: " + newIdent;
+            dlg.UnitsList = SharedParameters.UnitsList;
+            dlg.SelectedUnits = dlg.UnitsList.First();
+
+            if (dlg.ShowDialog() == true)
             {
-                //TODO:
+                //Save media definition (list of ingredients)
+                ingredientsList = dlg.IngredientsList;
+
+                using (StreamWriter outputFile = new StreamWriter(newDefinitionFilePath, false))
+                {
+                    outputFile.WriteLine(MediaIngredient.HeaderString());
+                    foreach (MediaIngredient line in ingredientsList)
+                    {
+                        outputFile.WriteLine(line.SaveString());
+                    }
+                }
+            }
+            else
+            {
+                //Don't do anything
             }
             
         }

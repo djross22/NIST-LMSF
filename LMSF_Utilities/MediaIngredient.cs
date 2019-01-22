@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace LMSF_Utilities
 {
-    class MediaIngredient
+    public class MediaIngredient
     {
         public string Name { get; set; }
-        public float Concentration { get; set; }
+        public double Concentration { get; set; }
         public string Units { get; set; }
 
-        public MediaIngredient(string name, float conc, string units)
+        public MediaIngredient(string name, double conc, string units)
         {
             Name = name;
             Concentration = conc;
@@ -21,8 +21,12 @@ namespace LMSF_Utilities
 
         public override string ToString()
         {
-            return $"{Concentration} {Units} \t{Name}";
-            
+            string units = Units;
+            if (units=="%")
+            {
+                units = "%        ";
+            }
+            return $"{Concentration} {units} \t{Name}";
         }
 
         public string SaveString()
