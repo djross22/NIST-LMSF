@@ -136,6 +136,38 @@ LMSF Scheduler: On main page, add visual indicator of run/paused state and abort
 
 LMSF Scheduler: Add WaitForTimer() method and code to ParseSteps()
 
+LMSF_Utilities: Add SharedParameters Class for storage of constants used by Utility methods
+
+LMSF_Utilities: Add MetaItem class; and SharedParameters.GetMetaList() method to parse meta-item lists
+
+LMSF_Utilities: Add SharedParameters.SortMetaList() method
+
+LMSF_Utilities: Add SharedParameters.SortAndSaveMetaList() method; fix encoding issue that caused problems with Hamilton Venus (use default encoding instead of UTF8)
+
+LMSF_Utilities: Add new class: SelectMetaIdentDialog, with placeholder code for CreateNewIdentier() methods
+
+LMSF_Utilities: Finish GetMetaIdentifier(), and most of CreateNewIdentier() (still has some TODO commetns in it)
+
+LMSF_Utilities: Add RegexValidationRule() and bindings to enforce validity of short identifiers in NewMetaIdentDialog
+
+LMSF_Utilities: Add NewLongNameDialog, NotesDialog
+
+LMSF_Utilities: Add NotesDialog and finish code for CreateNewIdentier()
+
+LMSF_Utilities: Set up Combo boxes to initially have slectedIndex = -1 (no item selected)
+
+LMSF_Utilities.GetMetaIdentifier: On cancel, make sure GetMetaIdentifier returns empty string.
+
+
+
+
+
+TODOs-
+
+CreateNewMediaIdentifier()-
+
+
+
 
 
 Copy functionality from Venus LMSF Utilities library
