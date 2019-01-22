@@ -11,10 +11,10 @@ namespace LMSF_Utilities
         public string Name { get; set; }
         public Concentration Conc { get; set; }
 
-        public MediaIngredient(string name, double conc, string units)
+        public MediaIngredient(string name, double concValue, string units)
         {
             Name = name;
-            Conc = new Concentration(conc, units);
+            Conc = new Concentration(concValue, units);
         }
 
         public MediaIngredient(string name, Concentration conc)
@@ -32,12 +32,12 @@ namespace LMSF_Utilities
             {
                 units = "%        ";
             }
-            return $"{Conc.Value} \t{units} \t\t{Name}";
+            return $"{Conc.ConcValue} \t{units} \t\t{Name}";
         }
 
         public string SaveString()
         {
-            return $"{Name},{Conc.Value},{Conc.Units}";
+            return $"{Name},{Conc.ConcValue},{Conc.Units}";
         }
 
         public static string HeaderString()
@@ -48,18 +48,18 @@ namespace LMSF_Utilities
 
     public class Concentration
     {
-        public double Value { get; set; }
+        public double ConcValue { get; set; }
         public string Units { get; set; }
 
-        public Concentration(double value, string units)
+        public Concentration(double concValue, string units)
         {
-            Value = value;
+            ConcValue = concValue;
             Units = units;
         }
 
         public override string ToString()
         {
-            return $"{Value} {Units}";
+            return $"{ConcValue} {Units}";
         }
     }
 }
