@@ -305,72 +305,88 @@ namespace LMSF_Utilities
                 }
 
                 string parentMessage = "";
-                if (metaType=="strain")
+                switch (metaType)
                 {
-                    parentMessage = "To create a new strain definition, you will need to specify the parent strain, or 'none'.\n\nThe parent strain is the strain that the new strain was derived from (via knock -out or knock-in, etc.).";
-                }
-                if (metaType=="plasmid")
-                {
-                    parentMessage = "To create a new plasmid definition, you will need to specify the parent plasmid, or 'none'.\n\nThe parent plasmid is the plasmid that the new plasmid was derived from.";
+                    case "strain":
+                        parentMessage = "To create a new strain definition, you will need to specify the parent strain, or 'none'.\n\nThe parent strain is the strain that the new strain was derived from (via knock -out or knock-in, etc.).";
+                        break;
+                    case "plasmid":
+                        parentMessage = "To create a new plasmid definition, you will need to specify the parent plasmid, or 'none'.\n\nThe parent plasmid is the plasmid that the new plasmid was derived from.";
+                        break;
+                    case "media":
+                        parentMessage = "To create a new media definition, you will need a list of the ingredients.\nFor each ingredient, you will also need the concentration and units.";
+                        break;
+                    default:
+                        break;
                 }
 
                 if (parentMessage != "")
                 {
-                    MessageBox.Show(parentMessage, "Identifier Parent", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(parentMessage, titleText, MessageBoxButton.OK, MessageBoxImage.Information);
 
-                    ObservableCollection<MetaItem> listPlusNone = new ObservableCollection<MetaItem>(metaList);
-                    listPlusNone.Add(new MetaItem("none", 0, ""));
-
-                    string selectTitle = "Select Parent " + ToTitleCase(metaType) + " For " + ToTitleCase(metaType) + " " + newIdent;
-                    string selectPrompt = "Select the parent " + metaType + " for new " + metaType + ": " + newIdent;
-
-                    // Instantiate the dialog box
-                    SelectMetaIdentDialog dlg2 = new SelectMetaIdentDialog();
-                    // Configure the dialog box
-                    dlg2.ItemList = metaList;
-                    dlg2.SelectedIndex = -1;
-                    dlg2.Title = selectTitle;
-                    dlg2.PromptText = selectPrompt;
-                    // Open the dialog box modally and set newIdent = "" if it does not returns true
-                    if (dlg2.ShowDialog() != true)
+                    if (metaType=="media")
                     {
-                        newIdent = "";
+                        GetAndSaveMediaIngredients();
+                        //TODO:
+                        
                     }
                     else
                     {
-                        //int parentIndex = dlg2.SelectedIndex;
-                        string parentID = dlg2.SelectedItem.ShortID;
+                        ObservableCollection<MetaItem> listPlusNone = new ObservableCollection<MetaItem>(metaList);
+                        listPlusNone.Add(new MetaItem("none", 0, ""));
 
-                        //Get notes for new strain/plasmid and save to new strain/plasmid file
-                        string notesPrompt = "Enter Notes for New " + ToTitleCase(metaType) + ": ";
-                        titleText = "New " + ToTitleCase(metaType) + " Notes";
-                        string newDefinitionFilePath = StrainFolderPath + newIdent + "-" + metaType + ".txt";
-                        string newDefinitionString = ToTitleCase(metaType) + " identifier: \t" + newIdent;
-
-                        notesPrompt += newIdent;
+                        string selectTitle = "Select Parent " + ToTitleCase(metaType) + " For " + ToTitleCase(metaType) + " " + newIdent;
+                        string selectPrompt = "Select the parent " + metaType + " for new " + metaType + ": " + newIdent;
 
                         // Instantiate the dialog box
-                        NotesDialog notesDlg = new NotesDialog();
+                        SelectMetaIdentDialog dlg2 = new SelectMetaIdentDialog();
                         // Configure the dialog box
-                        notesDlg.Title = titleText;
-                        notesDlg.PromptText = notesPrompt;
-                        // Open the dialog box modally and abort if it does not returns true
-                        if (notesDlg.ShowDialog() != true)
+                        dlg2.ItemList = metaList;
+                        dlg2.SelectedIndex = -1;
+                        dlg2.Title = selectTitle;
+                        dlg2.PromptText = selectPrompt;
+                        // Open the dialog box modally and set newIdent = "" if it does not returns true
+                        if (dlg2.ShowDialog() != true)
                         {
-                            newNotes = "";
+                            newIdent = "";
                         }
                         else
                         {
-                            newNotes = notesDlg.Notes;
+                            //int parentIndex = dlg2.SelectedIndex;
+                            string parentID = dlg2.SelectedItem.ShortID;
+
+                            //Get notes for new strain/plasmid and save to new strain/plasmid file
+                            string notesPrompt = "Enter Notes for New " + ToTitleCase(metaType) + ": ";
+                            titleText = "New " + ToTitleCase(metaType) + " Notes";
+                            string newDefinitionFilePath = StrainFolderPath + newIdent + "-" + metaType + ".txt";
+                            string newDefinitionString = ToTitleCase(metaType) + " identifier: \t" + newIdent;
+
+                            notesPrompt += newIdent;
+
+                            // Instantiate the dialog box
+                            NotesDialog notesDlg = new NotesDialog();
+                            // Configure the dialog box
+                            notesDlg.Title = titleText;
+                            notesDlg.PromptText = notesPrompt;
+                            // Open the dialog box modally and abort if it does not returns true
+                            if (notesDlg.ShowDialog() != true)
+                            {
+                                newNotes = "";
+                            }
+                            else
+                            {
+                                newNotes = notesDlg.Notes;
+                            }
+
+                            newDefinitionString += "\n\n";
+                            newDefinitionString += "Parent identifier: \t" + parentID + "\n\n";
+                            newDefinitionString += "Notes:\n" + newNotes + "\n";
+
+                            //Write out newDefinitionString to text file (newDefinitionFilePath)
+                            System.IO.File.WriteAllText(newDefinitionFilePath, newDefinitionString);
                         }
-
-                        newDefinitionString += "\n\n";
-                        newDefinitionString += "Parent identifier: \t" + parentID + "\n\n";
-                        newDefinitionString += "Notes:\n" + newNotes + "\n";
-
-                        //Write out newDefinitionString to text file (newDefinitionFilePath)
-                        System.IO.File.WriteAllText(newDefinitionFilePath, newDefinitionString);
                     }
+                    
                 }
             }
             else
@@ -385,6 +401,20 @@ namespace LMSF_Utilities
 
                 SortAndSaveMetaList(listPlusNew, metaType, -1);
             }
+        }
+
+        private static void GetAndSaveMediaIngredients()
+        {
+            //Set up Empty list of ingredients
+            ObservableCollection<MediaIngredient> ingredientsList = new ObservableCollection<MediaIngredient>();
+
+            //Loop over add ingredients step until Done
+            bool userDone = false;
+            while (!userDone)
+            {
+                //TODO:
+            }
+            
         }
 
         private static string ToTitleCase(string inString)
