@@ -155,8 +155,11 @@ namespace LMSF_Scheduler
             get { return this.inputText; }
             set
             {
+                if (this.inputText != value)
+                {
+                    InputChanged = true;
+                }
                 this.inputText = value;
-                InputChanged = true;
                 OnPropertyChanged("InputText");
             }
         }
