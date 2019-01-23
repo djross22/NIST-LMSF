@@ -494,110 +494,13 @@ namespace LMSF_Scheduler
                 switch (stepType)
                 {
                     case "Overlord":
-                        outString += "Running Overlord proccedure: ";
-                        bool isOvpFileName = false;
-                        if (numArgs < 2)
-                        {
-                            outString += "No procedure path given.";
-                            valFailed.Add(num);
-                        }
-                        else
-                        {
-                            if (stepArgs[1].EndsWith(".ovp"))
-                            {
-                                isOvpFileName = true;
-                            }
-                            else
-                            {
-                                outString += "Not a valid Overlord procedure filename: ";
-                                outString += stepArgs[1];
-                                valFailed.Add(num);
-                            }
-                        }
-
-                        if (isOvpFileName)
-                        {
-                            bool ovpExists = File.Exists(stepArgs[1]);
-                            if (ovpExists)
-                            {
-                                outString += stepArgs[1];
-
-                                if (!isValidating)
-                                {
-                                    RunOverlord(num, stepArgs[1]);
-                                }
-                            }
-                            else
-                            {
-                                outString += "Procedure file not found: ";
-                                outString += stepArgs[1];
-                                valFailed.Add(num);
-                            }
-                        }
+                        ParseOverlordStep();
                         break;
                     case "WaitFor":
-                        outString += "WaitFor: ";
-                        if (numArgs < 2)
-                        {
-                            outString += "Must specify the process to WaitFor (Overlord or Timer)";
-                            valFailed.Add(num);
-                        }
-                        else
-                        {
-                            switch (stepArgs[1])
-                            {
-                                case "Overlord":
-                                    outString += "Overlord, Done.";
-                                    if (!isValidating)
-                                    {
-                                        WaitForOverlord(num);
-                                    }
-                                    break;
-                                case "Timer":
-                                    outString += "Timer, Done.";
-                                    if (!isValidating)
-                                    {
-                                        WaitForTimer(num);
-                                    }
-                                    break;
-                                default:
-                                    outString += "WaitFor process not recognized: ";
-                                    outString += stepArgs[1];
-                                    valFailed.Add(num);
-                                    break;
-                            }
-                        }
+                        ParseWaitForStep();
                         break;
                     case "Timer":
-                        outString += "Running Timer: ";
-                        int waitTime = 0;
-                        bool isInteger = false;
-                        if (numArgs < 2)
-                        {
-                            outString += "No time given for the timer.";
-                            valFailed.Add(num);
-                        }
-                        else
-                        {
-                            if (int.TryParse(stepArgs[1], out waitTime))
-                            {
-                                isInteger = true;
-                            }
-                            else
-                            {
-                                outString += "Timer time parameter is not an integer: ";
-                                outString += stepArgs[1];
-                                valFailed.Add(num);
-                            }
-                        }
-
-                        if (isInteger)
-                        {
-                            if (!isValidating)
-                            {
-                                RunTimer(num, waitTime);
-                            }
-                        }
+                        ParseTimerStep();
                         break;
                     default:
                         valFailed.Add(num);
@@ -613,6 +516,119 @@ namespace LMSF_Scheduler
             }
 
             return outString;
+
+            //Local functions to parse each type of step
+            void ParseOverlordStep()
+            {
+                outString += "Running Overlord proccedure: ";
+                bool isOvpFileName = false;
+                if (numArgs < 2)
+                {
+                    outString += "No procedure path given.";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    if (stepArgs[1].EndsWith(".ovp"))
+                    {
+                        isOvpFileName = true;
+                    }
+                    else
+                    {
+                        outString += "Not a valid Overlord procedure filename: ";
+                        outString += stepArgs[1];
+                        valFailed.Add(num);
+                    }
+                }
+
+                if (isOvpFileName)
+                {
+                    bool ovpExists = File.Exists(stepArgs[1]);
+                    if (ovpExists)
+                    {
+                        outString += stepArgs[1];
+
+                        if (!isValidating)
+                        {
+                            RunOverlord(num, stepArgs[1]);
+                        }
+                    }
+                    else
+                    {
+                        outString += "Procedure file not found: ";
+                        outString += stepArgs[1];
+                        valFailed.Add(num);
+                    }
+                }
+            }
+
+            void ParseTimerStep()
+            {
+                outString += "Running Timer: ";
+                int waitTime = 0;
+                bool isInteger = false;
+                if (numArgs < 2)
+                {
+                    outString += "No time given for the timer.";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    if (int.TryParse(stepArgs[1], out waitTime))
+                    {
+                        isInteger = true;
+                    }
+                    else
+                    {
+                        outString += "Timer time parameter is not an integer: ";
+                        outString += stepArgs[1];
+                        valFailed.Add(num);
+                    }
+                }
+
+                if (isInteger)
+                {
+                    if (!isValidating)
+                    {
+                        RunTimer(num, waitTime);
+                    }
+                }
+            }
+
+            void ParseWaitForStep()
+            {
+                outString += "WaitFor: ";
+                if (numArgs < 2)
+                {
+                    outString += "Must specify the process to WaitFor (Overlord or Timer)";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    switch (stepArgs[1])
+                    {
+                        case "Overlord":
+                            outString += "Overlord, Done.";
+                            if (!isValidating)
+                            {
+                                WaitForOverlord(num);
+                            }
+                            break;
+                        case "Timer":
+                            outString += "Timer, Done.";
+                            if (!isValidating)
+                            {
+                                WaitForTimer(num);
+                            }
+                            break;
+                        default:
+                            outString += "WaitFor process not recognized: ";
+                            outString += stepArgs[1];
+                            valFailed.Add(num);
+                            break;
+                    }
+                }
+            }
         }
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
