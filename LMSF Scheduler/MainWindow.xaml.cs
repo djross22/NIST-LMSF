@@ -522,6 +522,7 @@ namespace LMSF_Scheduler
             {
                 outString += "Running Overlord proccedure: ";
                 bool isOvpFileName = false;
+                bool varArgsOk = true;
                 if (numArgs < 2)
                 {
                     outString += "No procedure path given.";
@@ -539,9 +540,41 @@ namespace LMSF_Scheduler
                         outString += stepArgs[1];
                         valFailed.Add(num);
                     }
+                    if (numArgs>2)
+                    {
+                        //check passed variables to make sure they have to correct format
+                        string varString = stepArgs[2];
+                        string[] varArgs = varString.Split(new[] { " " }, StringSplitOptions.None);
+
+                        //Needs to be an even number of varArgs
+                        int numVarArgs = varArgs.Length;
+                        if (numVarArgs%2 == 0)
+                        {
+                            varArgsOk = true;
+                            //And even arguments need to start with "[" and end with "]"
+                            for (int i = 0; i < varArgs.Length; i += 2)
+                            {
+                                if (!( varArgs[i].StartsWith("[") && varArgs[i].EndsWith("]") ) )
+                                {
+                                    varArgsOk = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            varArgsOk = false;
+                        }
+                        if (!varArgsOk)
+                        {
+                            outString += "Overlord variable syntax incorrect: ";
+                            outString += stepArgs[2];
+                            valFailed.Add(num);
+                        }
+
+                    }
                 }
 
-                if (isOvpFileName)
+                if (isOvpFileName & varArgsOk)
                 {
                     bool ovpExists = File.Exists(stepArgs[1]);
                     if (ovpExists)
@@ -550,7 +583,8 @@ namespace LMSF_Scheduler
 
                         if (!isValidating)
                         {
-                            RunOverlord(num, stepArgs[1]);
+                            //RunOverlord(num, stepArgs[1]);
+                            RunOverlord(num, stepArgs);
                         }
                     }
                     else
@@ -761,8 +795,9 @@ namespace LMSF_Scheduler
             Validate();
         }
 
-        private void RunOverlord(int num, string file)
+        private void RunOverlord(int num, string[] args)
         {
+            string file = args[1];
             //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
