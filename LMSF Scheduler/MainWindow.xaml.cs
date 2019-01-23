@@ -559,6 +559,24 @@ namespace LMSF_Scheduler
                                     varArgsOk = false;
                                 }
                             }
+                            //And odd arguments need to either parse as a number or be inclosed with quotes
+                            double temp;
+                            for (int i = 1; i < varArgs.Length; i += 2)
+                            {
+                                if (!(varArgs[i].StartsWith("\"") && varArgs[i].EndsWith("\"")))
+                                {
+                                    if (!Double.TryParse(varArgs[i], out temp))
+                                    {
+                                        varArgsOk = false;
+                                    }
+                                    if (!varArgsOk)
+                                    {
+                                        outString += "Overlord variables must either be a number or a string inclosed in quotes: ";
+                                        outString += varArgs[i];
+                                    }
+                                }
+
+                            }
                         }
                         else
                         {
@@ -797,7 +815,11 @@ namespace LMSF_Scheduler
 
         private void RunOverlord(int num, string[] args)
         {
+            //args[0] is "Overlord"
+            //args[1] is file path
             string file = args[1];
+            //second argument (if any) is the variables to pass
+
             //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
@@ -818,7 +840,18 @@ namespace LMSF_Scheduler
             ProcessStartInfo startInfo = new ProcessStartInfo();
             //startInfo.FileName = @"C:\Users\djross\source\repos\NIST LMSF\Overlord Simulator\bin\Release\Overlord.Main.exe";
             startInfo.FileName = @"C:\Program Files (x86)\PAA\Overlord3\Overlord.Main.exe";
-            startInfo.Arguments = "\"" + file + "\"" + " -r -c";
+
+            if (args.Length > 2)
+            {
+                //if there are variables to pass
+                startInfo.Arguments = "\"" + file + "\"" + " -r -c -v " + args[2];
+            }
+            else
+            {
+                //if no variables to pass
+                startInfo.Arguments = "\"" + file + "\"" + " -r -c";
+            }
+            
             ovProcess = Process.Start(startInfo);
         }
 
