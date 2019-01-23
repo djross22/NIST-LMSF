@@ -282,6 +282,9 @@ namespace LMSF_Scheduler
             }
         }
 
+        //SaveFirstQuery returns true unless the user chooses 'Cancel'
+        //    - either directly in response to the 1st Message Box
+        //    - or in in the Select File Save Dialog box-
         private bool SaveFirstQuery()
         {
             string messageBoxText = "Do you want to save changes first?";
@@ -296,8 +299,9 @@ namespace LMSF_Scheduler
             {
                 case MessageBoxResult.Yes:
                     // User pressed Yes button
-                    Save();
-                    okToGo = true;
+                    //Save();
+                    //okToGo = true;
+                    okToGo = Save();
                     break;
                 case MessageBoxResult.No:
                     // User pressed No button
@@ -349,17 +353,21 @@ namespace LMSF_Scheduler
             inputTextBox.Focus();
         }
 
-        private void Save()
+        private bool Save()
         {
+            bool didSave;
             if (ExperimentFileName != "")
             {
                 File.WriteAllText(ExperimentFileName, InputText);
                 InputChanged = false;
+                didSave = true;
             }
             else
             {
-                SaveAs();
+                didSave = SaveAs();
             }
+
+            return didSave;
         }
 
         private void SaveAsMenuItem_Click(object sender, RoutedEventArgs e)
@@ -368,21 +376,24 @@ namespace LMSF_Scheduler
             inputTextBox.Focus();
         }
 
-        private void SaveAs()
+        private bool SaveAs()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Text file (*.txt)|*.txt";
+            bool didSave;
             if (saveFileDialog.ShowDialog() == true)
             {
                 File.WriteAllText(saveFileDialog.FileName, InputText);
                 ExperimentFileName = saveFileDialog.FileName;
                 InputChanged = false;
+                didSave = true;
             }
-        }
+            else
+            {
+                didSave = false;
+            }
 
-        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            inputTextBox.Focus();
+            return didSave;
         }
 
         private void InsertFileButton_Click(object sender, RoutedEventArgs e)
@@ -965,5 +976,28 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = false;
         }
 
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            //Make sure that any edits in the inputTextBox are updated to the InputTest property
+            inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+
+            if (InputChanged && !SaveFirstQuery())
+            {
+                //Input trext has changed, and the user selected 'Cancel'
+                //    so do not close
+                e.Cancel = true;
+            }
+            else
+            {
+                // go ahead and close-
+            }
+            inputTextBox.Focus();
+        }
+
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+            inputTextBox.Focus();
+        }
     }
 }
