@@ -18,8 +18,11 @@ namespace LMSF_Utilities
     /// <summary>
     /// Interaction logic for TimerDialog.xaml
     /// </summary>
-    public partial class TimerDialog : Window
+    public partial class TimerDialog : Window, INotifyPropertyChanged
     {
+        //Property change notification event required for INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
         //Used to detect whether or not the TimerDialog has closed
         public bool IsClosed { get; private set; } = false;
 
@@ -29,9 +32,24 @@ namespace LMSF_Utilities
         //Wait time in seconds
         int waitTime = 10;
 
+        private string timeLeftString;
+        public string TimeLeftString
+        {
+            get { return this.timeLeftString; }
+            set
+            {
+                this.timeLeftString = value;
+                OnPropertyChanged("TimeLeftString");
+            }
+        }
+
         public TimerDialog(string title, int time)
         {
             InitializeComponent();
+            DataContext = this;
+
+            _isRunning = true;
+
             this.Title = title;
             this.waitTime = time;
 
@@ -47,11 +65,27 @@ namespace LMSF_Utilities
             //End code from https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
         }
 
+        protected void OnPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
         // More code (mostly) from: https://www.wpf-tutorial.com/misc/multi-threading-with-the-backgroundworker/
         void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            int sleepTime = (int)e.Argument * 10;
+            int timeInSeconds = (int)e.Argument;
+            double doubleTime = (double)timeInSeconds;
+
+            int sleepTime = 100;// timeInSeconds * 10;
             int simProgress = 0;
+
+            DateTime endTime = DateTime.Now;
+            endTime = endTime.AddSeconds(timeInSeconds);
+            TimeSpan timeLeft = endTime - DateTime.Now;
+            double doubleLeft = timeLeft.TotalSeconds;
 
             while (simProgress < 100)
             {
@@ -59,10 +93,34 @@ namespace LMSF_Utilities
                 System.Threading.Thread.Sleep(sleepTime);
                 if (_isRunning)
                 {
-                    simProgress++;
-                }
+                    timeLeft = endTime - DateTime.Now;
+                    doubleLeft = timeLeft.TotalSeconds;
 
+                    simProgress = 100 - (int)Math.Round(100*doubleLeft/doubleTime);
+                    if (simProgress>100)
+                    {
+                        simProgress = 100;
+                    }
+                }
+                else
+                {
+                    endTime = DateTime.Now + timeLeft;
+                }
+                this.Dispatcher.Invoke(() => { TimeLeftString = ToTimeLeft(timeLeft); });
             }
+        }
+
+        private string ToTimeLeft(TimeSpan ts)
+        {
+            int d = ts.Days;
+            int h = ts.Hours;
+            string timeString = ts.ToString(@"mm\:ss");
+            timeString = $"Time remaining: {h + 24 * d}:" + timeString;
+            if (!_isRunning)
+            {
+                timeString += " (Paused)";
+            }
+            return timeString;
         }
 
         void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)

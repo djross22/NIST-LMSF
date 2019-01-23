@@ -18,9 +18,10 @@
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ProgressBar x:Name="simTimeProgressBar" Margin="70,40,26,0" Width="500" Height="20" VerticalAlignment="Top"/>
+        <ProgressBar x:Name="simTimeProgressBar" Margin="70,0,26,0" Width="500" Height="20" VerticalAlignment="Center" Minimum="0" Maximum="100"/>
         <Button x:Name="pauseButton" Content="Pause" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Margin="40,20,84,45" Click="PauseButton_Click" Width="75" Height="25"/>
         <Button x:Name="stopButton" Content="Stop Now" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" HorizontalAlignment="Left" Margin="40,55,0,10" Width="75" Click="StopButton_Click" Height="25"/>
+        <TextBlock x:Name="timeLeftBlock" HorizontalAlignment="Left" Margin="70,22,0,0" TextWrapping="Wrap" Text="{Binding TimeLeftString}" VerticalAlignment="Top" Foreground="White" Width="500" TextAlignment="Center"/>
 
     </Grid>
 </Window>
