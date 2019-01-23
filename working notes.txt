@@ -126,6 +126,8 @@ Switch from "BackgroundWorker runStepsWorker" to "Thread runStepsThread" to crea
     		e.g., this.Dispatcher.Invoke(() => { IsRunning = false; });  
 			    "IsRunning" calls "UpdateEnabledState" which sets the enabled state of GUI components appropriatly
 	Anyway, I'm not sure if the Dispatcher thing would have worked in a background thread, and I don't want to take the time to find out, since the code now works.
+	
+	Notes added later: the Dispatcher things works from a background worker; I used it to display the time remaining in the TimerDialog class.
 
 LMSF Scheduler: Make play, pause, etc. buttons not focusable, and then insert "inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();"
     at the beginning of each button clicked method to makse sure the inputText gets updated appropriately.
@@ -158,15 +160,29 @@ LMSF_Utilities: Set up Combo boxes to initially have slectedIndex = -1 (no item 
 
 LMSF_Utilities.GetMetaIdentifier: On cancel, make sure GetMetaIdentifier returns empty string.
 
+LMSF_Utilities: Finish CreateNewMediaIdentifier() and MediaIngredientsDialog class
 
+LMSF_Utilities: Add ConcentrationDialog class
+
+LMSF Scheduler: Reorganize ParseSteps() method with Local functions to parse each step type
 
 
 
 TODOs-
 
-CreateNewMediaIdentifier()-
+
+LMSF Scheduler: Pass variables to Overlord Simulator
+
+LMSF Scheduler: display validation result promanently
 
 
+
+Collect and save metadata step(s) in LMSF Scheduler
+
+SaveToMetadatFile
+
+
+one-line constructors for custom dialogs
 
 
 
@@ -185,9 +201,6 @@ Add code to make sure Overlord is started before leaving RunOverlord() - since i
 
 
 
-
-
-Control where windows open?
 
 
 
