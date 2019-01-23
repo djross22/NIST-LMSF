@@ -46,11 +46,12 @@ namespace LMSF_Utilities
             DataContext = this;
         }
 
-        public UserPromptDialog(string prompt)
+        public UserPromptDialog(string title, string prompt)
         {
             InitializeComponent();
             DataContext = this;
 
+            Title = title;
             PromptText = prompt;
         }
 

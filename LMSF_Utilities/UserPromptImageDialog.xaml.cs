@@ -57,20 +57,22 @@ namespace LMSF_Utilities
             DataContext = this;
         }
 
-        public UserPromptImageDialog(string prompt, ImageSource pic)
+        public UserPromptImageDialog(string title, string prompt, ImageSource pic)
         {
             InitializeComponent();
             DataContext = this;
 
+            Title = title;
             PromptText = prompt;
             Picture = pic;
         }
 
-        public UserPromptImageDialog(string prompt, string bitmapFilePath)
+        public UserPromptImageDialog(string title, string prompt, string bitmapFilePath)
         {
             InitializeComponent();
             DataContext = this;
 
+            Title = title;
             PromptText = prompt;
 
             BitmapImage bi = new BitmapImage();
