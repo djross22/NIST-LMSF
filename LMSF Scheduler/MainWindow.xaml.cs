@@ -794,6 +794,7 @@ namespace LMSF_Scheduler
         private bool Validate()
         {
             IsPaused = false;
+            AbortCalled = false;
             IsRunning = true;
             isValidating = true;
             valFailed = new List<int>();
