@@ -56,6 +56,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UserPromptImageDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UserPromptDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -88,6 +92,9 @@
     <Compile Include="MetaItem.cs" />
     <Compile Include="MediaIngredientsDialog.xaml.cs">
       <DependentUpon>MediaIngredientsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserPromptImageDialog.xaml.cs">
+      <DependentUpon>UserPromptImageDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserPromptDialog.xaml.cs">
       <DependentUpon>UserPromptDialog.xaml</DependentUpon>
