@@ -523,5 +523,19 @@ namespace LMSF_Utilities
                 
         }
 
+        public static bool? ShowPrompt(string messageText, string title)
+        {
+            UserPromptDialog dlg = new UserPromptDialog(title, messageText);
+
+            return dlg.ShowDialog();
+        }
+
+        public static bool? ShowPrompt(string messageText, string title, string bitmapFilePath)
+        {
+            UserPromptImageDialog dlg = new UserPromptImageDialog(title, messageText, bitmapFilePath);
+
+            return dlg.ShowDialog();
+        }
+
     }
 }
