@@ -572,7 +572,7 @@ namespace LMSF_Scheduler
                                     if (!varArgsOk)
                                     {
                                         outString += "Overlord variables must either be a number or a string inclosed in quotes: ";
-                                        outString += varArgs[i];
+                                        outString += varArgs[i] + ", ";
                                     }
                                 }
 
@@ -598,6 +598,10 @@ namespace LMSF_Scheduler
                     if (ovpExists)
                     {
                         outString += stepArgs[1];
+                        if (stepArgs.Length>2)
+                        {
+                            outString += ", " + stepArgs[2];
+                        }
 
                         if (!isValidating)
                         {
