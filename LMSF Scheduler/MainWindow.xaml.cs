@@ -812,11 +812,15 @@ namespace LMSF_Scheduler
                 {
                     OutputText += $"{i}, ";
                 }
+                validationTextBlock.Text = "Validation Failed";
+                validationBorder.Background = new SolidColorBrush(Colors.Red);
             }
             else
             {
                 OutputText += "\r\n";
                 OutputText += "Validation sucessful.\r\n";
+                validationTextBlock.Text = "Validation Sucessful";
+                validationBorder.Background = new SolidColorBrush(Colors.LimeGreen);
                 valReturn = true;
             }
             isValidating = false;
