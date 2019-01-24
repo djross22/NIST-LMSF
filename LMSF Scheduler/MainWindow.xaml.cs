@@ -433,7 +433,15 @@ namespace LMSF_Scheduler
             //init running state for each step
             stepsRunning = Enumerable.Repeat(false, totalSteps).ToArray();
 
-            OutputText = "";
+            if (isValidating)
+            {
+                OutputText = $"Validating {ExperimentFileName}\n\n";
+            }
+            else
+            {
+                OutputText = $"Running {ExperimentFileName}\n\n";
+            }
+            
         }
 
         private void StepsThreadProc()
