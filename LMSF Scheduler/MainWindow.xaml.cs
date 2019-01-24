@@ -464,6 +464,8 @@ namespace LMSF_Scheduler
             //runStepsThread.SetApartmentState(ApartmentState.STA);
 
             runStepsThread.Start();
+
+            //Todo: add save log file here
         }
 
         private void Step()
@@ -482,7 +484,7 @@ namespace LMSF_Scheduler
                 }
                 else
                 {
-                    OutputText += "Done.\n";
+                    OutputText += $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}; Done.\n";
                     this.Dispatcher.Invoke(() => { IsRunning = false; });
                 }
 
@@ -494,6 +496,7 @@ namespace LMSF_Scheduler
         private string ParseStep(int num, string step)
         {
             string outString = $"{num}. ";
+            outString += $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}; ";
             string[] stepArgs = step.Split(new[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
 
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
@@ -525,10 +528,11 @@ namespace LMSF_Scheduler
                         }
                         break;
                 }
+
                 outString += "\r\n";
                 outString += "\r\n";
             }
-
+            
             return outString;
 
             //Local functions to parse each type of step
@@ -658,6 +662,7 @@ namespace LMSF_Scheduler
 
                 if (isInteger)
                 {
+                    outString += stepArgs[1];
                     if (!isValidating)
                     {
                         RunTimer(num, waitTime);
