@@ -453,8 +453,10 @@ namespace LMSF_Scheduler
         }
 
         //Breaks the InputText into steps/lines
-        private void InitSteps()
+        private bool InitSteps()
         {
+            bool initOK = true;
+
             inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             //remove leading and trailing white space from each line
@@ -474,30 +476,35 @@ namespace LMSF_Scheduler
             }
             else
             {
-                NewLogFile();
+                initOK = NewLogFile();
                 OutputText = $"Running {ExperimentFileName}\n\n";
                 File.WriteAllText(logFilePath, OutputText);
             }
-            
+
+            return initOK;
         }
 
         private void StepsThreadProc()
         {
-            InitSteps();
+            bool okToGo = InitSteps();
 
-            while (IsRunning)
+            if (okToGo)
             {
-                while (IsPaused)
+                while (IsRunning)
                 {
-                    if (IsOneStep)
+                    while (IsPaused)
                     {
-                        break;
+                        if (IsOneStep)
+                        {
+                            break;
+                        }
+                        Thread.Sleep(100);
                     }
-                    Thread.Sleep(100);
-                }
 
-                Step();
+                    Step();
+                }
             }
+            
         }
 
         private void RunSteps()
@@ -1074,9 +1081,29 @@ namespace LMSF_Scheduler
             return $"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.trc";
         }
 
-        private void NewLogFile()
+        private bool NewLogFile()
         {
+            bool okToGo = true;
             logFilePath = SharedParameters.LogFileFolderPath + NewLogFileName();
+            if (!Directory.Exists(SharedParameters.LogFileFolderPath))
+            {
+                try
+                {
+                    Directory.CreateDirectory(SharedParameters.LogFileFolderPath);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    string dialogText = @"Failed to create log file directory. Try manually creating the directory: 'C:\Shared Files\LMSF Scheduler\LogFiles\', then press 'OK' to continue, or 'Cancel' to abort the run.";
+                    MessageBoxResult result = MessageBox.Show(dialogText, "Log File Directory Error", MessageBoxButton.OKCancel);
+                    if (result == MessageBoxResult.Cancel)
+                    {
+                        okToGo = false;
+                    }
+                    
+                }
+            }
+
+            return okToGo;
         }
 
         private void SelectComboBox_DropDownClosed(object sender, EventArgs e)
