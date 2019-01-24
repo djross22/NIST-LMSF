@@ -62,6 +62,9 @@ namespace LMSF_Scheduler
         private static string appName = "LMSF Scheduler";
         private string displayTitle = appName + " - ";
 
+        //log file
+        private string logFilePath;
+
         #region Properties Getters and Setters
 
         public bool AbortCalled
@@ -234,6 +237,7 @@ namespace LMSF_Scheduler
         {
             InitializeComponent();
             runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
+            
             DataContext = this;
         }
 
@@ -439,7 +443,9 @@ namespace LMSF_Scheduler
             }
             else
             {
+                NewLogFile();
                 OutputText = $"Running {ExperimentFileName}\n\n";
+                File.WriteAllText(logFilePath, OutputText);
             }
             
         }
@@ -452,7 +458,6 @@ namespace LMSF_Scheduler
             {
                 while (IsPaused)
                 {
-                    //MessageBox.Show("In pause loop");
                     if (IsOneStep)
                     {
                         break;
@@ -487,12 +492,24 @@ namespace LMSF_Scheduler
             {
                 if (stepNum < totalSteps)
                 {
-                    OutputText += ParseStep(stepNum, inputSteps[stepNum]);
+                    string oldText = OutputText;
+                    string newText = ParseStep(stepNum, inputSteps[stepNum]);
+                    OutputText = oldText + newText;
+                    if (!isValidating)
+                    {
+                        File.AppendAllText(logFilePath, newText);
+                    }
+                    
                     stepNum++;
                 }
                 else
                 {
-                    OutputText += $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}; Done.\n";
+                    string doneText = $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}; Done.\n";
+                    OutputText += doneText;
+                    if (!isValidating)
+                    {
+                        File.AppendAllText(logFilePath, doneText);
+                    }
                     this.Dispatcher.Invoke(() => { IsRunning = false; });
                 }
 
@@ -1020,5 +1037,17 @@ namespace LMSF_Scheduler
             this.Close();
             inputTextBox.Focus();
         }
+
+        private string NewLogFileName()
+        {
+            return $"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.trc";
+        }
+
+        private void NewLogFile()
+        {
+            logFilePath = SharedParameters.LogFileFolderPath + NewLogFileName();
+        }
+
     }
+
 }

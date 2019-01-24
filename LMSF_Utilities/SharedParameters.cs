@@ -16,6 +16,9 @@ namespace LMSF_Utilities
         //Delimeter used in output files
         public static char Delimeter => ',';
 
+        //Folder for LMSF Scheduler log files
+        public static string LogFileFolderPath => "C:\\Shared Files\\LogFiles\\";
+
         //Folders for shared data and metadata
         public static string WorklistFolderPath => "C:\\Shared Files\\Data\\";
         public static string MetadataFolderPath => "C:\\Shared Files\\MetaData Schema\\";
