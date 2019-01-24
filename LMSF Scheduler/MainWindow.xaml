@@ -20,6 +20,13 @@
             </Menu>
             <ToolBarTray VerticalAlignment="Top" DockPanel.Dock="Top">
                 <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False">
+                    
+                    <Border BorderThickness="1" VerticalAlignment="Center">
+                        <ComboBox x:Name="selectComboBox" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Width="75" Height="25" ItemsSource="{Binding CommandList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedCommand, Mode=TwoWay}" BorderBrush="Black" DropDownClosed="SelectComboBox_DropDownClosed"/>
+
+                    </Border>
+                </ToolBar>
+                <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False">
                     <Button x:Name="playButton" ToolTip="Run/Continue Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="PlayButton_Click" Focusable="False">
                         <Image Source="start.png" Height="25"/>
                     </Button>
@@ -50,6 +57,7 @@
                 <Button x:Name="testButton" Content="Test" Width="75" Click="TestButton_Click" Margin="10,0,20,10"/>
                 <TextBox x:Name="testTextBox" TextWrapping="Wrap" Text="TextBox" Margin="0,0,0,10" Width="223"/>
                 <Button x:Name="testWriteButton" Content="Write" Width="75" Margin="10,0,0,10" Click="TestWriteButton_Click"/>
+                
             </StackPanel>
             <Grid Margin="10">
                 <Grid.RowDefinitions>

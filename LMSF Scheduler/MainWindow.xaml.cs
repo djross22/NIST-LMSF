@@ -65,7 +65,19 @@ namespace LMSF_Scheduler
         //log file
         private string logFilePath;
 
+        public ObservableCollection<string> CommandList { get; set; }
+        private string selectedCommand;
+
         #region Properties Getters and Setters
+        public string SelectedCommand
+        {
+            get { return this.selectedCommand; }
+            set
+            {
+                this.selectedCommand = value;
+                OnPropertyChanged("SelectedCommand");
+            }
+        }
 
         public bool AbortCalled
         {
@@ -239,6 +251,8 @@ namespace LMSF_Scheduler
             runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
             
             DataContext = this;
+
+            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor" }; //SharedParameters.UnitsList;
         }
 
         protected void OnPropertyChanged(string name)
@@ -410,14 +424,31 @@ namespace LMSF_Scheduler
 
             if (openFileDialog.ShowDialog() == true)
             {
-                int caretPos = inputTextBox.SelectionStart;
+                //int caretPos = inputTextBox.SelectionStart;
                 string newText = openFileDialog.FileName;
+
+                //InputText = InputText.Insert(caretPos, newText);
+
+                //inputTextBox.SelectionStart = caretPos + newText.Length;
+                //inputTextBox.SelectionLength = 0;
+
+                InsertInputText(newText);
+            }
+            inputTextBox.Focus();
+        }
+
+        private void InsertInputText(string newText)
+        {
+            if (!(newText is null))
+            {
+                int caretPos = inputTextBox.SelectionStart;
 
                 InputText = InputText.Insert(caretPos, newText);
 
                 inputTextBox.SelectionStart = caretPos + newText.Length;
                 inputTextBox.SelectionLength = 0;
             }
+            
             inputTextBox.Focus();
         }
 
@@ -1048,6 +1079,10 @@ namespace LMSF_Scheduler
             logFilePath = SharedParameters.LogFileFolderPath + NewLogFileName();
         }
 
+        private void SelectComboBox_DropDownClosed(object sender, EventArgs e)
+        {
+            InsertInputText($"{SelectedCommand}, ");
+        }
     }
 
 }
