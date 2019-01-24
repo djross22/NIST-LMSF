@@ -19,14 +19,15 @@
                 </MenuItem>
             </Menu>
             <ToolBarTray VerticalAlignment="Top" DockPanel.Dock="Top">
-                <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False">
-                    
+                <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False" Margin="10,0" ToolTip="Steps Input Shortcuts">
                     <Border BorderThickness="1" VerticalAlignment="Center">
                         <ComboBox x:Name="selectComboBox" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Width="75" Height="25" ItemsSource="{Binding CommandList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedCommand, Mode=TwoWay}" BorderBrush="Black" DropDownClosed="SelectComboBox_DropDownClosed"/>
-
+                    </Border>
+                    <Border BorderThickness="1" VerticalAlignment="Center">
+                        <Button x:Name="insertFileButton" Content="Insert File Path" Margin="10,4" VerticalAlignment="Center" Width="100" Click="InsertFileButton_Click" Height="25" />
                     </Border>
                 </ToolBar>
-                <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False">
+                <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False" Margin="10,0">
                     <Button x:Name="playButton" ToolTip="Run/Continue Experiment" VerticalAlignment="Top" Margin="5,0" BorderBrush="Black" Click="PlayButton_Click" Focusable="False">
                         <Image Source="start.png" Height="25"/>
                     </Button>
@@ -53,7 +54,7 @@
                 </ToolBar>
             </ToolBarTray>
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Height="30" FocusManager.IsFocusScope="False">
-                <Button x:Name="insertFileButton" Content="Insert File Path" Margin="30,4,20,4" VerticalAlignment="Center" Width="107" Click="InsertFileButton_Click" />
+                
                 <Button x:Name="testButton" Content="Test" Width="75" Click="TestButton_Click" Margin="10,0,20,10"/>
                 <TextBox x:Name="testTextBox" TextWrapping="Wrap" Text="TextBox" Margin="0,0,0,10" Width="223"/>
                 <Button x:Name="testWriteButton" Content="Write" Width="75" Margin="10,0,0,10" Click="TestWriteButton_Click"/>
