@@ -945,7 +945,7 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
-            OutputText += "... waiting for Overlord Process to exit.";
+            OutputText += "... waiting for Overlord to finish and exit.";
 
             BackgroundWorker ovMonitorWorker = new BackgroundWorker();
             ovMonitorWorker.WorkerReportsProgress = false;
