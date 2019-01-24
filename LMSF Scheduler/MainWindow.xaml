@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Scheduler"
         mc:Ignorable="d"
-        Title="{Binding DisplayTitle}" Height="450" Width="1200" Background="{DynamicResource PurpleBackgroundBrush}" MinHeight="450" MinWidth="1100" Closing="Window_Closing">
+        Title="{Binding DisplayTitle}" Height="600" Width="1200" Background="{DynamicResource PurpleBackgroundBrush}" MinHeight="600" MinWidth="1100" Closing="Window_Closing">
     <Grid>
         <DockPanel Margin="0">
             <Menu x:Name="mainMenu" VerticalAlignment="Top" DockPanel.Dock="Top" FocusManager.IsFocusScope="False">
