@@ -587,6 +587,7 @@ namespace LMSF_Scheduler
                     {
                         File.AppendAllText(logFilePath, doneText);
                     }
+
                     this.Dispatcher.Invoke(() => { IsRunning = false; });
                 }
 
@@ -1078,7 +1079,7 @@ namespace LMSF_Scheduler
             sourceAtt.Value = sourceStr;
             protocolNode.Attributes.Append(sourceAtt);
 
-            //add the datetime info to the 
+            AddDateTimeNodes(protocolNode, "protocol started");
 
             //add the step node to the experiment node
             experimentNode.AppendChild(protocolNode);
@@ -1142,6 +1143,17 @@ namespace LMSF_Scheduler
 
         private void RunSaveXml()
         {
+            //Add protocol finishing time to XML output
+            DateTime dt = DateTime.Now;
+            XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::protocol/dateTime");
+            XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
+            XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+            timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+            XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+            statusFiniAtt.Value = "protocol finished";
+            timeFiniNode.Attributes.Append(statusFiniAtt);
+            dateNode.AppendChild(timeFiniNode);
+
             //Save the XML document
             xmlDoc.Save(metaDataFilePath);
 
