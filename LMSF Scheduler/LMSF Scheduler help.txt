@@ -1,4 +1,6 @@
-Steps are entered into the "Steps Input:" text box; one step per line; blank lines are ignored;
+Steps are entered into the "Steps Input:" text box; one step per line.
+Blank lines are ignored.
+Lines can be commented out with two forward slashes at the start of the line ("//"). Commetned line siwll be ignored.
 
 Step syntax:
 <Command>,<parameter(s)>

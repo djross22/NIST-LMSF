@@ -487,6 +487,9 @@ namespace LMSF_Scheduler
             //then delete any lines that were just white space (are now empty)
             inputSteps = inputSteps.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
+            //then delete any lines that start with "//" - comment lines
+            inputSteps = inputSteps.Where(s => !s.StartsWith("//")).ToArray();
+
             stepNum = 0;
             totalSteps = inputSteps.Length;
 
