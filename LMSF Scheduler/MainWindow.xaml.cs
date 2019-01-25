@@ -74,6 +74,7 @@ namespace LMSF_Scheduler
         private XmlDocument xmlDoc;
         private XmlNode rootNode;
         private XmlNode projectNode;
+        private XmlNode experimentNode;
         private XmlNode experimentIdNode;
         string experimentID;
         private XmlNode protocolNode;
@@ -1077,8 +1078,8 @@ namespace LMSF_Scheduler
             sourceAtt.Value = sourceStr;
             protocolNode.Attributes.Append(sourceAtt);
 
-            //add the step node to the project node
-            projectNode.AppendChild(protocolNode);
+            //add the step node to the experiment node
+            experimentNode.AppendChild(protocolNode);
         }
 
         private string GetProjectIdentifier()
@@ -1119,14 +1120,19 @@ namespace LMSF_Scheduler
             //add the project node to the root node
             rootNode.AppendChild(projectNode);
 
+            //add experiment node to the project node
+            experimentNode = xmlDoc.CreateElement("experiment");
+            //add the experiment ID node to the project node
+            projectNode.AppendChild(experimentNode);
+
             //New experiment ID node
             //    Value/InnerText initially set to "temp_identifier"
             //    then a down-stream command will set it to a standard format, like "2019-01-09_1515_pGTGv1_pGTGv2" "yyyy-MM-dd_HHmm_<identifiers>"
             experimentIdNode = xmlDoc.CreateElement("experimentId");
             experimentID = "temp_identifier";
             experimentIdNode.InnerText = experimentID;
-            //add the experiment ID node to the project node
-            projectNode.AppendChild(experimentIdNode);
+            //add the experiment ID node to the experiment node
+            experimentNode.AppendChild(experimentIdNode);
 
             //Add the current experiment step to the XML
             AddXmlStep(args[1], stepSource);
@@ -1212,7 +1218,7 @@ namespace LMSF_Scheduler
                 dayNode.InnerText = dt.ToString("dd");
                 dateTimeNode.AppendChild(dayNode);
 
-                XmlNode timeNode = xmlDoc.CreateElement("day");
+                XmlNode timeNode = xmlDoc.CreateElement("time");
                 timeNode.InnerText = dt.ToString("HH:mm:ss");
                 XmlAttribute statusAtt = xmlDoc.CreateAttribute("status");
                 statusAtt.Value = "procedure started";
@@ -1250,13 +1256,15 @@ namespace LMSF_Scheduler
             {
                 DateTime dt = DateTime.Now;
 
-                XmlNode testNode = xmlDoc.SelectSingleNode("descendant::overlordProcedure/dateTime");
-                XmlNode timeFiniNode = xmlDoc.CreateElement("day");
+                //XmlNode testNode = xmlDoc.SelectSingleNode("descendant::overlordProcedure/dateTime");
+                XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::overlordProcedure/dateTime");
+                XmlNode dateNode = dateNodeList.Item(dateNodeList.Count-1);
+                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
                 timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
                 XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
                 statusFiniAtt.Value = "procedure finished";
                 timeFiniNode.Attributes.Append(statusFiniAtt);
-                testNode.AppendChild(timeFiniNode);
+                dateNode.AppendChild(timeFiniNode);
             }
 
         }
