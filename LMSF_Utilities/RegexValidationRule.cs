@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 namespace LMSF_Utilities
 {
     //code borrowed from: https://www.codeproject.com/Articles/15610/Regex-Validation-in-WPF
-    class RegexValidationRule : ValidationRule
+    public class RegexValidationRule : ValidationRule
     {
         public string RegexText { get; set; }
         public string ErrorMessage { get; set; }

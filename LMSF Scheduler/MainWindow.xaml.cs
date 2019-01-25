@@ -76,6 +76,8 @@ namespace LMSF_Scheduler
         private XmlNode projectNode;
         private XmlNode experimentIdNode;
         string experimentID;
+        private XmlNode stepNode;
+        private static string stepSource = "LMSF Scheduler";
 
         #region Properties Getters and Setters
         public string SelectedCommand
@@ -805,13 +807,42 @@ namespace LMSF_Scheduler
 
             void ParseNewXml()
             {
+                //Boolean used to track validity of arguments/parameters
+                bool argsOk = true;
+
                 //string for start of output from ParseStep()
                 outString += "Creating New XML document: ";
 
-                // no arguments to check, so go straigt to running it
-                if (!isValidating)
+                //Requires an argument for the step type:
+                if (numArgs < 2)
                 {
-                    RunNewXml();
+                    argsOk = false;
+                    //Message for missing argument or not enough arguments:
+                    outString += "No step type argument given.";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    //If the step type argument exists, amke sure it is ok (needs to be a good xml atribute value, with just letters, numbers, spaces, or "-" or "_")
+                    RegexValidationRule valRule = new RegexValidationRule();
+                    valRule.RegexText = "^[a-zA-Z0-9-_ ]+$";
+                    valRule.ErrorMessage = "Experiment step arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
+                    ValidationResult valRes = valRule.Validate(stepArgs[1], System.Globalization.CultureInfo.CurrentCulture);
+                    if (!valRes.IsValid)
+                    {
+                        argsOk = false;
+                        //Message for bad step typ argument
+                        outString += "Experiment step arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
+                        valFailed.Add(num);
+                    }
+                }
+
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        RunNewXml(num, stepArgs);
+                    }
                 }
             }
 
@@ -1021,7 +1052,26 @@ namespace LMSF_Scheduler
             Validate();
         }
 
-        private void RunNewXml()//(int num, string[] args)
+        private void AddXmlStep(string typeStr, string sourceStr)
+        {
+            //New step node
+            stepNode = xmlDoc.CreateElement("experimentStep");
+
+            //stepType attribute for step node
+            XmlAttribute stepIdAtt = xmlDoc.CreateAttribute("stepType");
+            stepIdAtt.Value = typeStr;
+            stepNode.Attributes.Append(stepIdAtt);
+
+            //source attribute for step node
+            XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
+            sourceAtt.Value = sourceStr;
+            stepNode.Attributes.Append(sourceAtt);
+
+            //add the step node to the project node
+            projectNode.AppendChild(stepNode);
+        }
+
+        private void RunNewXml(int num, string[] args)
         {
             //New XML document
             xmlDoc = new XmlDocument();
@@ -1055,6 +1105,9 @@ namespace LMSF_Scheduler
             experimentIdNode.InnerText = experimentID;
             //add the experiment ID node to the project node
             projectNode.AppendChild(experimentIdNode);
+
+            //Add the current experiment step to the XML
+            AddXmlStep(args[1], stepSource);
         }
 
         private void RunSaveXml()
@@ -1274,7 +1327,7 @@ namespace LMSF_Scheduler
             {
                 int caretPos = inputTextBox.SelectionStart;
 
-                InsertInputText("\n\nSaveXML, ");
+                InsertInputText(" <step type>\n\nSaveXML, ");
 
                 //move caret to middle line between NewXML and SaveXML
                 inputTextBox.SelectionStart = caretPos + 1;
