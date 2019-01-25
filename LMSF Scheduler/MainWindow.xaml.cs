@@ -78,6 +78,7 @@ namespace LMSF_Scheduler
         string experimentID;
         private XmlNode stepNode;
         private static string stepSource = "LMSF Scheduler";
+        private bool isCollectingXml;
 
         #region Properties Getters and Setters
         public string SelectedCommand
@@ -476,6 +477,9 @@ namespace LMSF_Scheduler
         {
             bool initOK = true;
 
+            //by default, don't collect metadata
+            isCollectingXml = false;
+
             inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             //remove leading and trailing white space from each line
@@ -573,7 +577,7 @@ namespace LMSF_Scheduler
                 }
                 else
                 {
-                    string doneText = $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}; Done.\n";
+                    string doneText = $"{SharedParameters.GetDateTimeString()}; Done.\n";
                     OutputText += doneText;
                     if (!isValidating)
                     {
@@ -590,7 +594,7 @@ namespace LMSF_Scheduler
         private string ParseStep(int num, string step)
         {
             string outString = $"{num}. ";
-            outString += $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}; ";
+            outString += $"{SharedParameters.GetDateTimeString()}; ";
             string[] stepArgs = step.Split(new[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
 
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
@@ -1054,6 +1058,9 @@ namespace LMSF_Scheduler
 
         private void AddXmlStep(string typeStr, string sourceStr)
         {
+            //turn on metadata collection
+            isCollectingXml = true;
+
             //New step node
             stepNode = xmlDoc.CreateElement("experimentStep");
 
@@ -1114,6 +1121,9 @@ namespace LMSF_Scheduler
         {
             //Save the XML document
             xmlDoc.Save(metaDataFilePath);
+
+            //turn off metadata collection
+            isCollectingXml = false;
         }
 
         private void RunOverlord(int num, string[] args)
@@ -1156,6 +1166,45 @@ namespace LMSF_Scheduler
             }
             
             ovProcess = Process.Start(startInfo);
+
+            //Send info to metadata if collecting
+            if (isCollectingXml)
+            {
+                //Add <overlordProcudure> node to metadata
+                XmlNode ovpNode = xmlDoc.CreateElement("overlordProcedure");
+                //add the overlordProcudure node to the step node
+                stepNode.AppendChild(ovpNode);
+
+                //Procedure file
+                XmlNode ovpFileNode = xmlDoc.CreateElement("procedureFile");
+                ovpFileNode.InnerText = file;
+                ovpNode.AppendChild(ovpFileNode);
+
+                //Date and time
+                DateTime dt = DateTime.Now;
+                XmlNode dateTimeNode = xmlDoc.CreateElement("dateTime");
+                ovpNode.AppendChild(dateTimeNode);
+
+                XmlNode yearNode = xmlDoc.CreateElement("year");
+                yearNode.InnerText = dt.ToString("yyyy");
+                dateTimeNode.AppendChild(yearNode);
+
+                XmlNode monthNode = xmlDoc.CreateElement("month");
+                monthNode.InnerText = dt.ToString("MM");
+                dateTimeNode.AppendChild(monthNode);
+
+                XmlNode dayNode = xmlDoc.CreateElement("day");
+                dayNode.InnerText = dt.ToString("dd");
+                dateTimeNode.AppendChild(dayNode);
+
+                XmlNode timeNode = xmlDoc.CreateElement("day");
+                timeNode.InnerText = dt.ToString("HH:mm:ss");
+                XmlAttribute statusAtt = xmlDoc.CreateAttribute("status");
+                statusAtt.Value = "procedure started";
+                timeNode.Attributes.Append(statusAtt);
+                dateTimeNode.AppendChild(timeNode);
+
+            }
         }
 
         private void WaitForOverlord(int num)
@@ -1179,6 +1228,20 @@ namespace LMSF_Scheduler
             while (WaitingForStepCompletion)
             {
                 System.Threading.Thread.Sleep(100);
+            }
+
+            //Send info to metadata if collecting
+            if (isCollectingXml)
+            {
+                DateTime dt = DateTime.Now;
+
+                XmlNode testNode = xmlDoc.SelectSingleNode("descendant::overlordProcedure/dateTime");
+                XmlNode timeFiniNode = xmlDoc.CreateElement("day");
+                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                statusFiniAtt.Value = "procedure finished";
+                timeFiniNode.Attributes.Append(statusFiniAtt);
+                testNode.AppendChild(timeFiniNode);
             }
 
         }
