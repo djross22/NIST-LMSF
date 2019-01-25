@@ -532,6 +532,11 @@ namespace LMSF_Scheduler
             if (AbortCalled)
             {
                 OutputText += "Method Aborted.\n";
+                //Add to log file
+                if (!isValidating)
+                {
+                    File.AppendAllText(logFilePath, "Method Aborted.\n");
+                }
                 this.Dispatcher.Invoke(() => { IsRunning = false;  });
             }
             else
