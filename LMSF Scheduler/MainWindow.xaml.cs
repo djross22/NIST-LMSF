@@ -1078,6 +1078,8 @@ namespace LMSF_Scheduler
             sourceAtt.Value = sourceStr;
             protocolNode.Attributes.Append(sourceAtt);
 
+            //add the datetime info to the 
+
             //add the step node to the experiment node
             experimentNode.AppendChild(protocolNode);
         }
@@ -1202,30 +1204,35 @@ namespace LMSF_Scheduler
                 ovpNode.AppendChild(ovpFileNode);
 
                 //Date and time
-                DateTime dt = DateTime.Now;
-                XmlNode dateTimeNode = xmlDoc.CreateElement("dateTime");
-                ovpNode.AppendChild(dateTimeNode);
-
-                XmlNode yearNode = xmlDoc.CreateElement("year");
-                yearNode.InnerText = dt.ToString("yyyy");
-                dateTimeNode.AppendChild(yearNode);
-
-                XmlNode monthNode = xmlDoc.CreateElement("month");
-                monthNode.InnerText = dt.ToString("MM");
-                dateTimeNode.AppendChild(monthNode);
-
-                XmlNode dayNode = xmlDoc.CreateElement("day");
-                dayNode.InnerText = dt.ToString("dd");
-                dateTimeNode.AppendChild(dayNode);
-
-                XmlNode timeNode = xmlDoc.CreateElement("time");
-                timeNode.InnerText = dt.ToString("HH:mm:ss");
-                XmlAttribute statusAtt = xmlDoc.CreateAttribute("status");
-                statusAtt.Value = "procedure started";
-                timeNode.Attributes.Append(statusAtt);
-                dateTimeNode.AppendChild(timeNode);
+                AddDateTimeNodes(ovpNode, "procedure started");
 
             }
+        }
+
+        private void AddDateTimeNodes(XmlNode parentNode, string statusStr)
+        {
+            DateTime dt = DateTime.Now;
+            XmlNode dateTimeNode = xmlDoc.CreateElement("dateTime");
+            parentNode.AppendChild(dateTimeNode);
+
+            XmlNode yearNode = xmlDoc.CreateElement("year");
+            yearNode.InnerText = dt.ToString("yyyy");
+            dateTimeNode.AppendChild(yearNode);
+
+            XmlNode monthNode = xmlDoc.CreateElement("month");
+            monthNode.InnerText = dt.ToString("MM");
+            dateTimeNode.AppendChild(monthNode);
+
+            XmlNode dayNode = xmlDoc.CreateElement("day");
+            dayNode.InnerText = dt.ToString("dd");
+            dateTimeNode.AppendChild(dayNode);
+
+            XmlNode timeNode = xmlDoc.CreateElement("time");
+            timeNode.InnerText = dt.ToString("HH:mm:ss");
+            XmlAttribute statusAtt = xmlDoc.CreateAttribute("status");
+            statusAtt.Value = statusStr;
+            timeNode.Attributes.Append(statusAtt);
+            dateTimeNode.AppendChild(timeNode);
         }
 
         private void WaitForOverlord(int num)
