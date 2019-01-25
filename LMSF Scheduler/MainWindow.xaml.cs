@@ -88,11 +88,13 @@ namespace LMSF_Scheduler
                 UpdateEnabledState();
                 if (this.abortCalled)
                 {
-                    abortButton.Background = new SolidColorBrush(Colors.Red);
+                    abortButton.Background = Brushes.Red; //new SolidColorBrush(Colors.Red);
+                    playButton.Background = Brushes.Transparent;
+                    stepButton.Background = Brushes.Transparent;
                 }
                 else
                 {
-                    abortButton.Background = new SolidColorBrush(Colors.White);
+                    abortButton.Background = Brushes.White; //new SolidColorBrush(Colors.White);
                 }
                 //OnPropertyChanged("AbortCalled");
             }
@@ -215,12 +217,16 @@ namespace LMSF_Scheduler
 
                 if (isPaused)
                 {
-                    statusBorder.Background = new SolidColorBrush(Colors.Yellow);
+                    statusBorder.Background = Brushes.Yellow; //new SolidColorBrush(Colors.Yellow);
+                    playButton.Background = Brushes.Yellow;
+                    stepButton.Background = Brushes.Yellow;
                     statusTextBlock.Text = "Paused";
                 }
                 else
                 {
-                    statusBorder.Background = new SolidColorBrush(Colors.LimeGreen);
+                    statusBorder.Background = Brushes.LimeGreen; //new SolidColorBrush(Colors.LimeGreen);
+                    playButton.Background = Brushes.Transparent;
+                    stepButton.Background = Brushes.Transparent;
                     statusTextBlock.Text = "Running";
                 }
                 
@@ -236,7 +242,9 @@ namespace LMSF_Scheduler
                 rewindButton.IsEnabled = true;
                 abortButton.IsEnabled = true;
 
-                statusBorder.Background = new SolidColorBrush(Colors.Red);
+                statusBorder.Background = Brushes.Red; //new SolidColorBrush(Colors.Red);
+                playButton.Background = Brushes.Transparent;
+                stepButton.Background = Brushes.Transparent;
                 statusTextBlock.Text = "Stopped";
 
                 inputTextBox.IsEnabled = true;
@@ -881,14 +889,14 @@ namespace LMSF_Scheduler
                     OutputText += $"{i}, ";
                 }
                 validationTextBlock.Text = "Validation Failed";
-                validationBorder.Background = new SolidColorBrush(Colors.Red);
+                validationBorder.Background = Brushes.Red;// new SolidColorBrush(Colors.Red);
             }
             else
             {
                 OutputText += "\r\n";
                 OutputText += "Validation sucessful.\r\n";
                 validationTextBlock.Text = "Validation Sucessful";
-                validationBorder.Background = new SolidColorBrush(Colors.LimeGreen);
+                validationBorder.Background = Brushes.LimeGreen;// new SolidColorBrush(Colors.LimeGreen);
                 valReturn = true;
             }
             isValidating = false;
