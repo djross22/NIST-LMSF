@@ -1078,6 +1078,18 @@ namespace LMSF_Scheduler
             projectNode.AppendChild(stepNode);
         }
 
+        private string GetProjectIdentifier()
+        {
+            string pId = SharedParameters.GetMetaIdentifier("project", "Select the Project Identifier for this experiment:");
+
+            if (pId == "")
+            {
+                AbortCalled = true;
+            }
+
+            return pId;
+        }
+
         private void RunNewXml(int num, string[] args)
         {
             //New XML document
@@ -1096,7 +1108,7 @@ namespace LMSF_Scheduler
             XmlAttribute projectIdAtt = xmlDoc.CreateAttribute("projectId");
 
             //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-            this.Dispatcher.Invoke(() => { projectIdAtt.Value = SharedParameters.GetMetaIdentifier("project", "Select the Project Identifier for this experiment:"); });
+            this.Dispatcher.Invoke(() => { projectIdAtt.Value = GetProjectIdentifier(); });
             //projectIdAtt.Value = SharedParameters.GetMetaIdentifier("project", "Select the Project Identifier for this experiment:");
 
 
