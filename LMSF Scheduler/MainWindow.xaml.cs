@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using LMSF_Utilities;
+using System.Xml;
 
 namespace LMSF_Scheduler
 {
@@ -67,6 +68,12 @@ namespace LMSF_Scheduler
 
         public ObservableCollection<string> CommandList { get; set; }
         private string selectedCommand;
+
+        //Fields for XML metadata output
+        private XmlDocument xmlDoc;
+        private XmlNode rootNode;
+        private XmlNode projectNode;
+        private XmlNode experimentIdNode;
 
         #region Properties Getters and Setters
         public string SelectedCommand
@@ -777,6 +784,64 @@ namespace LMSF_Scheduler
                             outString += stepArgs[1];
                             valFailed.Add(num);
                             break;
+                    }
+                }
+            }
+
+            //Don't actually use this local function, it's just here as a template for new ParseXxxxStep functions
+            void ParseGenericStep()
+            {
+                //string for start of output from ParseStep()
+                outString += "Running Generic Step: ";
+
+                //one or more Booleans used to track validity of arguments/parameters
+                bool argsOk = false;
+
+                //If the command requires a certain number of arguments, check that first:
+                if (numArgs < 2)
+                {
+                    //Message for missing argument or not enough arguments:
+                    outString += "No command argument given.";
+                    valFailed.Add(num);
+                }
+                //Then check the validity of the arguments (file types, parsable as numbers, etc.)
+                else
+                {
+                    //example checking for argumant that is a .ovp file path
+                    if (stepArgs[1].EndsWith(".ovp"))
+                    {
+                        argsOk = true;
+                    }
+                    else
+                    {
+                        //Message to explain what is wrong
+                        outString += "Not a valid ovp filename: ";
+                        outString += stepArgs[1];
+                        valFailed.Add(num);
+                    }
+                }
+
+                //Other validity checks, for example, checking to see if a file actaully exixts
+                if (argsOk)
+                {
+                    bool ovpExists = File.Exists(stepArgs[1]);
+                    if (ovpExists)
+                    {
+                        outString += stepArgs[1];
+
+                        if (!isValidating)
+                        {
+                            //Put in the code to actaully run the step here, e.g. RunOverlord(num, stepArgs);
+                            //  that method has to be written separately
+                            //RunGeneric(num, stepArgs);
+                        }
+                    }
+                    else
+                    {
+                        //Message if the file does not exist
+                        outString += "Procedure file not found: ";
+                        outString += stepArgs[1];
+                        valFailed.Add(num);
                     }
                 }
             }
