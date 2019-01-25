@@ -547,5 +547,11 @@ namespace LMSF_Utilities
             return dlg.ShowDialog();
         }
 
+        //For consistent formatting of DateTime strings:
+        public static string GetDateTimeString()
+        {
+            return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
     }
 }
