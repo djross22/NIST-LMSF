@@ -70,10 +70,12 @@ namespace LMSF_Scheduler
         private string selectedCommand;
 
         //Fields for XML metadata output
+        private string metaDataFilePath;
         private XmlDocument xmlDoc;
         private XmlNode rootNode;
         private XmlNode projectNode;
         private XmlNode experimentIdNode;
+        string experimentID;
 
         #region Properties Getters and Setters
         public string SelectedCommand
@@ -267,7 +269,7 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML" }; //SharedParameters.UnitsList;
         }
 
         protected void OnPropertyChanged(string name)
@@ -491,9 +493,16 @@ namespace LMSF_Scheduler
             }
             else
             {
+                //if not running in validation mode, get a new autimatically generated log file path and start wrting to the log file
                 initOK = NewLogFile();
                 OutputText = $"Running {ExperimentFileName}\n\n";
                 File.WriteAllText(logFilePath, OutputText);
+
+                //if the log file got created ok, set the temporary path for the metadata output file
+                if (initOK)
+                {
+                    metaDataFilePath = SharedParameters.LogFileFolderPath + "temp.xml";
+                }
             }
 
             return initOK;
@@ -601,6 +610,12 @@ namespace LMSF_Scheduler
                         break;
                     case "Timer":
                         ParseTimerStep();
+                        break;
+                    case "NewXML":
+                        ParseNewXml();
+                        break;
+                    case "SaveXML":
+                        ParseSaveXml();
                         break;
                     default:
                         valFailed.Add(num);
@@ -785,6 +800,30 @@ namespace LMSF_Scheduler
                             valFailed.Add(num);
                             break;
                     }
+                }
+            }
+
+            void ParseNewXml()
+            {
+                //string for start of output from ParseStep()
+                outString += "Creating New XML document: ";
+
+                // no arguments to check, so go straigt to running it
+                if (!isValidating)
+                {
+                    RunNewXml();
+                }
+            }
+
+            void ParseSaveXml()
+            {
+                //string for start of output from ParseStep()
+                outString += "Saving XML document: ";
+
+                // no arguments to check, so go straigt to running it
+                if (!isValidating)
+                {
+                    RunSaveXml();
                 }
             }
 
@@ -980,6 +1019,48 @@ namespace LMSF_Scheduler
             inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
             Validate();
+        }
+
+        private void RunNewXml()//(int num, string[] args)
+        {
+            //New XML document
+            xmlDoc = new XmlDocument();
+            //create and configure the root node
+            rootNode = xmlDoc.CreateElement("metadata");
+            XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
+            sourceAtt.Value = "NIST LMSF";
+            rootNode.Attributes.Append(sourceAtt);
+            //add the root node to the document
+            xmlDoc.AppendChild(rootNode);
+
+            //New project node
+            projectNode = xmlDoc.CreateElement("project");
+            //ID attribute for project node
+            XmlAttribute projectIdAtt = xmlDoc.CreateAttribute("projectId");
+
+            //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+            this.Dispatcher.Invoke(() => { projectIdAtt.Value = SharedParameters.GetMetaIdentifier("project", "Select the Project Identifier for this experiment:"); });
+            //projectIdAtt.Value = SharedParameters.GetMetaIdentifier("project", "Select the Project Identifier for this experiment:");
+
+
+            projectNode.Attributes.Append(projectIdAtt);
+            //add the project node to the root node
+            rootNode.AppendChild(projectNode);
+
+            //New experiment ID node
+            //    Value/InnerText initially set to "temp_identifier"
+            //    then a down-stream command will set it to a standard format, like "2019-01-09_1515_pGTGv1_pGTGv2" "yyyy-MM-dd_HHmm_<identifiers>"
+            XmlNode experimentIdNode = xmlDoc.CreateElement("experimentId");
+            experimentID = "temp_identifier";
+            experimentIdNode.InnerText = experimentID;
+            //add the experiment ID node to the project node
+            projectNode.AppendChild(experimentIdNode);
+        }
+
+        private void RunSaveXml()
+        {
+            //Save the XML document
+            xmlDoc.Save(metaDataFilePath);
         }
 
         private void RunOverlord(int num, string[] args)
@@ -1187,7 +1268,20 @@ namespace LMSF_Scheduler
         private void SelectComboBox_DropDownClosed(object sender, EventArgs e)
         {
             InsertInputText($"{SelectedCommand}, ");
+
+            //if it is a NewXML or AppendXML command, also add in the SaveXML command automatically
+            if (SelectedCommand == "NewXML" || SelectedCommand == "AppendXML")
+            {
+                int caretPos = inputTextBox.SelectionStart;
+
+                InsertInputText("\n\nSaveXML, ");
+
+                //move caret to middle line between NewXML and SaveXML
+                inputTextBox.SelectionStart = caretPos + 1;
+                inputTextBox.SelectionLength = 0;
+            }
         }
+
     }
 
 }
