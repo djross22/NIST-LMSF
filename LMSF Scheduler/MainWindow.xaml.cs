@@ -774,7 +774,7 @@ namespace LMSF_Scheduler
                     outString += stepArgs[1];
                     if (!isValidating)
                     {
-                        RunTimer(num, waitTime);
+                        RunTimer(num, stepArgs);
                     }
                 }
             }
@@ -1306,11 +1306,23 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = false;
         }
 
-        private void RunTimer(int num, int waitTime)
+        private void RunTimer(int num, string[] args)
         {
             //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
+
+            int waitTime;
+
+            if (int.TryParse(args[1], out waitTime))
+            {
+                //argument is an integer, so wait that long, in seconds
+            }
+            else
+            {
+                //argument is a DateTime string, so wait until the specified time
+                //TODO: add that code here
+            }
 
             if (!(stepTimerDialog is null))
             {
