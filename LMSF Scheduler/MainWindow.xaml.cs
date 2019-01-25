@@ -274,11 +274,11 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            string metaType = "media";
+            string metaType = "project";
 
             //OutputText = "";
 
-            string metaID = SharedParameters.GetMetaIdentifier(metaType, "");
+            string metaID = SharedParameters.GetMetaIdentifier(metaType, "Select the Project Identifier for this experiment:");
 
             OutputText += metaID + "\n";
         }

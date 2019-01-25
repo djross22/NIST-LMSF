@@ -44,6 +44,10 @@ namespace LMSF_Utilities
         public static string AntibioticFolderPath => MetadataFolderPath + "AntibioticList\\";
         public static string AntibioticFilePath => AntibioticFolderPath + "AntibioticList.csv";
 
+        //Project parameters
+        public static string ProjectFolderPath => MetadataFolderPath + "ProjectList\\";
+        public static string ProjectFilePath => ProjectFolderPath + "ProjectList.csv";
+
         //Units
         public static ObservableCollection<string> UnitsList => new ObservableCollection<string>() { "mmol/L", "umol/L", "mg/mL", "ug/mL", "ug/L", "%" };
 
@@ -109,6 +113,9 @@ namespace LMSF_Utilities
                     break;
                 case "antibiotic":
                     filePath = AntibioticFilePath;
+                    break;
+                case "project":
+                    filePath = ProjectFilePath;
                     break;
                 default:
                     return null;
