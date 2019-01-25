@@ -76,7 +76,7 @@ namespace LMSF_Scheduler
         private XmlNode projectNode;
         private XmlNode experimentIdNode;
         string experimentID;
-        private XmlNode stepNode;
+        private XmlNode protocolNode;
         private static string stepSource = "LMSF Scheduler";
         private bool isCollectingXml;
 
@@ -1064,21 +1064,21 @@ namespace LMSF_Scheduler
             //turn on metadata collection
             isCollectingXml = true;
 
-            //New step node
-            stepNode = xmlDoc.CreateElement("experimentStep");
+            //New protocol node
+            protocolNode = xmlDoc.CreateElement("protocol");
 
-            //stepType attribute for step node
-            XmlAttribute stepIdAtt = xmlDoc.CreateAttribute("stepType");
+            //type attribute for step node
+            XmlAttribute stepIdAtt = xmlDoc.CreateAttribute("type");
             stepIdAtt.Value = typeStr;
-            stepNode.Attributes.Append(stepIdAtt);
+            protocolNode.Attributes.Append(stepIdAtt);
 
             //source attribute for step node
             XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
             sourceAtt.Value = sourceStr;
-            stepNode.Attributes.Append(sourceAtt);
+            protocolNode.Attributes.Append(sourceAtt);
 
             //add the step node to the project node
-            projectNode.AppendChild(stepNode);
+            projectNode.AppendChild(protocolNode);
         }
 
         private string GetProjectIdentifier()
@@ -1122,7 +1122,7 @@ namespace LMSF_Scheduler
             //New experiment ID node
             //    Value/InnerText initially set to "temp_identifier"
             //    then a down-stream command will set it to a standard format, like "2019-01-09_1515_pGTGv1_pGTGv2" "yyyy-MM-dd_HHmm_<identifiers>"
-            XmlNode experimentIdNode = xmlDoc.CreateElement("experimentId");
+            experimentIdNode = xmlDoc.CreateElement("experimentId");
             experimentID = "temp_identifier";
             experimentIdNode.InnerText = experimentID;
             //add the experiment ID node to the project node
@@ -1188,7 +1188,7 @@ namespace LMSF_Scheduler
                 //Add <overlordProcudure> node to metadata
                 XmlNode ovpNode = xmlDoc.CreateElement("overlordProcedure");
                 //add the overlordProcudure node to the step node
-                stepNode.AppendChild(ovpNode);
+                protocolNode.AppendChild(ovpNode);
 
                 //Procedure file
                 XmlNode ovpFileNode = xmlDoc.CreateElement("procedureFile");
