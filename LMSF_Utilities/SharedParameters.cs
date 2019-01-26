@@ -359,7 +359,7 @@ namespace LMSF_Utilities
                         // Instantiate the dialog box
                         SelectMetaIdentDialog dlg2 = new SelectMetaIdentDialog();
                         // Configure the dialog box
-                        dlg2.ItemList = metaList;
+                        dlg2.ItemList = listPlusNone;
                         dlg2.SelectedIndex = -1;
                         dlg2.Title = selectTitle;
                         dlg2.PromptText = selectPrompt;
