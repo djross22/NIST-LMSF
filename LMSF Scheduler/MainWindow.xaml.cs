@@ -749,7 +749,8 @@ namespace LMSF_Scheduler
             {
                 outString += "Running Timer: ";
                 int waitTime = 0;
-                bool isInteger = false;
+                
+                bool argsOk = false;
                 if (numArgs < 2)
                 {
                     outString += "No time given for the timer.";
@@ -759,17 +760,37 @@ namespace LMSF_Scheduler
                 {
                     if (int.TryParse(stepArgs[1], out waitTime))
                     {
-                        isInteger = true;
+                        argsOk = true;
                     }
                     else
                     {
-                        outString += "Timer time parameter is not an integer: ";
-                        outString += stepArgs[1];
-                        valFailed.Add(num);
+                        DateTime waitUntil;
+                        if (DateTime.TryParse(stepArgs[1], out waitUntil))
+                        {
+                            //argument is a DateTime string, so wait until the specified time
+                            waitTime = (int)Math.Round((waitUntil - DateTime.Now).TotalSeconds);
+                            if (waitTime > 0)
+                            {
+                                argsOk = true;
+                            }
+                            else
+                            {
+                                argsOk = false;
+                                outString += "Timer date-time parameter is in the past: ";
+                                outString += stepArgs[1];
+                                valFailed.Add(num);
+                            }
+                        }
+                        else
+                        {
+                            outString += "Timer parameter is not an integer nor a parsable date-time string: ";
+                            outString += stepArgs[1];
+                            valFailed.Add(num);
+                        }
                     }
                 }
 
-                if (isInteger)
+                if (argsOk)
                 {
                     outString += stepArgs[1];
                     if (!isValidating)
@@ -1313,6 +1334,7 @@ namespace LMSF_Scheduler
             stepsRunning[num] = true;
 
             int waitTime;
+            DateTime waitUntil;
 
             if (int.TryParse(args[1], out waitTime))
             {
@@ -1321,6 +1343,16 @@ namespace LMSF_Scheduler
             else
             {
                 //argument is a DateTime string, so wait until the specified time
+                if (DateTime.TryParse(args[1], out waitUntil))
+                {
+                    //argument is a DateTime string, so wait until the specified time
+                    waitTime = (int)Math.Round((waitUntil - DateTime.Now).TotalSeconds);
+                    if (waitTime<0)
+                    {
+                        waitTime = 0;
+                    }
+                }
+
                 //TODO: add that code here
             }
 

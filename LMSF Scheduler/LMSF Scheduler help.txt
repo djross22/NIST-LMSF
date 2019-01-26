@@ -33,15 +33,20 @@ Overlord
 		
 	
 Timer
-    Starts a timer that runs for a specified amount of time
+    Starts a timer that runs for a specified amount of time, or until a specified time or date-time.
+	Parsing of time or date-time strings is done using: https://docs.microsoft.com/en-us/dotnet/api/system.datetime.tryparse?view=netframework-4.7.2.
+	With a time or date-time parameter, the Parser also checks to be sure the time or date-time is in the future.
 	
 	Syntax:
 	    Timer, <time in seconds (integer)>
+		Timer, <parsable time or date-time string>
 		
 	Examples:
 	    Timer, 20
 		Timer, 5
 		Timer, 2000
+		Timer, 7:30pm
+		Timer, 2019-01-25 7:30pm
 		
 		
 WaitFor
