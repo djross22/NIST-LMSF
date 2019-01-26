@@ -107,10 +107,21 @@ Commands:
 			UserPrompt/ Add Bacteria/ Add bacteria to growth plate, put plate in reader, and click 'OK'
 			UserPrompt/ Add Bacteria/ Add bacteria to growth plate and click 'OK'/ C:\Users\djross\Documents\temp\spinner.PNG 
 			
+			
+	Set
+		Directly sets an entry in the Metadata Dictionary.
+		
+		Syntax:
+			Set/ <key>/ <value>
+			
+		Examples:
+			Set/ count/ 20
+			Set/ strain/ MG1655
+			
 
 Metadata Dictionary:
 	The LMSF Scheduler has a Dictionary object that effectively gives the user the ability to create, store, and access variables for use across multiple steps.
 	The Metadata Dictionary (metaDictionary in the C# code) consists of key-value pairs. 
-	A value can be saved in the dictionary, either directly with a Set/ command or using a user dialog command such as GetStrain/.
-	Values can then be accessed ising the "{key}" syntax in a paramter entry.
+	A value can be saved in the dictionary, either directly with a Set/ command or using a user dialog command such as Get/.
+	Values can then be accessed ising the "{key}" syntax in a parameter entry.
 	

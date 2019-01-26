@@ -85,7 +85,7 @@ namespace LMSF_Scheduler
         private bool isCollectingXml;
 
         //Dictionary for storage of user inputs
-        private Dictionary<string, string> metaDictionary = new Dictionary<string, string>();
+        private Dictionary<string, string> metaDictionary;
 
         #region Properties Getters and Setters
         public string SelectedCommand
@@ -279,10 +279,9 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set" }; //SharedParameters.UnitsList;
 
-            //TODO: delete this line
-            metaDictionary.Add("testKey", "testValue");
+            metaDictionary = new Dictionary<string, string>();
         }
 
         protected void OnPropertyChanged(string name)
@@ -486,6 +485,9 @@ namespace LMSF_Scheduler
         private bool InitSteps()
         {
             bool initOK = true;
+
+            //Initialize metaDictionary
+            metaDictionary = new Dictionary<string, string>();
 
             //by default, don't collect metadata
             isCollectingXml = false;
@@ -719,6 +721,9 @@ namespace LMSF_Scheduler
                         break;
                     case "UserPrompt":
                         ParseUserPrompt();
+                        break;
+                    case "Set":
+                        ParseSet();
                         break;
                     default:
                         valFailed.Add(num);
@@ -1101,6 +1106,44 @@ namespace LMSF_Scheduler
                 }
             }
 
+            void ParseSet()
+            {
+                //Set takes 2 arguments
+                //First two arguments are the key and value to be set in the metaDictionary
+                string keyString;
+                string valueString;
+
+                //string for start of output from ParseStep()
+                outString += "Setting Dictionary entry: ";
+
+                //one or more Booleans used to track validity of arguments/parameters
+                bool argsOk = false;
+
+                //If the command requires a certain number of arguments, check that first:
+                if (numArgs < 3)
+                {
+                    //Message for missing argument or not enough arguments:
+                    outString += "Set command requries two arguments (key and value).";
+                    valFailed.Add(num);
+                }
+                //Then check the validity of the arguments (file types, parsable as numbers, etc.)
+                else
+                {
+                    //key and value just have to be non-empty strings, which has already been ruled out,
+                    //    so no additional validation checks needed
+                    keyString = stepArgs[1];
+                    valueString = stepArgs[2];
+                    argsOk = true;
+                    outString += $"{keyString} -> {valueString} ";
+                }
+
+                if (argsOk)
+                {
+                    //Set steps need to run even when validating
+                    RunSet(num, stepArgs);
+                }
+            }
+
             //Don't actually use this local function, it's just here as a template for new ParseXxxxStep functions
             void ParseGenericStep()
             {
@@ -1452,6 +1495,14 @@ namespace LMSF_Scheduler
                 string imagePath = args[3];
                 this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(messageStr, titleStr, imagePath); });
             }
+        }
+
+        private void RunSet(int num, string[] args)
+        {
+            string keyStr = args[1];
+            string valueStr = args[2];
+
+            metaDictionary[keyStr] = valueStr;
         }
 
         private void RunOverlord(int num, string[] args)
