@@ -48,7 +48,10 @@ namespace LMSF_Scheduler
         private bool isPaused = true;
         private bool isOneStep = false;
         private bool isValidating = false;
-        private List<int> valFailed;
+        private List<int> valFailed; 
+        //Validation failure is signaled by adding/having one or more entires in the valFailed list
+        //    valFailed is intialized to an empty list at the beginning of each run,
+        //    if a step fails a validation check, the step number is added to the valFailed list
 
         //Background worker to run steps
         private Thread runStepsThread;
@@ -604,12 +607,89 @@ namespace LMSF_Scheduler
 
         private string ParseStep(int num, string step)
         {
+            //Note on step validation:
+            //    valFailed is intialized to an empty list at the beginning of each run,
+            //    if a step fails a validation check, the step number is added to the valFailed list
+            
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
             string[] stepArgs = step.Split(new[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
 
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
             stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            //Check for {key} entries in stepArgs and replace with dictionary values, or fail validation
+            bool keysOk = true;
+            for (int j=0; j<stepArgs.Length; j++)
+            {
+                string arg = stepArgs[j];
+                string newArg = arg;
+
+                if (arg.Contains('{'))
+                {
+                    //First, make sure the number of "{" and "}" occurances are equal
+                    List<int> startIndList = arg.AllIndexesOf("{");
+                    List<int> endIndList = arg.AllIndexesOf("}");
+                    if (startIndList.Count != endIndList.Count)
+                    {
+                        outString += $"Improper key syntax: {arg}. ";
+                        keysOk = false;
+                    }
+                    else
+                    {
+                        //Then, make sure each "{" is properly followed by a "}"
+                        for (int i = 0; i < startIndList.Count; i++)
+                        {
+                            int startInd = startIndList[i];
+                            int endInd = endIndList[i];
+                            if (startInd > endInd)
+                            {
+                                outString += $"Improper key syntax: {arg}. ";
+                                keysOk = false;
+                            }
+                        }
+                    }
+                }
+                if (keysOk)
+                {
+                    //If the key syntax is ok, replace the keys with their values from the metaDictionary
+                    //    or signal valFailed if the key is not in the dictionary
+                    while (newArg.Contains('{'))
+                    {
+                        int startInd = newArg.IndexOf('{');
+                        int endInd = newArg.IndexOf('}');
+                        
+                        string beforeString = newArg.Substring(0, startInd);
+                        string keyStr = newArg.Substring(startInd + 1, (endInd - startInd) - 1);
+                        string afterString = newArg.Substring(endInd + 1, newArg.Length - endInd - 1);
+
+                        try
+                        {
+                            string newStr = metaDictionary[keyStr];
+                            newArg = $"{beforeString}{newStr}{afterString}";
+                            //MessageBox.Show(newArg);
+                        }
+                        catch (KeyNotFoundException)
+                        {
+                            outString += $"Key not in metaDictionary: {keyStr} in {arg}. ";
+                            keysOk = false;
+                            break;
+                        }
+                    }
+
+                }
+
+                stepArgs[j] = newArg;
+
+            }
+
+            if (!keysOk)
+            {
+                valFailed.Add(num);
+                //exit the method early if there are still key syntax errors
+                outString += "\n\n";
+                return outString;
+            }
 
             int numArgs = stepArgs.Length;
 
@@ -1183,6 +1263,7 @@ namespace LMSF_Scheduler
             // For validation, run in the main thread...
             StepsThreadProc();
 
+            //Validation failure is signaled by having one or more entires in the valFailed list 
             if (valFailed.Count > 0)
             {
                 OutputText += "\r\n";
