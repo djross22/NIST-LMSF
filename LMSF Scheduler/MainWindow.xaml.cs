@@ -279,7 +279,7 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set", "Get" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
         }
@@ -725,9 +725,12 @@ namespace LMSF_Scheduler
                     case "Set":
                         ParseSet();
                         break;
+                    case "Get":
+                        ParseGet();
+                        break;
                     default:
                         valFailed.Add(num);
-                        outString += "Step type not recongnized: ";
+                        outString += "Step Command not recongnized: ";
                         foreach (string s in stepArgs)
                         {
                             outString += s + ", ";
@@ -1134,13 +1137,71 @@ namespace LMSF_Scheduler
                     keyString = stepArgs[1];
                     valueString = stepArgs[2];
                     argsOk = true;
-                    outString += $"{keyString} -> {valueString} ";
+                    outString += $"{valueString} -> {keyString} ";
                 }
 
                 if (argsOk)
                 {
                     //Set steps need to run even when validating
                     RunSet(num, stepArgs);
+                }
+            }
+
+            void ParseGet()
+            {
+                //Get takes 2 or 3 arguments
+                //The first 2 arguments are the metadata typw and the key for saving the result in the metaDictionary
+                string typeStr = "";
+                string keyStr = "";
+
+                //The third argument (optional) is the user prompt
+                string promptStr = "";
+                //The user prompt can be any string, so there is no validation check on it
+                if (numArgs > 3)
+                {
+                    promptStr = stepArgs[3];
+                }
+
+                //string for start of output from ParseStep()
+                outString += $"Getting information from user: ";
+
+                //one or more Booleans used to track validity of arguments/parameters
+                bool argsOk = false;
+
+                //If the command requires a certain number of arguments, check that first:
+                if (numArgs < 3)
+                {
+                    //Message for missing argument or not enough arguments:
+                    outString += "Get command requries two arguments (metadata type and key).";
+                    valFailed.Add(num);
+                }
+                //Then check the validity of the arguments
+                else
+                {
+                    typeStr = stepArgs[1];
+                    keyStr = stepArgs[2];
+
+                    //Make sure the metadata type is an valid type
+                    if (SharedParameters.IsValidMetaType(typeStr))
+                    {
+                        argsOk = true;
+                        outString += $"{typeStr} -> {keyStr} ";
+                    }
+
+                }
+
+                if (argsOk)
+                {
+                    //If isValidating, don't actaully run step, but put placeholder value into dictionary
+                    if (isValidating)
+                    {
+                        metaDictionary[keyStr] = $"place-holder-{typeStr}";
+                    }
+                    else
+                    {
+                        RunGet(num, stepArgs);
+                    }
+                    
                 }
             }
 
@@ -1495,6 +1556,35 @@ namespace LMSF_Scheduler
                 string imagePath = args[3];
                 this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(messageStr, titleStr, imagePath); });
             }
+        }
+
+        private string GetMetaIdentifier(string metaType, string prompt)
+        {
+            string pId = SharedParameters.GetMetaIdentifier(metaType, prompt);
+
+            if (pId == "")
+            {
+                AbortCalled = true;
+            }
+
+            return pId;
+        }
+
+        private void RunGet(int num, string[] args)
+        {
+            string typeStr = args[1];
+            string keyStr = args[2];
+            string promptStr = "";
+            string valueStr = "";
+            if (args.Length > 3)
+            {
+                promptStr = args[3];
+            }
+
+            //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+            this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); });
+
+            metaDictionary[keyStr] = valueStr;
         }
 
         private void RunSet(int num, string[] args)

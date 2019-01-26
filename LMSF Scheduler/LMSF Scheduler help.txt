@@ -119,6 +119,20 @@ Commands:
 			Set/ strain/ MG1655
 			
 
+	Get
+		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.
+		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", and "project"
+		
+		Syntax:
+			Get/ <metadata type>/ <key>{/ <message prompt(optinal)>}
+			
+		Examples:
+			Get/ strain/ strain1
+			Get/ media/ baseMedia
+			Get/ additive/ inducer
+			Get/ additive/ inducer/ Select the inducer used for the left side of the plate:
+			
+
 Metadata Dictionary:
 	The LMSF Scheduler has a Dictionary object that effectively gives the user the ability to create, store, and access variables for use across multiple steps.
 	The Metadata Dictionary (metaDictionary in the C# code) consists of key-value pairs. 

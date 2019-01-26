@@ -53,6 +53,13 @@ namespace LMSF_Utilities
 
 
         //Utility methods
+
+        //Check to see if type exists
+        public static bool IsValidMetaType(string metaType)
+        {
+            return (GetFilePath(metaType) != "");
+        }
+        
         private static ObservableCollection<MetaItem> GetMetaList(string metaType)
         {
             string filePath = GetFilePath(metaType);
