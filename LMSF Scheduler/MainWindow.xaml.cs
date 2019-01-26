@@ -273,7 +273,7 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML" }; //SharedParameters.UnitsList;
         }
 
         protected void OnPropertyChanged(string name)
@@ -625,6 +625,9 @@ namespace LMSF_Scheduler
                     case "NewXML":
                         ParseNewXml();
                         break;
+                    case "AppendXML":
+                        ParseAppendXml();
+                        break;
                     case "SaveXML":
                         ParseSaveXml();
                         break;
@@ -876,6 +879,48 @@ namespace LMSF_Scheduler
                 }
             }
 
+
+            void ParseAppendXml()
+            {
+                //Boolean used to track validity of arguments/parameters
+                bool argsOk = true;
+
+                //string for start of output from ParseStep()
+                outString += "Appending to existing XML document: ";
+
+                //Requires an argument for the step type:
+                if (numArgs < 2)
+                {
+                    argsOk = false;
+                    //Message for missing argument or not enough arguments:
+                    outString += "No step type argument given.";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    //If the step type argument exists, amke sure it is ok (needs to be a good xml atribute value, with just letters, numbers, spaces, or "-" or "_")
+                    RegexValidationRule valRule = new RegexValidationRule();
+                    valRule.RegexText = "^[a-zA-Z0-9-_ ]+$";
+                    valRule.ErrorMessage = "Experiment step arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
+                    ValidationResult valRes = valRule.Validate(stepArgs[1], System.Globalization.CultureInfo.CurrentCulture);
+                    if (!valRes.IsValid)
+                    {
+                        argsOk = false;
+                        //Message for bad step typ argument
+                        outString += "Experiment step arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
+                        valFailed.Add(num);
+                    }
+                }
+
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        RunAppendXml(num, stepArgs);
+                    }
+                }
+            }
+
             void ParseSaveXml()
             {
                 //string for start of output from ParseStep()
@@ -1082,7 +1127,7 @@ namespace LMSF_Scheduler
             Validate();
         }
 
-        private void AddXmlStep(string typeStr, string sourceStr)
+        private void AddXmlProtocol(string typeStr, string sourceStr)
         {
             //turn on metadata collection
             isCollectingXml = true;
@@ -1116,6 +1161,48 @@ namespace LMSF_Scheduler
             }
 
             return pId;
+        }
+
+        private string SelectXmlDocument()
+        {
+            string filename = "temp.xml";
+
+            // Configure open file dialog box
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = filename; // Default file name
+            dlg.DefaultExt = ".xml"; // Default file extension
+            dlg.Filter = "XML documents (.xml)|*.xml"; // Filter files by extension
+            dlg.InitialDirectory = SharedParameters.LogFileFolderPath;
+            dlg.Title = "Select XML File to Append Metadata to:";
+
+            // Show open file dialog box
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (result == true)
+            {
+                // Open document
+                filename = dlg.FileName;
+            }
+
+            return filename;
+        }
+
+        private void RunAppendXml(int num, string[] args)
+        {
+            //auto-detect and/or prompt user to select existing XML file to append to
+            metaDataFilePath = SelectXmlDocument();
+
+            //Load existing XML document
+            xmlDoc = new XmlDocument();
+            xmlDoc.Load(metaDataFilePath);
+
+            //get the experiment node and append to it
+            XmlNodeList expNodeList = xmlDoc.SelectNodes("descendant::experiment");
+            experimentNode = expNodeList.Item(expNodeList.Count - 1);
+
+            //Add the current experiment protocol to the XML
+            AddXmlProtocol(args[1], stepSource);
         }
 
         private void RunNewXml(int num, string[] args)
@@ -1158,8 +1245,8 @@ namespace LMSF_Scheduler
             //add the experiment ID node to the experiment node
             experimentNode.AppendChild(experimentIdNode);
 
-            //Add the current experiment step to the XML
-            AddXmlStep(args[1], stepSource);
+            //Add the current experiment protocol to the XML
+            AddXmlProtocol(args[1], stepSource);
         }
 
         private void RunSaveXml()

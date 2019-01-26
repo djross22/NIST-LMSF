@@ -70,6 +70,17 @@ NewXML
 		NewXML, growth plate prep
 		NewXML, cytometry plate prep
 		
+
+AppendXML
+	Similar to NewXML, but opens an existing XML metadata document and adds to it
+	
+	Syntax:
+		AppendXML, <experiment step>
+		
+	Examples:
+		AppendXML, growth plate prep
+		AppendXML, cytometry plate prep
+		
 		
 SaveXML
 	Saves the XML metadata document. The SaveXML step does not take any parameters
