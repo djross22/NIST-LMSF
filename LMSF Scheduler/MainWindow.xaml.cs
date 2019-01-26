@@ -48,6 +48,7 @@ namespace LMSF_Scheduler
         private bool isPaused = true;
         private bool isOneStep = false;
         private bool isValidating = false;
+        private bool isValUserInput;
         private List<int> valFailed; 
         //Validation failure is signaled by adding/having one or more entires in the valFailed list
         //    valFailed is intialized to an empty list at the beginning of each run,
@@ -88,6 +89,16 @@ namespace LMSF_Scheduler
         private Dictionary<string, string> metaDictionary;
 
         #region Properties Getters and Setters
+        public bool IsValUserInput
+        {
+            get { return this.isValUserInput; }
+            set
+            {
+                this.isValUserInput = value;
+                OnPropertyChanged("IsValUserInput");
+            }
+        }
+
         public string SelectedCommand
         {
             get { return this.selectedCommand; }
@@ -295,13 +306,7 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            string metaType = "project";
-
-            //OutputText = "";
-
-            string metaID = SharedParameters.GetMetaIdentifier(metaType, "Select the Project Identifier for this experiment:");
-
-            OutputText += metaID + "\n";
+            testTextBox.Text = $"{IsValUserInput}";
         }
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
@@ -1106,6 +1111,19 @@ namespace LMSF_Scheduler
                         //Run the step
                         RunUserPrompt(num, stepArgs);
                     }
+                    else
+                    {
+                        //When validating, get actual user input for testing if IsValUserInput is true,
+                        // otherwise put placeholder value into dictionary
+                        if (IsValUserInput)
+                        {
+                            RunUserPrompt(num, stepArgs);
+                        }
+                        else
+                        {
+                            
+                        }
+                    }
                 }
             }
 
@@ -1192,14 +1210,23 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    //If isValidating, don't actaully run step, but put placeholder value into dictionary
-                    if (isValidating)
+                    if (!isValidating)
                     {
-                        metaDictionary[keyStr] = $"place-holder-{typeStr}";
+                        RunGet(num, stepArgs);
                     }
                     else
                     {
-                        RunGet(num, stepArgs);
+                        //When validating, get actual user input for testing if IsValUserInput is true,
+                        // otherwise put placeholder value into dictionary
+                        if (IsValUserInput)
+                        {
+                            RunGet(num, stepArgs);
+                        }
+                        else
+                        {
+                            metaDictionary[keyStr] = $"place-holder-{typeStr}";
+                        }
+                        
                     }
                     
                 }
@@ -1278,7 +1305,8 @@ namespace LMSF_Scheduler
             {
                 //if the step-runner thread is not already running, start it up
 
-                //Run validation check before ruanning actual experiment
+                //Run validation check before running actual experiment, but without user input
+                IsValUserInput = false;
                 if (Validate())
                 {
                     //Change the IsPaused property to false
@@ -1304,6 +1332,8 @@ namespace LMSF_Scheduler
             {
                 //if the step-runner thread is not already running, start it up the same as with PlayButton_Click
                 //    but with IsPaused = true and IsOneStep = true, so that it just runs one step
+                //    and without user input
+                IsValUserInput = false;
                 if (Validate())
                 {
                     IsPaused = true;
