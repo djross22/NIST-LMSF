@@ -81,6 +81,9 @@ namespace LMSF_Scheduler
         private static string stepSource = "LMSF Scheduler";
         private bool isCollectingXml;
 
+        //Dictionary for storage of user inputs
+        private Dictionary<string, string> metaDictionary = new Dictionary<string, string>();
+
         #region Properties Getters and Setters
         public string SelectedCommand
         {
@@ -273,7 +276,10 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt" }; //SharedParameters.UnitsList;
+
+            //TODO: delete this line
+            metaDictionary.Add("testKey", "testValue");
         }
 
         protected void OnPropertyChanged(string name)
@@ -631,6 +637,9 @@ namespace LMSF_Scheduler
                     case "SaveXML":
                         ParseSaveXml();
                         break;
+                    case "UserPrompt":
+                        ParseUserPrompt();
+                        break;
                     default:
                         valFailed.Add(num);
                         outString += "Step type not recongnized: ";
@@ -879,7 +888,6 @@ namespace LMSF_Scheduler
                 }
             }
 
-
             void ParseAppendXml()
             {
                 //Boolean used to track validity of arguments/parameters
@@ -930,6 +938,86 @@ namespace LMSF_Scheduler
                 if (!isValidating)
                 {
                     RunSaveXml();
+                }
+            }
+
+            void ParseUserPrompt()
+            {
+                //UserPrompt takes 2 or 3 arguments
+                //First two arguments are title and message
+                string titleString;
+                string messageString;
+                //third argument is string/path to a bitmap file
+                string imagePath;
+
+                //string for start of output from ParseStep()
+                outString += "User Prompt: ";
+
+                //Booleans to track validity of arguments
+                bool argsOk = false;
+
+                //UserPrompt requires at least two arguments:
+                if (numArgs < 3)
+                {
+                    //Message for missing argument or not enough arguments:
+                    outString += "Missing arguments; UserPrompt requires at least two arguments (title and message).";
+                    valFailed.Add(num);
+                    argsOk = false;
+                }
+                //Then check the validity of the arguments (file types, parsable as numbers, etc.)
+                else
+                {
+                    titleString = stepArgs[1];
+                    messageString = stepArgs[2];
+                    outString += $"{titleString}, ";
+                    //TODO: check validity of messageString - {key}
+                    if (true)
+                    {
+                        argsOk = true;
+                    }
+                    else
+                    {
+                        //Message to explain what is wrong
+                        outString += "Not a valid message string: ";    
+                        valFailed.Add(num);
+                    }
+                    outString += messageString;
+
+                    if (argsOk && (numArgs > 3) )
+                    {
+                        //check 3rd argument; needs to be a .bmp or .png
+                        //example checking for argumant that is a .ovp file path
+                        imagePath = stepArgs[3];
+                        if (imagePath.EndsWith(".bmp", StringComparison.CurrentCultureIgnoreCase) || imagePath.EndsWith(".png", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            argsOk = File.Exists(imagePath);
+                            if (!argsOk)
+                            {
+                                //Message to explain what is wrong
+                                outString += "; Image file not found: ";
+                                outString += imagePath;
+                                valFailed.Add(num);
+                            }
+                        }
+                        else
+                        {
+                            //Message for bad filename
+                            outString += "; Not a valid image filename: ";
+                            outString += imagePath;
+                            valFailed.Add(num);
+                            argsOk = false;
+                        }
+
+                    }
+                }
+
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        //Run the step
+                        RunUserPrompt(num, stepArgs);
+                    }
                 }
             }
 
@@ -1267,6 +1355,22 @@ namespace LMSF_Scheduler
 
             //turn off metadata collection
             isCollectingXml = false;
+        }
+
+        private void RunUserPrompt(int num, string[] args)
+        {
+            string messageStr = args[2];
+            string titleStr = args[1];
+            if (args.Length < 4)
+            {
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(messageStr, titleStr); });
+            }
+            else
+            {
+                string imagePath = args[3];
+                this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(messageStr, titleStr, imagePath); });
+            }
         }
 
         private void RunOverlord(int num, string[] args)

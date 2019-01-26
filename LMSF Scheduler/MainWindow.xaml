@@ -21,7 +21,7 @@
             <ToolBarTray VerticalAlignment="Top" DockPanel.Dock="Top">
                 <ToolBar HorizontalAlignment="Left" FocusManager.IsFocusScope="False" Margin="10,0" ToolTip="Steps Input Shortcuts">
                     <Border BorderThickness="1" VerticalAlignment="Center">
-                        <ComboBox x:Name="selectComboBox" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Width="75" Height="25" ItemsSource="{Binding CommandList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedCommand, Mode=TwoWay}" BorderBrush="Black" DropDownClosed="SelectComboBox_DropDownClosed"/>
+                        <ComboBox x:Name="selectComboBox" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Width="100" Height="25" ItemsSource="{Binding CommandList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedCommand, Mode=TwoWay}" BorderBrush="Black" DropDownClosed="SelectComboBox_DropDownClosed"/>
                     </Border>
                     <Border BorderThickness="1" VerticalAlignment="Center">
                         <Button x:Name="insertFileButton" Content="Insert File Path" Margin="10,4" VerticalAlignment="Center" Width="100" Click="InsertFileButton_Click" Height="25" />

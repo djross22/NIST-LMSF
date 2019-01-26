@@ -89,3 +89,14 @@ SaveXML
 		SaveXML,
 		
 		
+UserPrompt
+	Opens a message dialog box to prompt the user.
+	
+	Syntax:
+	    UserPrompt, <title>, <message>{, <image file path (optional)>}
+		
+	Examples:
+	    UserPrompt, Add Bacteria, Add bacteria to growth plate and click 'OK'
+	    UserPrompt, Add Bacteria, Add bacteria to growth plate and click 'OK', C:\Users\djross\Documents\temp\spinner.PNG 
+		
+		
