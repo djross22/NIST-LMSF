@@ -606,7 +606,7 @@ namespace LMSF_Scheduler
         {
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
-            string[] stepArgs = step.Split(new[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] stepArgs = step.Split(new[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
 
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
             stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
@@ -1660,14 +1660,14 @@ namespace LMSF_Scheduler
 
         private void SelectComboBox_DropDownClosed(object sender, EventArgs e)
         {
-            InsertInputText($"{SelectedCommand}, ");
+            InsertInputText($"{SelectedCommand}/ ");
 
             //if it is a NewXML or AppendXML command, also add in the SaveXML command automatically
             if (SelectedCommand == "NewXML" || SelectedCommand == "AppendXML")
             {
                 int caretPos = inputTextBox.SelectionStart;
 
-                InsertInputText(" <step type>\n\nSaveXML, ");
+                InsertInputText(" <step type>\n\nSaveXML/ ");
 
                 //move caret to middle line between NewXML and SaveXML
                 inputTextBox.SelectionStart = caretPos + 1;
