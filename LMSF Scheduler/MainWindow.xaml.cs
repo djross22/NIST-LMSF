@@ -2120,19 +2120,24 @@ namespace LMSF_Scheduler
 
         private void SelectComboBox_DropDownClosed(object sender, EventArgs e)
         {
-            InsertInputText($"{SelectedCommand}/ ");
-
-            //if it is a NewXML or AppendXML command, also add in the SaveXML command automatically
-            if (SelectedCommand == "NewXML" || SelectedCommand == "AppendXML")
+            //Don't add text if SelectedCommand is null
+            if (SelectedCommand != null)
             {
-                int caretPos = inputTextBox.SelectionStart;
+                InsertInputText($"{SelectedCommand}/ ");
 
-                InsertInputText(" <step type>\n\nSaveXML/ ");
+                //if it is a NewXML or AppendXML command, also add in the SaveXML command automatically
+                if (SelectedCommand == "NewXML" || SelectedCommand == "AppendXML")
+                {
+                    int caretPos = inputTextBox.SelectionStart;
 
-                //move caret to middle line between NewXML and SaveXML
-                inputTextBox.SelectionStart = caretPos + 1;
-                inputTextBox.SelectionLength = 0;
+                    InsertInputText(" <step type>\n\nSaveXML/ ");
+
+                    //move caret to middle line between NewXML and SaveXML
+                    inputTextBox.SelectionStart = caretPos + 1;
+                    inputTextBox.SelectionLength = 0;
+                }
             }
+
         }
 
     }
