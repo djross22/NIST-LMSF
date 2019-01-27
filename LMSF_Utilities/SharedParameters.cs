@@ -602,6 +602,17 @@ namespace LMSF_Utilities
                 return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             }
         }
+        public static string GetDateTimeString(DateTime dt, bool isForExpId)
+        {
+            if (isForExpId)
+            {
+                return dt.ToString("yyyy-MM-dd-HHmm");
+            }
+            else
+            {
+                return dt.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+        }
 
         //from: https://stackoverflow.com/questions/2641326/finding-all-positions-of-substring-in-a-larger-string-in-c-sharp
         public static List<int> AllIndexesOf(this string str, string value)

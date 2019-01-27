@@ -84,6 +84,7 @@ namespace LMSF_Scheduler
         private XmlNode protocolNode;
         private static string stepSource = "LMSF Scheduler";
         private bool isCollectingXml;
+        private DateTime startDateTime;
 
         //Dictionaries for storage of user inputs
         private Dictionary<string, string> metaDictionary;
@@ -291,7 +292,7 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set", "Get" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
@@ -755,6 +756,9 @@ namespace LMSF_Scheduler
                     case "Get":
                         ParseGet();
                         break;
+                    case "GetExpID":
+                        ParseGetExpId();
+                        break;
                     default:
                         valFailed.Add(num);
                         outString += "Step Command not recongnized: ";
@@ -1003,6 +1007,7 @@ namespace LMSF_Scheduler
                     else
                     {
                         metaDictionary["protocol type"] = stepArgs[1];
+                        metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(true);
                     }
                 }
             }
@@ -1044,6 +1049,10 @@ namespace LMSF_Scheduler
                     if (!isValidating)
                     {
                         RunAppendXml(num, stepArgs);
+                    }
+                    else
+                    {
+                        metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(true);
                     }
                 }
             }
@@ -1254,6 +1263,89 @@ namespace LMSF_Scheduler
                         
                     }
                     
+                }
+            }
+
+            void ParseGetExpId()
+            {
+                //GetExpId takes 1 or 2 arguments
+                //The first argument is the default experiment ID
+                string expIdStr = "";
+                //The second (optional) argument is the default data directory
+                string dataDirStr = "";
+
+                //string for start of output from ParseStep()
+                outString += $"Getting Experiment ID from user: ";
+
+                //one or more Booleans used to track validity of arguments/parameters
+                bool argsOk = true;
+
+                //If the command requires a certain number of arguments, check that first:
+                if (numArgs < 2)
+                {
+                    argsOk = false;
+                    //Message for missing argument or not enough arguments:
+                    outString += "GetExpId command requries at least one argument (default experiment ID).";
+                    valFailed.Add(num);
+                }
+                //Then check the validity of the arguments
+                else
+                {
+                    expIdStr = stepArgs[1];
+
+                    //expIdStr needs to be usable in filenames, so make sure it only has just letters, numbers, or "-" or "_")
+                    RegexValidationRule valRule = new RegexValidationRule();
+                    valRule.RegexText = "^[a-zA-Z0-9-_]+$";
+                    valRule.ErrorMessage = "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
+                    ValidationResult valRes = valRule.Validate(expIdStr, System.Globalization.CultureInfo.CurrentCulture);
+                    if (!valRes.IsValid)
+                    {
+                        argsOk = false;
+                        //Message for bad Experiment ID argument
+                        outString += "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
+                        valFailed.Add(num);
+                    }
+                    else
+                    {
+                        if (numArgs>2)
+                        {
+                            //check 2nd argument if there is one
+                            dataDirStr = stepArgs[2];
+                            //needs to be a valid path to a directory
+                            if (!Directory.Exists(dataDirStr))
+                            {
+                                argsOk = false;
+                                //Message for bad dataDirStr argument
+                                outString += "Second argument must be a path to a valid directory. ";
+                                valFailed.Add(num);
+                            }
+                        }
+                    }
+
+                }
+
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        RunGetExpId(num, stepArgs);
+                    }
+                    else
+                    {
+                        //When validating, get actual user input for testing if IsValUserInput is true,
+                        // otherwise put placeholder value into dictionary
+                        if (IsValUserInput)
+                        {
+                            RunGetExpId(num, stepArgs);
+                        }
+                        else
+                        {
+                            metaDictionary["experimentId"] = $"place-holder-experimentId";
+                            metaDictionary["dataDirectory"] = $"place-holder-directory";
+                        }
+
+                    }
+
                 }
             }
 
@@ -1473,7 +1565,8 @@ namespace LMSF_Scheduler
             sourceAtt.Value = sourceStr;
             protocolNode.Attributes.Append(sourceAtt);
 
-            AddDateTimeNodes(protocolNode, "protocol started");
+            startDateTime = DateTime.Now;
+            AddDateTimeNodes(startDateTime, protocolNode, "protocol started");
 
             //add the step node to the experiment node
             experimentNode.AppendChild(protocolNode);
@@ -1660,6 +1753,9 @@ namespace LMSF_Scheduler
 
             //Add the current experiment protocol to the XML
             AddXmlProtocol(args[1], stepSource);
+
+            //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
+            metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
         }
 
         private void RunNewXml(int num, string[] args)
@@ -1709,6 +1805,8 @@ namespace LMSF_Scheduler
 
             //Also add the protocol type to the metaDictionary
             metaDictionary["protocol type"] = protocolType;
+            //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
+            metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
         }
 
         private void RunSaveXml()
@@ -1832,6 +1930,73 @@ namespace LMSF_Scheduler
             
         }
 
+        private void UpdateXmlExpId(string expIdStr)
+        {
+            XmlNode idNode;
+            //Changes the Inner Text of the current experimentId node
+            //look for the base node and append to it or create it if it does not exist
+            XmlNodeList nodeList = experimentNode.SelectNodes($"descendant::experimentId");
+            if (nodeList.Count > 0)
+            {
+                idNode = nodeList.Item(nodeList.Count - 1);
+            }
+            else
+            {
+                idNode = xmlDoc.CreateElement("experimentId");
+                experimentNode.AppendChild(idNode);
+            }
+            
+            idNode.InnerText = expIdStr;
+
+        }
+
+        private string[] GetExpId(string dataDirStr, string expIdStr)
+        {
+            //return string[0] = experimentId
+            //return string[1] = XML file path
+            //return string[2] = saveDirectory
+            string[] getIdStrings = SharedParameters.GetExperimentId(dataDirStr, expIdStr);
+            expIdStr = getIdStrings[0];
+            metaDataFilePath = getIdStrings[1];
+            string saveDirectory = getIdStrings[2];
+
+            if (expIdStr == "")
+            {
+                AbortCalled = true;
+            }
+
+            return new string[] { expIdStr, metaDataFilePath, saveDirectory };
+        }
+
+        private void RunGetExpId(int num, string[] args)
+        {
+            //The first argument is the default experiment ID
+            string expIdStr = args[1];
+            //The second (optional) argument is the default data directory
+            string dataDirStr = "";
+            if (args.Length>2)
+            {
+                dataDirStr = args[2];
+            }
+
+            string[] argsBack = new string[] { "", "", "" };
+            //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+            this.Dispatcher.Invoke(() => {
+                argsBack = GetExpId(dataDirStr, expIdStr);
+            });
+            
+            //Then save to XML document if...
+            if (isCollectingXml && !AbortCalled)
+            {
+                UpdateXmlExpId(expIdStr);
+            }
+
+            //And add the experiment ID to the metaDictionary
+            metaDictionary["experimentId"] = argsBack[0];
+            metaDictionary["dataDirectory"] = argsBack[2];
+
+        }
+
         private void RunSet(int num, string[] args)
         {
             string keyStr = args[1];
@@ -1895,14 +2060,14 @@ namespace LMSF_Scheduler
                 ovpNode.AppendChild(ovpFileNode);
 
                 //Date and time
-                AddDateTimeNodes(ovpNode, "procedure started");
+                AddDateTimeNodes(DateTime.Now, ovpNode, "procedure started");
 
             }
         }
 
-        private void AddDateTimeNodes(XmlNode parentNode, string statusStr)
+        private void AddDateTimeNodes(DateTime dt, XmlNode parentNode, string statusStr)
         {
-            DateTime dt = DateTime.Now;
+            //DateTime dt = DateTime.Now;
             XmlNode dateTimeNode = xmlDoc.CreateElement("dateTime");
             parentNode.AppendChild(dateTimeNode);
 

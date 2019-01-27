@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Utilities"
         mc:Ignorable="d"
-        Title="Experiment ID Dialog" Height="300" Width="520" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="520" MinHeight="300"
+        Title="Experiment ID Dialog" Height="300" Width="800" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="800" MinHeight="300"
         WindowStartupLocation="CenterScreen">
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

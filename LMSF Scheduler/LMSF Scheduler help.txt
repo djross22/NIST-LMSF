@@ -69,7 +69,8 @@ Commands:
 			
 			
 	NewXML
-		Starts a new XML metadata document
+		Starts a new XML metadata document.
+		Also, adds the protocol starting date and time to the Metadata Dictionary in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
 		
 		The <protocol type> is meant to be a short, human-readable description of the function of the current protocol.
 			It is also used to distinguish protocols in a multi-protocol experiment.
@@ -84,7 +85,8 @@ Commands:
 			
 
 	AppendXML
-		Similar to NewXML, but opens an existing XML metadata document and adds to it
+		Similar to NewXML, but opens an existing XML metadata document and adds to it.
+		Also, adds the protocol starting date and time to the Metadata Dictionary (key = "startDateTime") in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
 		
 		Syntax:
 			AppendXML/ <protocol type>
@@ -110,6 +112,23 @@ Commands:
 		Examples:
 			UserPrompt/ Add Bacteria/ Add bacteria to growth plate, put plate in reader, and click 'OK'
 			UserPrompt/ Add Bacteria/ Add bacteria to growth plate and click 'OK'/ C:\Users\djross\Documents\temp\spinner.PNG 
+			
+			
+	GetExpId
+		Opens a user dialog box to get the experiment identifier and data directory from the user.
+		The dialog starts with default/suggested values defined by the parameters.
+		If no <default data directory> parameter is given, "C:\Shared Files\Data" is used.
+		By default, the command creates a new directory with the same name as the experiment ID,
+			So, the default file will be saved as "<default data directory>\<default experiment ID>\<default experiment ID>.xml"
+		The user can manually override the defaults in the dialog or accept them.
+		After the user confirms, GetExpId also adds the experiment ID (key = "experimentId"), and the data directory (key = "dataDirectory") to the Metadata Dictionary 
+		
+		Syntax:
+			GetExpId/ <default experiment ID>{/ <default data directory (optional)>}
+			
+		Examples:
+			GetExpId/ {startDateTime}-{strain1}
+			GetExpId/ {startDateTime}-{strain1}/ C:\Users\djross\Documents\LMSF data
 			
 
 	Get
