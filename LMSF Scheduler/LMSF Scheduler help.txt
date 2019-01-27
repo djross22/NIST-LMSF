@@ -121,7 +121,12 @@ Commands:
 
 	Get
 		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.
-		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", and "project"
+		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", "project", and "concentration"
+		For metadata type "concentration", the user dialog gets the numeric value and units for the concentration.
+		
+		In the XML output, a concentration is attached to the last additive or antibiotic output (if there is one).
+		So, a "Get/ concentration/..." command should be immediately after the matching "Get/ additive/..." command, so that the automated XML document script will attach them together correctly. 
+		
 		
 		Syntax:
 			Get/ <metadata type>/ <key>{/ <message prompt(optinal)>}
@@ -131,6 +136,7 @@ Commands:
 			Get/ media/ baseMedia
 			Get/ additive/ inducer
 			Get/ additive/ inducer/ Select the inducer used for the left side of the plate:
+			Get/ concentration/ inducer stock
 			
 
 Metadata Dictionary:

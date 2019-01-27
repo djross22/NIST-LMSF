@@ -1215,12 +1215,11 @@ namespace LMSF_Scheduler
                     keyStr = stepArgs[2];
 
                     //Make sure the metadata type is an valid type
-                    if (SharedParameters.IsValidMetaType(typeStr))
+                    if (SharedParameters.IsValidMetaType(typeStr) || typeStr == "concentration")
                     {
                         argsOk = true;
                         outString += $"{typeStr} -> {keyStr} ";
                     }
-
                 }
 
                 if (argsOk)
@@ -1550,13 +1549,18 @@ namespace LMSF_Scheduler
             idNode.InnerText = idStr;
             detailNode.AppendChild(idNode);
 
-            //For additives/antibiotics also add the startingStock node
-            if (detailNodeStr == "additive")
-            {
-                XmlNode stockNode = xmlDoc.CreateElement("startingStock");
-                detailNode.AppendChild(stockNode);
-                //Will also need to call AddStartingStockConc() to append the concentration and units
-            }
+            ////For additives/antibiotics also add the concentration node
+            //if (detailNodeStr == "additive")
+            //{
+            //    XmlNode stockNode = xmlDoc.CreateElement("concentration");
+
+            //    XmlAttribute keyAtt = xmlDoc.CreateAttribute("useKey");
+            //    keyAtt.Value = "startingStock";
+            //    stockNode.Attributes.Append(keyAtt);
+
+            //    detailNode.AppendChild(stockNode);
+            //    //Will also need to run command Get/ concentration/... to append the concentration value and units
+            //}
 
             //then add notes if notes!=""
             if (notes !="")
@@ -1565,6 +1569,44 @@ namespace LMSF_Scheduler
                 notesNode.InnerText = notes;
                 detailNode.AppendChild(notesNode);
             }
+
+        }
+
+        private void AddXmlConcentration(Concentration conc, string keyStr)
+        {
+            XmlNode baseNode;
+            XmlNode stockNode;
+
+            string baseNodeStr = "additives";
+            string stockNodeStr = "concentration";
+
+            //Adds metadata to the current protocolNode
+            //look for the base node and append to it or create it if it does not exist
+            XmlNodeList baseNodeList = protocolNode.SelectNodes($"descendant::{baseNodeStr}");
+            if (baseNodeList.Count > 0)
+            {
+                baseNode = baseNodeList.Item(baseNodeList.Count - 1);
+            }
+            else
+            {
+                baseNode = xmlDoc.CreateElement(baseNodeStr);
+                protocolNode.AppendChild(baseNode);
+            }
+
+            //Add the concentration node
+            stockNode = xmlDoc.CreateElement(stockNodeStr);
+            XmlAttribute keyAtt = xmlDoc.CreateAttribute("useKey");
+            keyAtt.Value = keyStr;
+            stockNode.Attributes.Append(keyAtt);
+            baseNode.AppendChild(stockNode);
+
+            //Concentration details get attached to the concentration node
+            XmlNode valueNode = xmlDoc.CreateElement("value");
+            valueNode.InnerText = $"{conc.ConcValue}";
+            stockNode.AppendChild(valueNode);
+            XmlNode unitsNode = xmlDoc.CreateElement("value");
+            unitsNode.InnerText = conc.Units;
+            stockNode.AppendChild(unitsNode);
 
         }
 
@@ -1714,6 +1756,18 @@ namespace LMSF_Scheduler
             return pId;
         }
 
+        private Concentration GetAdditiveConcentration(string name, string prompt)
+        {
+            Concentration conc = SharedParameters.GetAdditiveConcentration(name, prompt);
+
+            if (conc is null)
+            {
+                AbortCalled = true;
+            }
+
+            return conc;
+        }
+
         private void RunGet(int num, string[] args)
         {
             string typeStr = args[1];
@@ -1730,16 +1784,34 @@ namespace LMSF_Scheduler
                 notes = args[4];
             }
 
-            //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-            this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); });
-
-            metaDictionary[keyStr] = valueStr;
-
-            //Then save to XML document if...
-            if (isCollectingXml)
+            if (typeStr == "concentration")
             {
-                AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                Concentration conc;
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => {
+                    conc = GetAdditiveConcentration(keyStr, promptStr);
+                    concDictionary[keyStr] = conc;
+
+                    //Then save to XML document if...
+                    if (isCollectingXml)
+                    {
+                        AddXmlConcentration(conc, keyStr);
+                    }
+                });
+
             }
+            else
+            {
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr;});
+
+                //Then save to XML document if...
+                if (isCollectingXml)
+                {
+                    AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                }
+            }
+            
         }
 
         private void RunSet(int num, string[] args)
