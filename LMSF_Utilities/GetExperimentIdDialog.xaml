@@ -29,7 +29,7 @@
             <TextBox.Text>
                 <Binding Path="ExperimentId" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
-                        <local:RegexValidationRule RegexText = "^[-a-zA-Z0-9 _]+$" ErrorMessage="Experiment identifiers can only contain letters, numbers, spaces, '_', or '-'." ValidationOptions="None"/>
+                        <local:RegexValidationRule RegexText = "^[-a-zA-Z0-9_]+$" ErrorMessage="Experiment identifiers can only contain letters, numbers, spaces, '_', or '-'." ValidationOptions="None"/>
                     </Binding.ValidationRules>
                 </Binding>
             </TextBox.Text>
