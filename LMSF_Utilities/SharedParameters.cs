@@ -207,6 +207,38 @@ namespace LMSF_Utilities
             return notValidReason;
         }
 
+        //GetExperimentId() gets both the experiment id and the XML save file path
+        //    return string[0] = experimentId
+        //    return string[1] = XML file path
+        //    return string[2] = saveDirectory
+        public static string[] GetExperimentId(string initialDir, string defaultId)
+        {
+            string experimentId = "";
+            string xmlFilePath = "";
+            string saveDirectory = "";
+
+            if (initialDir=="")
+            {
+                initialDir = $"{WorklistFolderPath}{defaultId}\\";
+            }
+
+            if (!Directory.Exists(initialDir)) {
+                Directory.CreateDirectory(initialDir);
+            }
+
+            GetExperimentIdDialog dlg = new GetExperimentIdDialog(initialDir, defaultId);
+
+            // Open the dialog box modally and return concentration if dialog returns true (OK)
+            if (dlg.ShowDialog() == true)
+            {
+                experimentId = dlg.ExperimentId;
+                xmlFilePath = dlg.SaveFilePath;
+                saveDirectory = Directory.GetParent(xmlFilePath).FullName;
+            }
+
+            return new string[] { experimentId, xmlFilePath, saveDirectory };
+        }
+
         public static string GetMetaIdentifier(string metaType, string selectPrompt)
         {
             string metaID="";

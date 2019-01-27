@@ -308,7 +308,14 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            testTextBox.Text = $"{IsValUserInput}";
+            string[] test = SharedParameters.GetExperimentId("", "test-abcd");
+
+            OutputText += test[0];
+            OutputText += "\n";
+            OutputText += test[1];
+            OutputText += "\n";
+            OutputText += test[2];
+            OutputText += "\n";
         }
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
