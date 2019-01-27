@@ -124,17 +124,19 @@ Commands:
 		In the XML output, the result of a "Get/ concentration/..." command is attached to the last additive or antibiotic XML output (if there is one).
 		So, a "Get/ concentration/..." command should be immediately after the matching "Get/ additive/..." command, so that the automated XML document script will attach them together correctly. 
 		
-		If no <message prompt> parameter is given, the Get command will us the default prompt, "Select the <key> for the experiment: "
+		If no <message prompt> parameter is given, the Get command will use the default prompt, "Select the <key> for the experiment: "
+		The Get command will also use the default prompt if the <message prompt> parameter is "default".
 		
 		
 		Syntax:
-			Get/ <metadata type>/ <key>{/ <message prompt(optinal)>}
+			Get/ <metadata type>/ <key>{/ <message prompt(optinal)>/ <notes (optional)>}
 			
 		Examples:
 			Get/ strain/ strain1
 			Get/ media/ baseMedia
 			Get/ additive/ inducer
 			Get/ additive/ inducer/ Select the inducer used for the left side of the plate:
+			Get/ additive/ inducer/ default/ notes to add to the XML file
 			Get/ concentration/ inducer stock
 			
 			

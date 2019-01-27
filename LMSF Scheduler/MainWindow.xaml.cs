@@ -1553,19 +1553,6 @@ namespace LMSF_Scheduler
             idNode.InnerText = idStr;
             detailNode.AppendChild(idNode);
 
-            ////For additives/antibiotics also add the concentration node
-            //if (detailNodeStr == "additive")
-            //{
-            //    XmlNode stockNode = xmlDoc.CreateElement("concentration");
-
-            //    XmlAttribute keyAtt = xmlDoc.CreateAttribute("useKey");
-            //    keyAtt.Value = "startingStock";
-            //    stockNode.Attributes.Append(keyAtt);
-
-            //    detailNode.AppendChild(stockNode);
-            //    //Will also need to run command Get/ concentration/... to append the concentration value and units
-            //}
-
             //then add notes if notes!=""
             if (notes !="")
             {
@@ -1787,6 +1774,9 @@ namespace LMSF_Scheduler
             if (args.Length > 3)
             {
                 promptStr = args[3];
+                if (promptStr=="default") {
+                    promptStr = "";
+                }
             }
             if (args.Length > 4)
             {
