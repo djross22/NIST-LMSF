@@ -6,18 +6,18 @@ Step syntax:
 <Command>/<parameter(s)>
 
 The Command and parameters are separated by a foreward slash "/"
-    White space before/after the slash is ignored
+    White space before and after the slash is ignored
 	So,
 	    <Command>/<parameter(s)>
 		<Command>/ <parameter(s)>
 		<Command> / <parameter(s)>
 	all get read the same way.
 	
-If a Command takes multiple parameters, they are also seprated by commas/semicolons.
+If a Command takes multiple parameters, they are also separated by foreward slashes.
 
-The parsing of Cammands and parameters is case sensitive.
+The parsing of Commands and parameters is generally case sensitive.
 
-Parameters can generally contain any character except "/" which is used as a command-parameter separator.
+Parameters can generally contain any character except "/" which is reserved for use as a command-parameter separator.
 
 Parameters can contain key references, demarked by "{" and "}". The parser will replace the text, "{<key>}" with "<value>", where <key> and <value> are a key-value pair in the Metadata Dictionary (see below).
 	For example, the input step:
@@ -58,7 +58,7 @@ Commands:
 			
 			
 	WaitFor
-		Pauses execution and waits for a preivous step to finish
+		Pauses execution and waits for a previous step to finish
 		
 		Syntax:
 			WaitFor/ <step to wait for>
@@ -71,8 +71,12 @@ Commands:
 	NewXML
 		Starts a new XML metadata document
 		
+		The <protocol type> is meant to be a short, human-readable description of the function of the current protocol.
+			It is also used to distinguish protocols in a multi-protocol experiment.
+			The <protocol type> is saved in the Metadata Dictionary with the key "protocol type".
+		
 		Syntax:
-			NewXML/ <experiment step>
+			NewXML/ <protocol type>
 			
 		Examples:
 			NewXML/ growth plate prep
@@ -83,7 +87,7 @@ Commands:
 		Similar to NewXML, but opens an existing XML metadata document and adds to it
 		
 		Syntax:
-			AppendXML/ <experiment step>
+			AppendXML/ <protocol type>
 			
 		Examples:
 			AppendXML/ growth plate prep
@@ -107,25 +111,20 @@ Commands:
 			UserPrompt/ Add Bacteria/ Add bacteria to growth plate, put plate in reader, and click 'OK'
 			UserPrompt/ Add Bacteria/ Add bacteria to growth plate and click 'OK'/ C:\Users\djross\Documents\temp\spinner.PNG 
 			
-			
-	Set
-		Directly sets an entry in the Metadata Dictionary.
-		
-		Syntax:
-			Set/ <key>/ <value>
-			
-		Examples:
-			Set/ count/ 20
-			Set/ strain/ MG1655
-			
 
 	Get
 		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.
+		
 		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", "project", and "concentration"
 		For metadata type "concentration", the user dialog gets the numeric value and units for the concentration.
 		
-		In the XML output, a concentration is attached to the last additive or antibiotic output (if there is one).
+		The <key> parameter is meant to be a short, human-readable indentifier of the function of the media, strain, plasmid, etc. in the current experiment.
+		It is also used as the key for storage of Get/ result in the metaDictionary.
+		
+		In the XML output, the result of a "Get/ concentration/..." command is attached to the last additive or antibiotic XML output (if there is one).
 		So, a "Get/ concentration/..." command should be immediately after the matching "Get/ additive/..." command, so that the automated XML document script will attach them together correctly. 
+		
+		If no <message prompt> parameter is given, the Get command will us the default prompt, "Select the <key> for the experiment: "
 		
 		
 		Syntax:
@@ -138,10 +137,29 @@ Commands:
 			Get/ additive/ inducer/ Select the inducer used for the left side of the plate:
 			Get/ concentration/ inducer stock
 			
+			
+	Set
+		Directly sets an entry in the Metadata Dictionary.
+		
+		Syntax:
+			Set/ <key>/ <value>
+			
+		Examples:
+			Set/ count/ 20
+			Set/ strain/ MG1655
+			
 
 Metadata Dictionary:
-	The LMSF Scheduler has a Dictionary object that effectively gives the user the ability to create, store, and access variables for use across multiple steps.
-	The Metadata Dictionary (metaDictionary in the C# code) consists of key-value pairs. 
-	A value can be saved in the dictionary, either directly with a Set/ command or using a user dialog command such as Get/.
-	Values can then be accessed ising the "{key}" syntax in a parameter entry.
+	The LMSF Scheduler has two Dictionary objects that effectively give the user the ability to create, store, and access variables for use across multiple steps.
+	The first dictionary is for storage of string identifiers, the second is for storage of concentrations.
+	The Metadata Dictionaries (metaDictionary and concDictionary in the C# code) consist of key-value pairs. 
+	A value can be saved in one of the dictionaries, either directly with a Set/ command or using a user dialog command such as Get/.
+	Values in either dictionary can then be accessed using the "{key}" syntax in a subsequent parameter entry.
+		The command parser first looks for a key in the string identifier dictionary (metaDictionary),
+		and then looks in the concentration dictionary if the key is not found in the string identifier dictionary.
+		So, it is possible to use the same key to store values in both dictionaries, but the parser will only be able to find the corresponding value in the string dictionary.
+		It is reccomended to use related, but not identical keys for matching additive identifiers and concentrations,
+			for example, "Get/ additive/ inducer" followed by "Get/ concentration/ inducer stock"
+			
+		If the command parser finds the requested key in one of the dictionaries, it replaces the sub-string, "{<key>}", with the sub-string "<value>" in the parameter string.
 	
