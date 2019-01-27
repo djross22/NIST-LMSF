@@ -1668,7 +1668,7 @@ namespace LMSF_Scheduler
             XmlNode baseNode;
             XmlNode stockNode;
 
-            string baseNodeStr = "additives";
+            string baseNodeStr = "additive";
             string stockNodeStr = "concentration";
 
             //Adds metadata to the current protocolNode
