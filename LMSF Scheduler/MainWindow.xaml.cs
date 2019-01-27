@@ -85,8 +85,9 @@ namespace LMSF_Scheduler
         private static string stepSource = "LMSF Scheduler";
         private bool isCollectingXml;
 
-        //Dictionary for storage of user inputs
+        //Dictionaries for storage of user inputs
         private Dictionary<string, string> metaDictionary;
+        private Dictionary<string, Concentration> concDictionary;
 
         #region Properties Getters and Setters
         public bool IsValUserInput
@@ -293,6 +294,7 @@ namespace LMSF_Scheduler
             CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set", "Get" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
+            concDictionary = new Dictionary<string, Concentration>();
         }
 
         protected void OnPropertyChanged(string name)
@@ -491,8 +493,9 @@ namespace LMSF_Scheduler
         {
             bool initOK = true;
 
-            //Initialize metaDictionary
+            //Initialize metadata Dictionaries
             metaDictionary = new Dictionary<string, string>();
+            concDictionary = new Dictionary<string, Concentration>();
 
             //by default, don't collect metadata
             isCollectingXml = false;
@@ -672,15 +675,27 @@ namespace LMSF_Scheduler
 
                         try
                         {
+                            //First look in <string> dictionary
                             string newStr = metaDictionary[keyStr];
                             newArg = $"{beforeString}{newStr}{afterString}";
                             //MessageBox.Show(newArg);
                         }
                         catch (KeyNotFoundException)
                         {
-                            outString += $"Key not in metaDictionary: {keyStr} in {arg}. ";
-                            keysOk = false;
-                            break;
+                            try
+                            {
+                                //then, if the key is not found in the <string> dictionary,
+                                //    look in the <Concentration> dictionary
+                                string newStr = concDictionary[keyStr].ToString();
+                                newArg = $"{beforeString}{newStr}{afterString}";
+                                //MessageBox.Show(newArg);
+                            }
+                            catch (KeyNotFoundException)
+                            {
+                                outString += $"Key not in metaDictionary: {keyStr} in {arg}. ";
+                                keysOk = false;
+                                break;
+                            }
                         }
                     }
 
