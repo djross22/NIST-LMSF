@@ -968,21 +968,21 @@ namespace LMSF_Scheduler
                 {
                     argsOk = false;
                     //Message for missing argument or not enough arguments:
-                    outString += "No step type argument given.";
+                    outString += "No protocol type argument given.";
                     valFailed.Add(num);
                 }
                 else
                 {
-                    //If the step type argument exists, amke sure it is ok (needs to be a good xml atribute value, with just letters, numbers, spaces, or "-" or "_")
+                    //If the protocol type argument exists, make sure it is ok (needs to be a good xml atribute value, with just letters, numbers, spaces, or "-" or "_")
                     RegexValidationRule valRule = new RegexValidationRule();
                     valRule.RegexText = "^[a-zA-Z0-9-_ ]+$";
-                    valRule.ErrorMessage = "Experiment step arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
+                    valRule.ErrorMessage = "Protocol type arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
                     ValidationResult valRes = valRule.Validate(stepArgs[1], System.Globalization.CultureInfo.CurrentCulture);
                     if (!valRes.IsValid)
                     {
                         argsOk = false;
-                        //Message for bad step typ argument
-                        outString += "Experiment step arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
+                        //Message for bad Protocol argument
+                        outString += "Protocol type arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
                         valFailed.Add(num);
                     }
                 }
@@ -992,6 +992,10 @@ namespace LMSF_Scheduler
                     if (!isValidating)
                     {
                         RunNewXml(num, stepArgs);
+                    }
+                    else
+                    {
+                        metaDictionary["protocol type"] = stepArgs[1];
                     }
                 }
             }
@@ -1666,6 +1670,8 @@ namespace LMSF_Scheduler
 
         private void RunNewXml(int num, string[] args)
         {
+            string protocolType = args[1];
+
             //New XML document
             xmlDoc = new XmlDocument();
             //create and configure the root node
@@ -1705,7 +1711,10 @@ namespace LMSF_Scheduler
             experimentNode.AppendChild(experimentIdNode);
 
             //Add the current experiment protocol to the XML
-            AddXmlProtocol(args[1], stepSource);
+            AddXmlProtocol(protocolType, stepSource);
+
+            //Also add the protocol type to the metaDictionary
+            metaDictionary["protocol type"] = protocolType;
         }
 
         private void RunSaveXml()
