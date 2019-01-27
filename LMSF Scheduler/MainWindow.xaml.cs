@@ -1798,7 +1798,7 @@ namespace LMSF_Scheduler
                     concDictionary[keyStr] = conc;
 
                     //Then save to XML document if...
-                    if (isCollectingXml)
+                    if (isCollectingXml && !AbortCalled)
                     {
                         AddXmlConcentration(conc, keyStr);
                     }
