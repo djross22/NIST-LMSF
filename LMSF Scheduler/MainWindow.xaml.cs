@@ -1454,6 +1454,105 @@ namespace LMSF_Scheduler
             experimentNode.AppendChild(protocolNode);
         }
 
+        private void AddXmlMetaDetail(string metaType, string idStr, string key, string notes)
+        {
+            XmlNode baseNode;
+            XmlNode detailNode;
+            XmlNode idNode;
+            XmlNode notesNode;
+
+            string baseNodeStr = $"{metaType}s";
+            string detailNodeStr = metaType;
+            string idNodeStr = $"{metaType}Id";
+            if (metaType == "plasmid")
+            {
+                baseNodeStr = "strains";
+                detailNodeStr = "strain";
+                idNodeStr = "plasmidId";
+            }
+            if (metaType == "media")
+            {
+                baseNodeStr = "media";
+                detailNodeStr = "medium";
+                idNodeStr = "mediaId";
+            }
+            if (metaType == "antibiotic")
+            {
+                baseNodeStr = "additives";
+                detailNodeStr = "additive";
+                idNodeStr = "additiveId";
+                key = "antibiotic";
+            }
+            //Adds metadata to the current protocolNode
+            //look for the base node and append to it or create it if it does not exist
+            XmlNodeList baseNodeList = protocolNode.SelectNodes($"descendant::{baseNodeStr}");
+            if (baseNodeList.Count>0)
+            {
+                baseNode = baseNodeList.Item(baseNodeList.Count - 1);
+            }
+            else
+            {
+                baseNode = xmlDoc.CreateElement(baseNodeStr);
+                protocolNode.AppendChild(baseNode);
+            }
+
+            //Plasmid details get attached to the last "strain" detail node if there is one
+            if (metaType=="plasmid")
+            {
+                XmlNodeList nodeList = baseNode.SelectNodes("descendant::strain");
+                if (nodeList.Count > 0)
+                {
+                    detailNode = nodeList.Item(nodeList.Count - 1);
+                }
+                else
+                {
+                    detailNode = xmlDoc.CreateElement(detailNodeStr);
+                    if (key != "")
+                    {
+                        XmlAttribute keyAtt = xmlDoc.CreateAttribute("useKey");
+                        keyAtt.Value = key;
+                        detailNode.Attributes.Append(keyAtt);
+                    }
+                    baseNode.AppendChild(detailNode);
+                }
+            }
+            else
+            {
+                //Then create and append the detail node
+                //    with attribute useKey if key!=""
+                detailNode = xmlDoc.CreateElement(detailNodeStr);
+                if (key != "")
+                {
+                    XmlAttribute keyAtt = xmlDoc.CreateAttribute("useKey");
+                    keyAtt.Value = key;
+                    detailNode.Attributes.Append(keyAtt);
+                }
+                baseNode.AppendChild(detailNode);
+            }
+
+            //Then create and append the ID node
+            idNode = xmlDoc.CreateElement(idNodeStr);
+            idNode.InnerText = idStr;
+            detailNode.AppendChild(idNode);
+
+            //For additives/antibiotics also add the startingStock node
+            if (detailNodeStr == "additive")
+            {
+                XmlNode stockNode = xmlDoc.CreateElement("startingStock");
+                detailNode.AppendChild(stockNode);
+                //Will also need to call AddStartingStockConc() to append the concentration and units
+            }
+
+            //then add notes if notes!=""
+            if (notes !="")
+            {
+                notesNode = xmlDoc.CreateElement("notes");
+                notesNode.InnerText = notes;
+                detailNode.AppendChild(notesNode);
+            }
+
+        }
+
         private string GetProjectIdentifier()
         {
             string pId = SharedParameters.GetMetaIdentifier("project", "Select the Project Identifier for this experiment:");
@@ -1606,15 +1705,26 @@ namespace LMSF_Scheduler
             string keyStr = args[2];
             string promptStr = "";
             string valueStr = "";
+            string notes = "";
             if (args.Length > 3)
             {
                 promptStr = args[3];
+            }
+            if (args.Length > 4)
+            {
+                notes = args[4];
             }
 
             //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
             this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); });
 
             metaDictionary[keyStr] = valueStr;
+
+            //Then save to XML document if...
+            if (isCollectingXml)
+            {
+                AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+            }
         }
 
         private void RunSet(int num, string[] args)
