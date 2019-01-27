@@ -1786,6 +1786,12 @@ namespace LMSF_Scheduler
 
             if (typeStr == "concentration")
             {
+                //Default prompt for concentration
+                if (promptStr == "")
+                {
+                    promptStr = $"Enter the concentration and units for the {keyStr}: ";
+                }
+
                 Concentration conc;
                 //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
                 this.Dispatcher.Invoke(() => {
@@ -1802,6 +1808,12 @@ namespace LMSF_Scheduler
             }
             else
             {
+                //Default prompt for averything except concentration
+                if (promptStr == "")
+                {
+                    promptStr = $"Select the {keyStr} for the experiment: ";
+                }
+
                 //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
                 this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr;});
 
