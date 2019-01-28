@@ -216,6 +216,7 @@ namespace LMSF_Utilities
             string experimentId = "";
             string xmlFilePath = "";
             string saveDirectory = "";
+            bool dirCreated = false;
 
             if (initialDir=="")
             {
@@ -224,6 +225,7 @@ namespace LMSF_Utilities
 
             if (!Directory.Exists(initialDir)) {
                 Directory.CreateDirectory(initialDir);
+                dirCreated = true;
             }
 
             GetExperimentIdDialog dlg = new GetExperimentIdDialog(initialDir, defaultId);
@@ -234,6 +236,21 @@ namespace LMSF_Utilities
                 experimentId = dlg.ExperimentId;
                 xmlFilePath = dlg.SaveFilePath;
                 saveDirectory = Directory.GetParent(xmlFilePath).FullName;
+            }
+            
+            if (dirCreated && (Path.GetFullPath(saveDirectory).TrimEnd('\\') != Path.GetFullPath(initialDir).TrimEnd('\\')))
+            {
+                if (Directory.Exists(initialDir))
+                {
+                    try
+                    {
+                        Directory.Delete(initialDir);
+                    }
+                    catch (IOException e)
+                    {
+                        //do nothing
+                    }
+                }
             }
 
             return new string[] { experimentId, xmlFilePath, saveDirectory };
