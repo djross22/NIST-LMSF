@@ -133,8 +133,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Utilities\bin\$(Configuration)\LMSF_Utilities.dll" "$(ProjectDir)bin\LMSF_Utilities.dll"
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Utilities\bin\$(Configuration)\LMSF_Utilities.dll" "$(ProjectDir)bin\LMSF_Utilities.dll"
 
-copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Utilities\bin\$(Configuration)\LMSF_Utilities.dll" "$(ProjectDir)bin\$(Configuration)\LMSF_Utilities.dll"</PostBuildEvent>
+copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Utilities\bin\$(Configuration)\LMSF_Utilities.dll" "$(ProjectDir)bin\$(Configuration)\LMSF_Utilities.dll"</PreBuildEvent>
   </PropertyGroup>
 </Project>
