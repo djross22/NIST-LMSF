@@ -134,7 +134,7 @@ Commands:
 	Get
 		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.
 		
-		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", and "notes"
+		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", and "note"
 		For metadata type "concentration", the user dialog gets the numeric value and units for the concentration.
 		
 		The <key> parameter is meant to be a short, human-readable indentifier of the function of the media, strain, plasmid, etc. in the current experiment.
