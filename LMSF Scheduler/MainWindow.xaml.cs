@@ -1234,11 +1234,17 @@ namespace LMSF_Scheduler
                     typeStr = stepArgs[1];
                     keyStr = stepArgs[2];
 
-                    //Make sure the metadata type is an valid type
-                    if (SharedParameters.IsValidMetaType(typeStr) || typeStr == "concentration")
+                    //Make sure the metadata type is a valid type
+                    if (SharedParameters.IsValidMetaType(typeStr) || typeStr == "concentration" || typeStr == "note")
                     {
                         argsOk = true;
                         outString += $"{typeStr} -> {keyStr} ";
+                    }
+                    else
+                    {
+                        //Message for bad argument:
+                        outString += $"Not a valid metadata type: {typeStr}. ";
+                        valFailed.Add(num);
                     }
                 }
 
@@ -1639,27 +1645,35 @@ namespace LMSF_Scheduler
                 //Then create and append the detail node
                 //    with attribute useKey if key!=""
                 detailNode = xmlDoc.CreateElement(detailNodeStr);
-                if (key != "")
+                if ((key != "") && (metaType!="note"))
                 {
                     XmlAttribute keyAtt = xmlDoc.CreateAttribute("useKey");
                     keyAtt.Value = key;
                     detailNode.Attributes.Append(keyAtt);
                 }
+                if (metaType == "note")
+                {
+                    detailNode.InnerText = idStr;
+                }
                 baseNode.AppendChild(detailNode);
             }
 
-            //Then create and append the ID node
-            idNode = xmlDoc.CreateElement(idNodeStr);
-            idNode.InnerText = idStr;
-            detailNode.AppendChild(idNode);
-
-            //then add notes if notes!=""
-            if (notes !="")
+            if (metaType != "note")
             {
-                notesNode = xmlDoc.CreateElement("notes");
-                notesNode.InnerText = notes;
-                detailNode.AppendChild(notesNode);
+                //Then create and append the ID node
+                idNode = xmlDoc.CreateElement(idNodeStr);
+                idNode.InnerText = idStr;
+                detailNode.AppendChild(idNode);
+
+                //then add notes if notes!=""
+                if (notes != "")
+                {
+                    notesNode = xmlDoc.CreateElement("note");
+                    notesNode.InnerText = notes;
+                    detailNode.AppendChild(notesNode);
+                }
             }
+                
 
         }
 
@@ -1869,6 +1883,13 @@ namespace LMSF_Scheduler
             return conc;
         }
 
+        private string GetNotes(string prompt)
+        {
+            string notes = SharedParameters.GetNotes("Protocol Note", prompt);
+
+            return notes;
+        }
+
         private void RunGet(int num, string[] args)
         {
             string typeStr = args[1];
@@ -1912,20 +1933,44 @@ namespace LMSF_Scheduler
             }
             else
             {
-                //Default prompt for averything except concentration
-                if (promptStr == "")
+                if (typeStr == "note")
                 {
-                    promptStr = $"Select the {keyStr} for the experiment: ";
+                    //Default prompt for notes
+                    if (promptStr == "")
+                    {
+                        promptStr = $"Enter any additional {keyStr}s for this protocol: ";
+                    }
+
+                    //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                    this.Dispatcher.Invoke(() => {
+                        valueStr = GetNotes(promptStr);
+                        metaDictionary[keyStr] = valueStr;
+                    });
+
+                    //Then save to XML document if...
+                    if (isCollectingXml)
+                    {
+                        AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                    }
                 }
-
-                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-                this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr;});
-
-                //Then save to XML document if...
-                if (isCollectingXml)
+                else
                 {
-                    AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                    //Default prompt for everything except concentration and notes
+                    if (promptStr == "")
+                    {
+                        promptStr = $"Select the {keyStr} for the experiment: ";
+                    }
+
+                    //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                    this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr; });
+
+                    //Then save to XML document if...
+                    if (isCollectingXml)
+                    {
+                        AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                    }
                 }
+                
             }
             
         }
