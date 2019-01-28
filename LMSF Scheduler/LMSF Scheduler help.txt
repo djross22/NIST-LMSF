@@ -135,6 +135,7 @@ Commands:
 		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.
 		
 		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", and "note"
+
 		For metadata type "concentration", the user dialog gets the numeric value and units for the concentration.
 		
 		The <key> parameter is meant to be a short, human-readable indentifier of the function of the media, strain, plasmid, etc. in the current experiment.
@@ -146,22 +147,24 @@ Commands:
 		If no <message prompt> parameter is given, the Get command will use the default prompt, "Select the <key> for the experiment: "
 		The Get command will also use the default prompt if the <message prompt> parameter is "default".
 		
-		The optional <notes> parameter and use of the "notes" metadata type are different:
-			Using "notes" as a metadata type gets notes from the user and adds them in a "notes" node to the XML protocol node.
-			The optional <notes> parameter can be used by the protocol programmer to add notes to any of the other metadata type nodes.
-			So, "notes" are created by the user when the automation protocol is run, whereas <note> are created by the programmer when the protocol is written.
-			Also, adding a <notes> parameter to a "notes" metadata doesn't do anything.
+		The optional <note> parameter and use of the "note" metadata type are different:
+			Using "note" as a metadata type gets notes from the user and adds them in a "note" node to the XML protocol node.
+			The optional <note> parameter can be used by the protocol programmer to add notes to any of the other metadata type nodes.
+			So, a "note" is created by the user when the automation protocol is run, whereas a <note> is created by the programmer when the protocol is written.
+
+			Also, adding a <note> parameter to a "note" metadata doesn't do anything.
+
 		
 		
 		Syntax:
-			Get/ <metadata type>/ <key>{/ <message prompt(optinal)>/ <notes (optional)>}
+			Get/ <metadata type>/ <key>{/ <message prompt(optinal)>/ <note (optional)>}
 			
 		Examples:
 			Get/ strain/ strain1
 			Get/ media/ baseMedia
 			Get/ additive/ inducer
 			Get/ additive/ inducer/ Select the inducer used for the left side of the plate:
-			Get/ additive/ inducer/ default/ notes to add to the XML file
+			Get/ additive/ inducer/ default/ note to add to the XML file
 			Get/ concentration/ inducer stock
 			
 			
