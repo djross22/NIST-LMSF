@@ -166,20 +166,145 @@ LMSF_Utilities: Add ConcentrationDialog class
 
 LMSF Scheduler: Reorganize ParseSteps() method with Local functions to parse each step type
 
+LMSF Scheduler: Fix Bug: Output does not show/update text for variables passed to Overlord
+
+LMSF Scheduler: Add/midify code to properly deal with Main Window closing - either through the red 'X' or the File.Close()
+
+LMSF Scheduler: Fix Bug: inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource(); - causes InputChanged <- true, even when it has not changed;
+    slight change in Setter to fix
+
+LMSF Scheduler: Fix Bug: Will not Validate after Aborted run;
+
+LMSF Scheduler: display validation result prominently with gree/red colr to indicate success/fail
+
+LMSF Scheduler: Put DateTime info in Output text;
+
+LMSF Scheduler: Add Running/Validating and ExperimentFileName to beginning of OutputText
+
+LMSF Scheduler: Add saving of output text to log file
+
+LMSF Scheduler: Add ComboBox on toolbar for shortcuts to insert Command into InputText
+
+LMSF Scheduler: Move InsertFileButton to tool bar
+
+LMSF Scheduler: Change WaitForOverlord() output to "... waiting for Overlord to finish and exit."
+
+LMSF Scheduler: Add code to create log file directory if it does not exist, also changed the log file directory to: "C:\\Shared Files\\LMSF Scheduler\\LogFiles\\"
+
+LMSF Scheduler: Change format for log file name to , "yyyy-MM-dd HH.mm.ss"
+
+LMSF Scheduler: Turn play and step buttons yellow when waiting to resume from pause; also use predefined Brushes everywhere else: Brushes.NamedBrush
+
+LMSF Scheduler: Add "Method Aborted." to log file
+
+LMSF Scheduler: "project" to metadata type (same dialogs as additive/antibiotic)
+
+LMSF Scheduler: Add local method, ParseGenericStep(), in ParseSteps(), as a template for new local parse methods
+
+LMSF Scheduler: NewXML and SaveXML steps to ParseSteps(); and RunNewXml() and RunSaveXml() methods
+
+LMSF Scheduler: Add  AddXmlStep() method, and argument handling in ParseNewXml() to assign value to experimentStep attribute in XML aoutput
+
+LMSF_Utilities: Add GetDateTimeString() method for consistent formatting of DateTime string: "yyyy-MM-dd HH:mm:ss", for everything except log file names
+
+LMSF Scheduler: Add  AddXmlStep() method, and argument handling in ParseNewXml() to assign value to experimentStep attribute in XML aoutput
+
+LMSF Scheduler: Change code for RunNewXml() so that if 'Cancel' is selected at the "select project" dialog, the run will abort
+
+LMSF Scheduler: Allow commenting input lines with "//"
+
+LMSF Scheduler: Change XML schema a bit: metadata/project/protocol/<step> instead of metadata/project/experimentStep/<step>
+
+LMSF Scheduler: Fix "procedure started" and "procedure finished" bugs 
+
+LMSF Scheduler: AddDateTimeNodes(XmlNode parentNode)
+
+LMSF Scheduler: Add datetime info to protocol start/finish in XML;
+
+LMSF Scheduler: Change signature of RunTimer() method to RunTimer(int num, string[] args) to be consistent with other RunXxxx() methods
+
+LMSF Scheduler: Add command: WaitFor, DateTime
+
+LMSF Scheduler: Add command: AppendXML
+
+LMSF Scheduler: Add command: UserPrompt; make shortcut drop-down box a bit wider
+
+LMSF Scheduler: Change command-argument separator to foreward slash "/" - to allow use of commas and semicolons in arguments.
+
+LMSF Scheduler: Add key syntax to arguments: any {keyString}, inclosed with "{" and "}", in an inputText argument will be replaced with the corresponding value from the metaDictionary
+
+LMSF Scheduler: Add Set command to directly set entries in metaDictionary
+
+LMSF Scheduler: Add Get command, calls up a user dialog to get a metadata type and saves the result in the metaDictionary
+
+LMSF_Utilities: Fix Bug; "none" not showing up in parent list for create new identifier
+
+LMSF Scheduler: Add "Validate with User Input" check box - when checked, the validate method goes through all the user dialogs
+
+LMSF Scheduler: Add XML metadata output at end of RunGet() method
+
+LMSF Scheduler: Add concDictionary (Dictionary<string, Concentration>) to store user input concentrations
+
+LMSF Scheduler: Add Get/ concentration/... command, with automated XML output
+
+LMSF Scheduler: Change default prompt on Get/ command to use the "key" instead of "type"
+
+LMSF Scheduler: Add code to NewXML/ command: automatically add the protocol type to the metadata dictionary, metaDictionary["protocol type"] = protocolType;
+
+LMSF Scheduler: Add "default" as prompt parameter in Get/ command; update help file
+
+LMSF Scheduler: Fix bug: When 'Cancel' selected in Get/ concentration/..., the run needs to abort before trying to reference the concentration object, which is null.
+
+LMSF_Utilities: User prompt dialog open in center of screen
+
+LMSF Scheduler: Fix Bug: "/" getting insterted when short-cut comboBox returns null
+
+LMSF_Utilities: Add GetExperimentId Dialog and method
+
+LMSF Scheduler: Implement GetExpID/ command and RunGetExpId()
+        Also, modify signature of AddDateTimeNodes(DateTime dt, XmlNode parentNode, string statusStr) to take DateTime object as first argument (so it can add dateTime info other than DateTime.Now)
+
+LMSF Scheduler: Fix Bug in "Get/ concentration" command- concentration node was being appended to the additives instead of the last additive node 
+
+LMSF Scheduler: In GetExpID/ command, delete automatically created directory if it is not used (user choosed to same xml file somewhere else)
+
+LMSF Scheduler: Add command: Get/ notes/ <key>/ <prompt>, to get notes from the user and append them as a notes node to the protocol node in the XML document
+
+
 
 
 TODOs-
 
+Add Get/ notes/ <key>/ <prompt>, to get notes from the user
 
-LMSF Scheduler: Pass variables to Overlord Simulator
-
-LMSF Scheduler: display validation result promanently
-
+notes dialog open in center of screen
 
 
-Collect and save metadata step(s) in LMSF Scheduler
 
-SaveToMetadatFile
+
+
+Save Set/ to XML doc
+
+
+
+
+
+
+
+Open timer dialog near top of screen?
+
+
+Open Overlord to edit procedure button
+
+control which screen Overlord opens on (screen one preferred)
+
+Comnbine MetaList.csv files from multiple sources (STAR and Overlord Main)
+
+
+
+
+
+
 
 
 one-line constructors for custom dialogs
@@ -191,7 +316,28 @@ Copy functionality from Venus LMSF Utilities library
 User input steps: need C# metadata -> xml?
 
 
+(Probably) Hard-to-do stuff:
 
+Highlight lines in output that have errors (or change text to red)
+    would require changing to a RichTextBox and more complicated text entry
+	Still need to figure out Binding - since the idea I had to bind to the Document Property of the Control doesn't work
+	
+	    First, switch the Binding Property from OutPutText to OutPutDocument (Document class)
+	
+	    Then, change return type of the ParseStep() method to Paragraph
+		
+	    Then, in the Step() method, replace  the line,
+		    OutputText += ParseStep(stepNum, inputSteps[stepNum]); 
+	    with:
+		    OutPutDocument.Blocks.Add(ParseStep(stepNum, inputSteps[stepNum]));
+			
+		And in the ParseStep() method, at the end, 
+			Paragraph newOutText = new Paragraph();
+			newOutText.Inlines.Add(outString);
+			newOutText.FontWeight = FontWeights.Bold; - if validation error
+			newOutText.Foreground = Brushes.Red; - or Black if passed validation
+			
+			return newOutText;
 
 
 
