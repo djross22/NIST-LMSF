@@ -60,6 +60,9 @@ namespace LMSF_Scheduler
         //Overlord process (runs Overlord.Main.exe)
         private Process ovProcess;
 
+        //Hamilton process (runs HxRun.exe)
+        private Process hamProcess;
+
         //Timer dialog window
         private TimerDialog stepTimerDialog;
 
@@ -292,7 +295,7 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
@@ -732,6 +735,9 @@ namespace LMSF_Scheduler
                     case "Overlord":
                         ParseOverlordStep();
                         break;
+                    case "Hamilton":
+                        ParseHamiltonStep();
+                        break;
                     case "WaitFor":
                         ParseWaitForStep();
                         break;
@@ -875,6 +881,52 @@ namespace LMSF_Scheduler
                     }
                 }
             }
+            
+            void ParseHamiltonStep()
+            {
+                outString += "Running Hamilton Venus Method: ";
+                bool isHslFileName = false;
+
+                //Requires one argument, the Method file path
+                if (numArgs < 2)
+                {
+                    outString += "No method file path given.";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    if (stepArgs[1].EndsWith(".hsl"))
+                    {
+                        isHslFileName = true;
+                    }
+                    else
+                    {
+                        outString += "Not a valid Hamilton method (*.hsl) filename: ";
+                        outString += stepArgs[1];
+                        valFailed.Add(num);
+                    }
+                }
+
+                if (isHslFileName)
+                {
+                    bool hslExists = File.Exists(stepArgs[1]);
+                    if (hslExists)
+                    {
+                        outString += stepArgs[1];
+
+                        if (!isValidating)
+                        {
+                            RunHamilton(num, stepArgs);
+                        }
+                    }
+                    else
+                    {
+                        outString += "Method file not found: ";
+                        outString += stepArgs[1];
+                        valFailed.Add(num);
+                    }
+                }
+            }
 
             void ParseTimerStep()
             {
@@ -950,6 +1002,13 @@ namespace LMSF_Scheduler
                                 WaitForOverlord(num);
                             }
                             break;
+                        case "Hamilton":
+                            outString += "Hamilton, Done.";
+                            if (!isValidating)
+                            {
+                                WaitForHamilton(num);
+                            }
+                            break;
                         case "Timer":
                             outString += "Timer, Done.";
                             if (!isValidating)
@@ -974,7 +1033,7 @@ namespace LMSF_Scheduler
                 //string for start of output from ParseStep()
                 outString += "Creating New XML document: ";
 
-                //Requires an argument for the step type:
+                //Requires an argument for the protocol type:
                 if (numArgs < 2)
                 {
                     argsOk = false;
@@ -1020,17 +1079,17 @@ namespace LMSF_Scheduler
                 //string for start of output from ParseStep()
                 outString += "Appending to existing XML document: ";
 
-                //Requires an argument for the step type:
+                //Requires an argument for the protocol type:
                 if (numArgs < 2)
                 {
                     argsOk = false;
                     //Message for missing argument or not enough arguments:
-                    outString += "No step type argument given.";
+                    outString += "No protocol type argument given.";
                     valFailed.Add(num);
                 }
                 else
                 {
-                    //If the step type argument exists, amke sure it is ok (needs to be a good xml atribute value, with just letters, numbers, spaces, or "-" or "_")
+                    //If the protocol type argument exists, amke sure it is ok (needs to be a good xml atribute value, with just letters, numbers, spaces, or "-" or "_")
                     RegexValidationRule valRule = new RegexValidationRule();
                     valRule.RegexText = "^[a-zA-Z0-9-_ ]+$";
                     valRule.ErrorMessage = "Experiment step arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
@@ -2110,6 +2169,56 @@ namespace LMSF_Scheduler
             }
         }
 
+        private void RunHamilton(int num, string[] args)
+        {
+            //args[0] is "Hamilton"
+            //args[1] is file path
+            string file = args[1];
+
+            //TODO: re-evaluate the need for these variables-
+            WaitingForStepCompletion = true;
+            stepsRunning[num] = true;
+
+            if ( !(hamProcess is null) )
+            {
+                if (!hamProcess.HasExited)
+                {
+                    OutputText += "... waiting for last Hamilton Process to exit.";
+                    while (!hamProcess.HasExited)
+                    {
+                        Thread.Sleep(100);
+                    }
+                }
+            }
+
+            //This part starts the Hamiltin HxRun.exe process
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = @"C:\Program Files (x86)\HAMILTON\Bin\HxRun.exe";
+
+            //the -t modifier causes HxRun.exe to run the method and then terminate itself after
+            startInfo.Arguments = "\"" + file + "\"" + " -t";
+
+            hamProcess = Process.Start(startInfo);
+
+            //Send info to metadata if collecting
+            if (isCollectingXml)
+            {
+                //Add <hamiltonMethod> node to metadata
+                XmlNode hamNode = xmlDoc.CreateElement("hamiltonMethod");
+                //add the hamiltonMethod node to the protocol node
+                protocolNode.AppendChild(hamNode);
+
+                //Method file
+                XmlNode hamFileNode = xmlDoc.CreateElement("methodFile");
+                hamFileNode.InnerText = file;
+                hamNode.AppendChild(hamFileNode);
+
+                //Date and time
+                AddDateTimeNodes(DateTime.Now, hamNode, "method started");
+
+            }
+        }
+
         private void AddDateTimeNodes(DateTime dt, XmlNode parentNode, string statusStr)
         {
             //DateTime dt = DateTime.Now;
@@ -2171,6 +2280,46 @@ namespace LMSF_Scheduler
                 timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
                 XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
                 statusFiniAtt.Value = "procedure finished";
+                timeFiniNode.Attributes.Append(statusFiniAtt);
+                dateNode.AppendChild(timeFiniNode);
+            }
+
+        }
+        
+        private void WaitForHamilton(int num)
+        {
+            //TODO: re-evaluate the need for these variables-
+            WaitingForStepCompletion = true;
+            stepsRunning[num] = true;
+
+            OutputText += "... waiting for Hamilton Runtime Engine to finish and exit.";
+
+            BackgroundWorker hamMonitorWorker = new BackgroundWorker();
+            hamMonitorWorker.WorkerReportsProgress = false;
+            hamMonitorWorker.DoWork += OutsideProcessMonitor_DoWork;
+            hamMonitorWorker.RunWorkerCompleted += OutsideProcessMonitor_RunWorkerCompleted;
+
+            List<object> arguments = new List<object>();
+            arguments.Add(num);
+            arguments.Add(hamProcess);
+            hamMonitorWorker.RunWorkerAsync(arguments);
+
+            while (WaitingForStepCompletion)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+
+            //Send finish info to metadata if collecting
+            if (isCollectingXml)
+            {
+                DateTime dt = DateTime.Now;
+
+                XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::hamiltonMethod/dateTime");
+                XmlNode dateNode = dateNodeList.Item(dateNodeList.Count-1);
+                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                statusFiniAtt.Value = "method finished";
                 timeFiniNode.Attributes.Append(statusFiniAtt);
                 dateNode.AppendChild(timeFiniNode);
             }
@@ -2347,7 +2496,7 @@ namespace LMSF_Scheduler
                 {
                     int caretPos = inputTextBox.SelectionStart;
 
-                    InsertInputText(" <step type>\n\nSaveXML/ ");
+                    InsertInputText(" <protocol type>\n\nSaveXML/ ");
 
                     //move caret to middle line between NewXML and SaveXML
                     inputTextBox.SelectionStart = caretPos + 1;
