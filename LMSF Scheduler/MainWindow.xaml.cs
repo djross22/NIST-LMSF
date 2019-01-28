@@ -1234,8 +1234,8 @@ namespace LMSF_Scheduler
                     typeStr = stepArgs[1];
                     keyStr = stepArgs[2];
 
-                    //Make sure the metadata type is an valid type
-                    if (SharedParameters.IsValidMetaType(typeStr) || typeStr == "concentration")
+                    //Make sure the metadata type is a valid type
+                    if (SharedParameters.IsValidMetaType(typeStr) || typeStr == "concentration" || typeStr == "notes")
                     {
                         argsOk = true;
                         outString += $"{typeStr} -> {keyStr} ";
@@ -1869,6 +1869,13 @@ namespace LMSF_Scheduler
             return conc;
         }
 
+        private string GetNotes(string prompt)
+        {
+            string notes = SharedParameters.GetNotes("Protocol Notes", prompt);
+
+            return notes;
+        }
+
         private void RunGet(int num, string[] args)
         {
             string typeStr = args[1];
@@ -1912,20 +1919,44 @@ namespace LMSF_Scheduler
             }
             else
             {
-                //Default prompt for averything except concentration
-                if (promptStr == "")
+                if (typeStr == "notes")
                 {
-                    promptStr = $"Select the {keyStr} for the experiment: ";
+                    //Default prompt for notes
+                    if (promptStr == "")
+                    {
+                        promptStr = $"Enter any additional {keyStr} for this protocol: ";
+                    }
+
+                    //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                    this.Dispatcher.Invoke(() => {
+                        valueStr = GetNotes(promptStr);
+                        metaDictionary[keyStr] = valueStr;
+                    });
+
+                    //Then save to XML document if...
+                    if (isCollectingXml)
+                    {
+                        AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                    }
                 }
-
-                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-                this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr;});
-
-                //Then save to XML document if...
-                if (isCollectingXml)
+                else
                 {
-                    AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                    //Default prompt for everything except concentration and notes
+                    if (promptStr == "")
+                    {
+                        promptStr = $"Select the {keyStr} for the experiment: ";
+                    }
+
+                    //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                    this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr; });
+
+                    //Then save to XML document if...
+                    if (isCollectingXml)
+                    {
+                        AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                    }
                 }
+                
             }
             
         }

@@ -320,6 +320,28 @@ namespace LMSF_Utilities
             return metaID;
         }
 
+        public static string GetNotes(string titleText, string notesPrompt)
+        {
+            string newNotes = "";
+
+            // Instantiate the dialog box
+            NotesDialog notesDlg = new NotesDialog();
+            // Configure the dialog box
+            notesDlg.Title = titleText;
+            notesDlg.PromptText = notesPrompt;
+            // Open the dialog box modally and abort if it does not returns true
+            if (notesDlg.ShowDialog() != true)
+            {
+                newNotes = "";
+            }
+            else
+            {
+                newNotes = notesDlg.Notes;
+            }
+
+            return newNotes;
+        }
+
         private static void CreateNewMetaIdentifier(string metaType)
         {
             string newIdent = "";
