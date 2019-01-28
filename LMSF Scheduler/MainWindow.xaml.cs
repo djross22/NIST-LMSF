@@ -1203,7 +1203,7 @@ namespace LMSF_Scheduler
             void ParseGet()
             {
                 //Get takes 2 or 3 arguments
-                //The first 2 arguments are the metadata typw and the key for saving the result in the metaDictionary
+                //The first 2 arguments are the metadata type and the key for saving the result in the metaDictionary
                 string typeStr = "";
                 string keyStr = "";
 

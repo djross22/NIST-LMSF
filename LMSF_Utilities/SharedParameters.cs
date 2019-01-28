@@ -432,7 +432,7 @@ namespace LMSF_Utilities
                                 case "strain":
                                     newDefinitionFilePath = StrainFolderPath;
                                     break;
-                                case "plsmid":
+                                case "plasmid":
                                     newDefinitionFilePath = PlasmidFolderPath;
                                     break;
                                 default:
