@@ -271,13 +271,13 @@ LMSF Scheduler: In GetExpID/ command, delete automatically created directory if 
 LMSF Scheduler: Add command: Get/ notes/ <key>/ <prompt>, to get notes from the user and append them as a notes node to the protocol node in the XML document
 
 
+LMSF Scheduler: Add commands: Hamilton/ <method file>, and WaitFor/ Hamilton, to run Hamilton Venus methods (similar to Overlord/ command)
+
+
 
 
 TODOs-
 
-Add Get/ notes/ <key>/ <prompt>, to get notes from the user
-
-notes dialog open in center of screen
 
 
 
@@ -286,6 +286,9 @@ notes dialog open in center of screen
 Save Set/ to XML doc
 
 
+
+Attune front end? 4 buttons: Startup, perf test, run experiment, shutdown
+	Uses LMSF Scheduler and Utilities code
 
 
 
