@@ -23,6 +23,7 @@ namespace LMSF_Utilities
         public static string WorklistFolderPath => "C:\\Shared Files\\Data\\";
         public static string MetadataFolderPath => "C:\\Shared Files\\MetaData Schema\\";
         public static string OverlordFolderPath => "C:\\Shared Files\\Overlord-Venus\\";
+        public static string HamiltonFolderPath => "C:\\Program Files (x86)\\HAMILTON\\LMSF_FrontEnd\\";
 
         //Media parameters
         public static string MediaFolderPath => MetadataFolderPath + "MediaList\\";

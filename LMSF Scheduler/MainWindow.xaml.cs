@@ -1876,8 +1876,9 @@ namespace LMSF_Scheduler
             //Add the current experiment protocol to the XML
             AddXmlProtocol(protocolType, stepSource);
 
-            //Also add the protocol type to the metaDictionary
+            //Also add the protocol type and projectID to the metaDictionary
             metaDictionary["protocol type"] = protocolType;
+            metaDictionary["projectId"] = projectIdAtt.Value;
             //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
             metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
         }
@@ -2169,6 +2170,26 @@ namespace LMSF_Scheduler
             }
         }
 
+        private void ExportDictionary(string dir, string fileName)
+        {
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            string outPath = System.IO.Path.Combine(dir, fileName);
+
+            string header = String.Join(",", metaDictionary.Keys);
+            string values = String.Join(",", metaDictionary.Values);
+
+            using (StreamWriter outputFile = new StreamWriter(outPath))
+            {
+                outputFile.WriteLine(header);
+                outputFile.WriteLine(values);
+            }
+
+        }
+
         private void RunHamilton(int num, string[] args)
         {
             //args[0] is "Hamilton"
@@ -2190,6 +2211,9 @@ namespace LMSF_Scheduler
                     }
                 }
             }
+
+            //Export the metaDicitonary to the Hamilton/LMSF_FrontEnd dirctory
+            ExportDictionary(SharedParameters.HamiltonFolderPath, "parameters.csv");
 
             //This part starts the Hamiltin HxRun.exe process
             ProcessStartInfo startInfo = new ProcessStartInfo();
