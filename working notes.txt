@@ -279,7 +279,7 @@ LMSF Scheduler: Add commands: Hamilton/ <method file>, and WaitFor/ Hamilton, to
 TODOs-
 
 
-
+Add startDate to metaDictionary (same string as startDateTime, but without the time)
 
 
 
