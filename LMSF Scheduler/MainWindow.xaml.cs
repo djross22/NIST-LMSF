@@ -406,7 +406,7 @@ namespace LMSF_Scheduler
         private void Open()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Text file (*.txt)|*.txt";
+            openFileDialog.Filter = "LMSF file (*.lmsf)|*.lmsf";
             if (openFileDialog.ShowDialog() == true)
             {
                 InputText = File.ReadAllText(openFileDialog.FileName);
@@ -447,7 +447,7 @@ namespace LMSF_Scheduler
         private bool SaveAs()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Text file (*.txt)|*.txt";
+            saveFileDialog.Filter = "LMSF file (*.lmsf)|*.lmsf";
             bool didSave;
             if (saveFileDialog.ShowDialog() == true)
             {
