@@ -591,6 +591,21 @@ namespace LMSF_Utilities
             }
         }
 
+        public static string GetNumber(string prompt)
+        {
+            string numStr = "";
+            NumericInputDialog dlg = new NumericInputDialog();
+            // Configure the dialog box
+            //dlg.Title = "Long Name";
+            dlg.PromptText = prompt;
+            if (dlg.ShowDialog() == true)
+            {
+                numStr = dlg.NumString;
+            }
+
+            return numStr;
+        }
+
         private static void GetAndSaveMediaIngredients(string newIdent)
         {
             //Set up Empty list of ingredients

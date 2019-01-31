@@ -312,13 +312,9 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            string[] test = SharedParameters.GetExperimentId("", "test-abcd");
+            string test = SharedParameters.GetNumber("enter a number:");
 
-            OutputText += test[0];
-            OutputText += "\n";
-            OutputText += test[1];
-            OutputText += "\n";
-            OutputText += test[2];
+            OutputText += test;
             OutputText += "\n";
         }
 
@@ -1298,7 +1294,7 @@ namespace LMSF_Scheduler
                     keyStr = stepArgs[2];
 
                     //Make sure the metadata type is a valid type
-                    if (SharedParameters.IsValidMetaType(typeStr) || typeStr == "concentration" || typeStr == "note")
+                    if (SharedParameters.IsValidMetaType(typeStr) || typeStr == "concentration" || typeStr == "note" || typeStr == "number")
                     {
                         argsOk = true;
                         outString += $"{typeStr} -> {keyStr} ";
@@ -1975,7 +1971,39 @@ namespace LMSF_Scheduler
                 notes = args[4];
             }
 
-            if (typeStr == "concentration")
+            switch (typeStr)
+            {
+                case "number":
+                    GetNumber();
+                    break;
+                case "concentration":
+                    GetConcentration();
+                    break;
+                case "note":
+                    GetNote();
+                    break;
+                default:
+                    GetDefault();
+                    break;
+            }
+
+            void GetNumber()
+            {
+                //Default prompt for number
+                if (promptStr == "")
+                {
+                    promptStr = $"Enter the number: ";
+                }
+
+                //this has to be delegated becasue it interacts with the GUI by calling up a dialog box
+                this.Dispatcher.Invoke(() => {
+                    valueStr = GetNumberFromUser(promptStr);
+                    metaDictionary[keyStr] = valueStr;
+                });
+
+            }
+
+            void GetConcentration()
             {
                 //Default prompt for concentration
                 if (promptStr == "")
@@ -1995,50 +2023,58 @@ namespace LMSF_Scheduler
                         AddXmlConcentration(conc, keyStr);
                     }
                 });
-
             }
-            else
+
+            void GetNote() {
+                //Default prompt for notes
+                if (promptStr == "")
+                {
+                    promptStr = $"Enter any additional {keyStr}s for this protocol: ";
+                }
+
+                //this has to be delegated becasue it interacts with the GUI by calling up a dialog box
+                this.Dispatcher.Invoke(() => {
+                    valueStr = GetNotes(promptStr);
+                    metaDictionary[keyStr] = valueStr;
+                });
+
+                //Then save to XML document if...
+                if (isCollectingXml)
+                {
+                    AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                }
+            }
+
+            void GetDefault()
             {
-                if (typeStr == "note")
+                //Default prompt for everything except concentration and notes
+                if (promptStr == "")
                 {
-                    //Default prompt for notes
-                    if (promptStr == "")
-                    {
-                        promptStr = $"Enter any additional {keyStr}s for this protocol: ";
-                    }
-
-                    //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-                    this.Dispatcher.Invoke(() => {
-                        valueStr = GetNotes(promptStr);
-                        metaDictionary[keyStr] = valueStr;
-                    });
-
-                    //Then save to XML document if...
-                    if (isCollectingXml)
-                    {
-                        AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
-                    }
+                    promptStr = $"Select the {keyStr} for the experiment: ";
                 }
-                else
+
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr; });
+
+                //Then save to XML document if...
+                if (isCollectingXml)
                 {
-                    //Default prompt for everything except concentration and notes
-                    if (promptStr == "")
-                    {
-                        promptStr = $"Select the {keyStr} for the experiment: ";
-                    }
-
-                    //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-                    this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr; });
-
-                    //Then save to XML document if...
-                    if (isCollectingXml)
-                    {
-                        AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
-                    }
+                    AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
                 }
-                
             }
-            
+
+        }
+
+        private string GetNumberFromUser(string prompt)
+        {
+            string numStr = SharedParameters.GetNumber(prompt);
+
+            if (numStr == "")
+            {
+                AbortCalled = true;
+            }
+
+            return numStr;
         }
 
         private void UpdateXmlExpId(string expIdStr)

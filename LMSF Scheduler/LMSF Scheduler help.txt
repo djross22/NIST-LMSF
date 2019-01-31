@@ -70,7 +70,8 @@ Commands:
 			
 	NewXML
 		Starts a new XML metadata document.
-		Also, adds the protocol starting date and time to the Metadata Dictionary in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
+		Also, adds the protocol starting date and time to the Metadata Dictionary (key = "startDateTime") in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
+		Also, adds the protocol starting date to the Metadata Dictionary (key = "startDate") in a form that is suitable for use in file names/identifiers: "yyyy-MM-dd".
 		
 		The <protocol type> is meant to be a short, human-readable description of the function of the current protocol.
 			It is also used to distinguish protocols in a multi-protocol experiment.
@@ -87,6 +88,7 @@ Commands:
 	AppendXML
 		Similar to NewXML, but opens an existing XML metadata document and adds to it.
 		Also, adds the protocol starting date and time to the Metadata Dictionary (key = "startDateTime") in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
+		Also, adds the protocol starting date to the Metadata Dictionary (key = "startDate") in a form that is suitable for use in file names/identifiers: "yyyy-MM-dd".
 		
 		Syntax:
 			AppendXML/ <protocol type>
@@ -134,7 +136,7 @@ Commands:
 	Get
 		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.
 		
-		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", and "note"
+		The list of valid metadata types is: "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", "note", and "number"
 
 		For metadata type "concentration", the user dialog gets the numeric value and units for the concentration.
 		

@@ -60,6 +60,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="NumericInputDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UserPromptImageDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -99,6 +103,9 @@
     </Compile>
     <Compile Include="GetExperimentIdDialog.xaml.cs">
       <DependentUpon>GetExperimentIdDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NumericInputDialog.xaml.cs">
+      <DependentUpon>NumericInputDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserPromptImageDialog.xaml.cs">
       <DependentUpon>UserPromptImageDialog.xaml</DependentUpon>
