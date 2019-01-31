@@ -275,6 +275,71 @@ namespace LMSF_Utilities
 
             return new string[] { experimentId, xmlFilePath, saveDirectory };
         }
+        //If a projectID is gievn, use it in the default filePath,
+        public static string[] GetExperimentId(string initialDir, string defaultId, string projId)
+        {
+            string experimentId = "";
+            string xmlFilePath = "";
+            string saveDirectory = "";
+            bool dirCreated = false;
+
+            if (initialDir == "")
+            {
+                initialDir = $"{WorklistFolderPath}{projId}\\{defaultId}\\";
+            }
+
+            if (!Directory.Exists(initialDir))
+            {
+                Directory.CreateDirectory(initialDir);
+                dirCreated = true;
+            }
+
+            GetExperimentIdDialog dlg = new GetExperimentIdDialog(initialDir, defaultId);
+
+            // Open the dialog box modally and return concentration if dialog returns true (OK)
+            if (dlg.ShowDialog() == true)
+            {
+                experimentId = dlg.ExperimentId;
+                xmlFilePath = dlg.SaveFilePath;
+                saveDirectory = Directory.GetParent(xmlFilePath).FullName;
+
+                if (dirCreated && (Path.GetFullPath(saveDirectory).TrimEnd('\\') != Path.GetFullPath(initialDir).TrimEnd('\\')))
+                {
+                    if (Directory.Exists(initialDir))
+                    {
+                        try
+                        {
+                            Directory.Delete(initialDir);
+                        }
+                        catch (IOException e)
+                        {
+                            //do nothing
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (dirCreated)
+                {
+                    if (Directory.Exists(initialDir))
+                    {
+                        try
+                        {
+                            Directory.Delete(initialDir);
+                        }
+                        catch (IOException e)
+                        {
+                            //do nothing
+                        }
+                    }
+                }
+            }
+
+
+
+            return new string[] { experimentId, xmlFilePath, saveDirectory };
+        }
 
         public static string GetMetaIdentifier(string metaType, string selectPrompt)
         {

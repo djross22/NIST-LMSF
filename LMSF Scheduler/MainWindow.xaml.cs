@@ -2072,6 +2072,24 @@ namespace LMSF_Scheduler
 
             return new string[] { expIdStr, metaDataFilePath, saveDirectory };
         }
+        //If a projectID is gievn, use it in the default filePath, via the overloaded SharedParameters.GetExperimentId()
+        private string[] GetExpId(string dataDirStr, string expIdStr, string projID)
+        {
+            //return string[0] = experimentId
+            //return string[1] = XML file path
+            //return string[2] = saveDirectory
+            string[] getIdStrings = SharedParameters.GetExperimentId(dataDirStr, expIdStr, projID);
+            expIdStr = getIdStrings[0];
+            metaDataFilePath = getIdStrings[1];
+            string saveDirectory = getIdStrings[2];
+
+            if (expIdStr == "")
+            {
+                AbortCalled = true;
+            }
+
+            return new string[] { expIdStr, metaDataFilePath, saveDirectory };
+        }
 
         private void RunGetExpId(int num, string[] args)
         {
@@ -2087,7 +2105,15 @@ namespace LMSF_Scheduler
             string[] argsBack = new string[] { "", "", "" };
             //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
             this.Dispatcher.Invoke(() => {
-                argsBack = GetExpId(dataDirStr, expIdStr);
+                //argsBack = GetExpId(dataDirStr, expIdStr);
+                if (metaDictionary.ContainsKey("projectId"))
+                {
+                    argsBack = GetExpId(dataDirStr, expIdStr, metaDictionary["projectId"]);
+                }
+                else
+                {
+                    argsBack = GetExpId(dataDirStr, expIdStr);
+                }
             });
             
             //Then save to XML document if...
