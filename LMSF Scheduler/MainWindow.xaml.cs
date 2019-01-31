@@ -1066,7 +1066,9 @@ namespace LMSF_Scheduler
                     else
                     {
                         metaDictionary["protocol type"] = stepArgs[1];
-                        metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(true);
+                        DateTime startDt = DateTime.Now;
+                        metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
+                        metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
                     }
                 }
             }
@@ -1111,7 +1113,9 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(true);
+                        DateTime startDt = DateTime.Now;
+                        metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
+                        metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
                     }
                 }
             }
@@ -1829,6 +1833,7 @@ namespace LMSF_Scheduler
 
             //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
             metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
+            metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
         }
 
         private void RunNewXml(int num, string[] args)
@@ -1881,6 +1886,7 @@ namespace LMSF_Scheduler
             metaDictionary["projectId"] = projectIdAtt.Value;
             //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
             metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
+            metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
         }
 
         private void RunSaveXml()
