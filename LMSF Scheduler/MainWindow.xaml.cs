@@ -1999,15 +1999,28 @@ namespace LMSF_Scheduler
         {
             string messageStr = args[2];
             string titleStr = args[1];
+            bool? oKToGo = false;
             if (args.Length < 4)
             {
                 //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-                this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(messageStr, titleStr); });
+                this.Dispatcher.Invoke(() => {
+                    oKToGo = SharedParameters.ShowPrompt(messageStr, titleStr);
+                    if (!(oKToGo == true))
+                    {
+                        AbortCalled = true;
+                    }
+                });
             }
             else
             {
                 string imagePath = args[3];
-                this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(messageStr, titleStr, imagePath); });
+                this.Dispatcher.Invoke(() => {
+                    oKToGo = SharedParameters.ShowPrompt(messageStr, titleStr, imagePath);
+                    if (!(oKToGo == true))
+                    {
+                        AbortCalled = true;
+                    }
+                });
             }
         }
 
