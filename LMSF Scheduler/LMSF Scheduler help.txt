@@ -39,6 +39,17 @@ Commands:
 			Overlord/ C:\Program Files (x86)\PAA\Overlord3\Procedures\Common\Add Lid.ovp
 			Overlord/ C:\Program Files (x86)\PAA\Overlord3\Procedures\Common\Add Lid.ovp/ [Plates] 10 [Barcode] "12345678"
 			
+			
+	Hamilton
+		Runs a Hamilton method (on a computer with Hamilton Venus installed).
+		Also saves the Metadata Dictionary (metaDictionary) to a parameters file that can be read by a Hamilton Venus program (C:\Program Files (x86)\HAMILTON\LMSF_FrontEnd\parameters.csv).
+		
+		Syntax:
+			Hamilton/ <file path>
+			
+		Examples:
+			Hamilton/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl
+			
 		
 	Timer
 		Starts a timer that runs for a specified amount of time, or until a specified time or date-time.
