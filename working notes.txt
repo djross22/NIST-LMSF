@@ -278,15 +278,29 @@ LMSF Scheduler: Add Get/ number/ - to get generic numberic input from user, with
 
 LMSF Scheduler: Add "Start/ <protocol title>/ <list file path>" command; Protocol Start Dialog, w/ list of requirements and 'OK' and 'Abort' buttons.
 
+At start of RunHamilton, delete the schema.ini file from the Hamilton parameters directory;
+
+Add abort button to UserPromptDialog
+
+Experiment ID dialog: "choose XML file to save metadata:"
+
+
+
+
 
 TODOs-
+
+New command: AddXML/ <parentNode> / <newNode>/ <innerText>
+
+Add output/worklist file and path info to metadata
+
+New command to enter/verify other output files?
 
 
 Add cells now/later dialog, w/ 'now', 'later', and 'abort' buttons
 
-Review Experiment Dialog?
+Review Experiment Dialog? at end of set-up, with 'OK' and 'Abort' buttons
 
-Add abort button to UserPromptDialog?
 
 
 
