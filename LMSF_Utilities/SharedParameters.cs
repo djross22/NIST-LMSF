@@ -725,6 +725,13 @@ namespace LMSF_Utilities
             return dlg.ShowDialog();
         }
 
+        public static bool? ShowStartDialog(string title, string listFilePath)
+        {
+            ProtocolStartDialog dlg = new ProtocolStartDialog(title, listFilePath);
+
+            return dlg.ShowDialog();
+        }
+
         //For consistent formatting of DateTime strings:
         public static string GetDateTimeString()
         {

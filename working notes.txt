@@ -274,12 +274,15 @@ LMSF Scheduler: Add commands: Hamilton/ <method file>, and WaitFor/ Hamilton, to
 
 LMSF Scheduler: Add startDate to metaDictionary (same string as startDateTime, but without the time)
 
+LMSF Scheduler: Add Get/ number/ - to get generic numberic input from user, with prompt
+
+LMSF Scheduler: Add "Start/ <protocol title>/ <list file path>" command; Protocol Start Dialog, w/ list of requirements and 'OK' and 'Abort' buttons.
 
 
 TODOs-
 
 
-Get basic numberic input from user
+
 
 
 

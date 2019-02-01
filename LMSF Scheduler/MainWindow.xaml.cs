@@ -295,7 +295,7 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "NewXML", "AppendXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "Start", "NewXML", "AppendXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
@@ -760,6 +760,9 @@ namespace LMSF_Scheduler
                         break;
                     case "GetExpID":
                         ParseGetExpId();
+                        break;
+                    case "Start":
+                        ParseStart();
                         break;
                     default:
                         valFailed.Add(num);
@@ -1414,6 +1417,83 @@ namespace LMSF_Scheduler
                 }
             }
 
+            void ParseStart()
+            {
+                //UserPrompt takes 2 arguments
+                //First two arguments are title and listFilePath
+                string titleString;
+                string listFilePath;
+
+                //string for start of output from ParseStep()
+                outString += "Start Dialog: ";
+
+                //Booleans to track validity of arguments
+                bool argsOk = false;
+
+                //UserPrompt requires at least two arguments:
+                if (numArgs < 3)
+                {
+                    //Message for missing argument or not enough arguments:
+                    outString += "Missing arguments; Start requires two arguments (title and list file path).";
+                    valFailed.Add(num);
+                    argsOk = false;
+                }
+                //Then check the validity of the arguments (file types, parsable as numbers, etc.)
+                else
+                {
+                    titleString = stepArgs[1];
+                    listFilePath = stepArgs[2];
+                    outString += $"{titleString}, ";
+
+                    if (listFilePath.EndsWith(".txt", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        argsOk = File.Exists(listFilePath);
+                        if (!argsOk)
+                        {
+                            //Message to explain what is wrong
+                            outString += "; List file not found: ";
+                            outString += listFilePath;
+                            valFailed.Add(num);
+                        }
+                        else
+                        {
+                            outString += listFilePath;
+                        }
+                    }
+                    else
+                    {
+                        //Message for bad filename
+                        outString += "; Not a valid list filename (.txt): ";
+                        outString += listFilePath;
+                        valFailed.Add(num);
+                        argsOk = false;
+                    }
+
+                }
+
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        //Run the step
+                        RunStartDialog(num, stepArgs);
+                    }
+                    else
+                    {
+                        //When validating, get actual user input for testing if IsValUserInput is true,
+                        // otherwise put placeholder value into dictionary
+                        if (IsValUserInput)
+                        {
+                            RunStartDialog(num, stepArgs);
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+            }
+
             //Don't actually use this local function, it's just here as a template for new ParseXxxxStep functions
             void ParseGenericStep()
             {
@@ -1919,6 +1999,24 @@ namespace LMSF_Scheduler
                 string imagePath = args[3];
                 this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(messageStr, titleStr, imagePath); });
             }
+        }
+
+        private void RunStartDialog(int num, string[] args)
+        {
+            string listPath = args[2];
+            string titleStr = args[1];
+
+            bool? oKToGo = false;
+
+            this.Dispatcher.Invoke(() => {
+                oKToGo = SharedParameters.ShowStartDialog(titleStr, listPath);
+
+                if (!(oKToGo == true))
+                {
+                    AbortCalled = true;
+                }
+            });
+
         }
 
         private string GetMetaIdentifier(string metaType, string prompt)

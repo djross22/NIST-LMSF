@@ -64,6 +64,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="ProtocolStartDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UserPromptImageDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -106,6 +110,9 @@
     </Compile>
     <Compile Include="NumericInputDialog.xaml.cs">
       <DependentUpon>NumericInputDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProtocolStartDialog.xaml.cs">
+      <DependentUpon>ProtocolStartDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserPromptImageDialog.xaml.cs">
       <DependentUpon>UserPromptImageDialog.xaml</DependentUpon>
