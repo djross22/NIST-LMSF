@@ -2163,7 +2163,7 @@ namespace LMSF_Scheduler
                 //Default prompt for everything except concentration and notes
                 if (promptStr == "")
                 {
-                    promptStr = $"Select the {keyStr} for the experiment: ";
+                    promptStr = $"Select the {keyStr} for this protocol: ";
                 }
 
                 //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
