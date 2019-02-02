@@ -746,7 +746,7 @@ namespace LMSF_Utilities
 
             int numLines = messageText.Split('\n').Length;
 
-            double height = numLines * 21 + 175;
+            double height = (numLines + 1) * 21 + 175;
 
             dlg.Height = height;
 
@@ -759,7 +759,7 @@ namespace LMSF_Utilities
 
             int numLines = messageText.Split('\n').Length;
 
-            double height = numLines * 21 + 625;
+            double height = (numLines + 1) * 21 + 625;
 
             dlg.Height = height;
 
