@@ -193,36 +193,11 @@ namespace LMSF_Utilities
         //    if selectedIndex < 0, the method does not increment, but just sorts and saves.
         private static void SaveMetaList(ObservableCollection<MetaItem> listToSort, string metaType, int selectedIndex)
         {
-            string filePath = GetFilePath(metaType);
-            if (filePath is null)
-            {
-                return;
-            }
-
             if (selectedIndex >= 0)
             {
                 listToSort.ElementAt(selectedIndex).TimesUsed += 1;
             }
-            //SortMetaList(listToSort);
-
-            //get the header line with a read
-            //System.IO.StreamReader readFile = new System.IO.StreamReader(filePath, System.Text.Encoding.UTF8);
-            System.IO.StreamReader readFile = new System.IO.StreamReader(filePath);
-            string headerLine = readFile.ReadLine();
-            readFile.Close();
-
-            //then re-Save the list...
-            FileStream fs = new FileStream(filePath, FileMode.Create);
-            //using (System.IO.StreamWriter file = new System.IO.StreamWriter(fs, System.Text.Encoding.UTF8))
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(fs))
-            {
-                file.WriteLine(headerLine);
-                foreach (MetaItem item in listToSort)
-                {
-                    file.WriteLine(item.SaveString());
-                }
-            }
-
+            
             //Save or append the list to the metaList.xml document (MetaIdFilePath)
             XmlNode rootNode;
             XmlDocument xmlDoc = new XmlDocument(); ;
