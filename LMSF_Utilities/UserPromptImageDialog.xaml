@@ -15,8 +15,8 @@
     </Window.Background>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="4*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
         <TextBlock x:Name="promptTextBlock" Margin="50,29,50,10" TextWrapping="Wrap" Text="{Binding PromptText}" Foreground="White" FontSize="16"/>

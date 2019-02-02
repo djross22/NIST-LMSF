@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Utilities"
         mc:Ignorable="d"
-        Title="Protocol Start" Height="540" Width="580" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="500" MinHeight="400"
-        WindowStartupLocation="CenterScreen">
+        Title="Protocol Start" Width="580" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="500" MinHeight="250"
+        WindowStartupLocation="CenterScreen" Height="250">
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="Black" Offset="0"/>
@@ -15,7 +15,7 @@
     </Window.Background>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
         <TextBlock x:Name="titleTextBlock" Margin="50,29,50,0" TextWrapping="Wrap" Text="{Binding ProtocolTitle}" Foreground="White" FontSize="16" VerticalAlignment="Top"/>

@@ -76,7 +76,11 @@ namespace LMSF_Utilities
             {
                 StuffList = "";
             }
-            
+
+            int numLines = StuffList.Split('\n').Length;
+
+            Height = numLines * 19 + 175 + 90;
+
         }
 
         protected void OnPropertyChanged(string name)

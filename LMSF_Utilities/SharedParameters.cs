@@ -715,12 +715,24 @@ namespace LMSF_Utilities
         {
             UserPromptDialog dlg = new UserPromptDialog(title, messageText);
 
+            int numLines = messageText.Split('\n').Length;
+
+            double height = numLines * 21 + 175;
+
+            dlg.Height = height;
+
             return dlg.ShowDialog();
         }
 
         public static bool? ShowPrompt(string messageText, string title, string bitmapFilePath)
         {
             UserPromptImageDialog dlg = new UserPromptImageDialog(title, messageText, bitmapFilePath);
+
+            int numLines = messageText.Split('\n').Length;
+
+            double height = numLines * 21 + 625;
+
+            dlg.Height = height;
 
             return dlg.ShowDialog();
         }
