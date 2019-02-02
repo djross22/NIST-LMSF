@@ -140,6 +140,7 @@ Commands:
 		Opens a message dialog box to prompt the user.
 		The <message> string parameter is interpretted using string escape sequences ("\t" for tab, "\n" for new line).
 			So, multi-line messages can be formateed and displayed.
+			Note that you need to be careful to use the double back-slash "\\" as folder/file separators when using a UserPrompt to display file path information
 			For a complete list of escape sequences, see https://blogs.msdn.microsoft.com/csharpfaq/2004/03/12/what-character-escape-sequences-are-available/
 				Not all of the escape sequences on that list work as expected in the context of this command, so try them.
 				If <message> includes an unrecognized escape sequence, the entire message will be displayed as a litteral string ignoring all escape sequences.

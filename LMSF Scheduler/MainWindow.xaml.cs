@@ -2058,7 +2058,7 @@ namespace LMSF_Scheduler
 
             //Add the new node
             newNode = xmlDoc.CreateElement(newNodeStr);
-            newNode.InnerText = innerText;
+            newNode.InnerText = innerText.Replace(@"\\",@"\");
             parentNode.AppendChild(newNode);
         }
 

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Text.RegularExpressions;
 
 namespace LMSF_Utilities
 {
@@ -365,7 +366,8 @@ namespace LMSF_Utilities
                 }
             }
 
-
+            //saveDirectory = Regex.Escape(saveDirectory);
+            saveDirectory = saveDirectory.Replace(@"\", @"\\");
 
             return new string[] { experimentId, xmlFilePath, saveDirectory };
         }
