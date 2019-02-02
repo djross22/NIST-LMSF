@@ -118,11 +118,11 @@ namespace LMSF_Utilities
                     newName = lineStrings[2].Trim('"');
                     if (Int32.TryParse(lineStrings[1], out newNum))
                     {
-                        outList.Add(new MetaItem(newID, newNum, newName));
+                        outList.Add(new MetaItem(newID, newNum, newName, metaType));
                     }
                     else
                     {
-                        outList.Add(new MetaItem(newID, 0, newName));
+                        outList.Add(new MetaItem(newID, 0, newName, metaType));
                     }
                 }
                 counter++;
@@ -502,7 +502,7 @@ namespace LMSF_Utilities
             {
                 metaList = GetMetaList(metaType);
                 ObservableCollection<MetaItem> listPlusNew = new ObservableCollection<MetaItem>(metaList);
-                listPlusNew.Add(new MetaItem(createNewText, 0, ""));
+                listPlusNew.Add(new MetaItem(createNewText, 0, "", metaType));
 
                 // Instantiate the dialog box to select the Meta Identifier
                 SelectMetaIdentDialog dlg = new SelectMetaIdentDialog();
@@ -649,7 +649,7 @@ namespace LMSF_Utilities
                     else
                     {
                         ObservableCollection<MetaItem> listPlusNone = new ObservableCollection<MetaItem>(metaList);
-                        listPlusNone.Add(new MetaItem("none", 0, ""));
+                        listPlusNone.Add(new MetaItem("none", 0, "", metaType));
 
                         string selectTitle = "Select Parent " + ToTitleCase(metaType) + " For " + ToTitleCase(metaType) + " " + newIdent;
                         string selectPrompt = "Select the parent " + metaType + " for new " + metaType + ": " + newIdent;
@@ -727,7 +727,7 @@ namespace LMSF_Utilities
             if (newIdent != "")
             {
                 ObservableCollection<MetaItem> listPlusNew = new ObservableCollection<MetaItem>(metaList);
-                listPlusNew.Add(new MetaItem(newIdent, 0, newLongName));
+                listPlusNew.Add(new MetaItem(newIdent, 0, newLongName, metaType));
 
                 SortAndSaveMetaList(listPlusNew, metaType, -1);
             }
