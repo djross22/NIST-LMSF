@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Utilities"
         mc:Ignorable="d"
-        Title="NewMetaIdentDialog" Height="275" Width="410" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="410" MinHeight="275"
+        Title="NewMetaIdentDialog" Height="275" Width="511.479" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="410" MinHeight="275"
         WindowStartupLocation="CenterScreen">
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -21,7 +21,7 @@
         <TextBlock x:Name="promptTextBlock" HorizontalAlignment="Left" Margin="50,29,0,0" TextWrapping="Wrap" Text="{Binding PromptText}" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="53" Width="250"/>
         <Button x:Name="okButton" Content="OK" HorizontalAlignment="Left" Margin="75,0,0,0" VerticalAlignment="Center" Width="75" Grid.Row="1" Height="25" IsDefault="True" Click="OkButton_Click"/>
         <Button x:Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="170,37.5,0,37.5" VerticalAlignment="Center" Width="75" Grid.Row="1" Height="25" IsCancel="True" Click="CancelButton_Click"/>
-        <TextBox x:Name="newLongNameTextBox" HorizontalAlignment="Left" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Width="225" Margin="85,85,0,0">
+        <TextBox x:Name="newLongNameTextBox" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Margin="60,85,60,0">
             <TextBox.Text>
                 <Binding Path="NewLongName" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
