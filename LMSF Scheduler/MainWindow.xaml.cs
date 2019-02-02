@@ -2475,12 +2475,21 @@ namespace LMSF_Scheduler
             string header = String.Join(",", metaDictionary.Keys);
             string values = String.Join(",", metaDictionary.Values);
 
-            using (StreamWriter outputFile = new StreamWriter(outPath))
+            try
             {
-                outputFile.WriteLine(header);
-                outputFile.WriteLine(values);
+                using (StreamWriter outputFile = new StreamWriter(outPath))
+                {
+                    outputFile.WriteLine(header);
+                    outputFile.WriteLine(values);
+                }
             }
-
+            catch (UnauthorizedAccessException e)
+            {
+                MessageBox.Show(e.Message);
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => { AbortCalled = true; });
+            }
+            
         }
 
         private void RunHamilton(int num, string[] args)
