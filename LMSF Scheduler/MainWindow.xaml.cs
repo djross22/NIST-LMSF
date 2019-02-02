@@ -1124,9 +1124,19 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        DateTime startDt = DateTime.Now;
-                        metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
-                        metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
+                        //When validating, get actual user input for testing if IsValUserInput is true,
+                        // otherwise put placeholder values into dictionary
+                        if (IsValUserInput)
+                        {
+                            RunAppendXml(num, stepArgs);
+                        }
+                        else
+                        {
+                            DateTime startDt = DateTime.Now;
+                            metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
+                            metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
+                        }
+                        
                     }
                 }
             }
