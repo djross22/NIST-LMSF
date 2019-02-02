@@ -550,6 +550,8 @@ namespace LMSF_Utilities
             string newLongName = "";
             string newNotes = "";
             string notValidReason = "Something unexpected happened in CreateNewMetaIdentifier().";
+            string parentMessage = "";
+            string parentID = "";
             ObservableCollection<MetaItem> metaList = GetMetaList(metaType);
 
             string titleText = "New " + ToTitleCase(metaType) + " Identifier";
@@ -597,7 +599,6 @@ namespace LMSF_Utilities
                     newLongName = "Long Name Place-Holder";
                 }
 
-                string parentMessage = "";
                 switch (metaType)
                 {
                     case "strain":
@@ -644,7 +645,7 @@ namespace LMSF_Utilities
                         else
                         {
                             //int parentIndex = dlg2.SelectedIndex;
-                            string parentID = dlg2.SelectedItem.ShortID;
+                            parentID = dlg2.SelectedItem.ShortID;
 
                             //Get notes for new strain/plasmid and save to new strain/plasmid file
                             string notesPrompt = "Enter Notes for New " + ToTitleCase(metaType) + ": ";
@@ -706,8 +707,74 @@ namespace LMSF_Utilities
 
                 SaveMetaList(listPlusNew, metaType, -1);
 
-                //Add additional info to XML doc here:
+                //Add parentId and notes to XML doc here (if there is any)
+                if ((parentMessage != "") && (metaType != "media"))
+                {
+                    //Append the new nodes to the metaList.xml document (MetaIdFilePath)
+                    XmlNode rootNode;
+                    XmlDocument xmlDoc = new XmlDocument(); ;
+                    if (File.Exists(MetaIdFilePath))
+                    {
+                        //Load existing XML document if it exists
+                        xmlDoc.Load(MetaIdFilePath);
+                        rootNode = xmlDoc.SelectSingleNode("metadata");
+                    }
+                    else
+                    {
+                        //create and configure the root node
+                        rootNode = xmlDoc.CreateElement("metadata");
+                        XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
+                        sourceAtt.Value = "NIST LMSF";
+                        rootNode.Attributes.Append(sourceAtt);
+                        //add the root node to the document
+                        xmlDoc.AppendChild(rootNode);
+                    }
 
+                    XmlNode baseNode;
+                    //XmlNode detailNode;
+                    XmlNode detailNode;
+                    XmlNode idNode;
+                    string baseNodeStr = $"{metaType}s";
+                    string detailNodeStr = metaType;
+                    string idNodeStr = $"{metaType}Id";
+
+                    //look for the base node and append to it or create it if it does not exist
+                    XmlNodeList baseNodeList = rootNode.SelectNodes($"descendant::{baseNodeStr}");
+                    if (baseNodeList.Count > 0)
+                    {
+                        baseNode = baseNodeList.Item(baseNodeList.Count - 1);
+                    }
+                    else
+                    {
+                        baseNode = xmlDoc.CreateElement(baseNodeStr);
+                        rootNode.AppendChild(baseNode);
+                    }
+
+                    //Then find the detail node with the correct idNode
+                    XmlNodeList detailNodeList = baseNode.SelectNodes($"descendant::{detailNodeStr}[{idNodeStr}='{newIdent}']");
+                    if (detailNodeList.Count > 0)
+                    {
+                        detailNode = detailNodeList.Item(detailNodeList.Count - 1);
+
+                        //if the detailNode exists, append the parentId and notes to the detailNode
+                        XmlNode parentNode = xmlDoc.CreateElement("parentId");
+                        parentNode.InnerText = parentID;
+                        detailNode.AppendChild(parentNode);
+                        if (newNotes !="")
+                        {
+                            XmlNode noteNode = xmlDoc.CreateElement("note");
+                            noteNode.InnerText = newNotes;
+                            detailNode.AppendChild(noteNode);
+                        }
+                    }
+                    else
+                    {
+                        //if there is no matching idNode, then something is wrong...
+                    }
+                    //Save the XML doc
+                    xmlDoc.Save(MetaIdFilePath);
+                }
+                
             }
         }
 
