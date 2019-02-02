@@ -90,44 +90,44 @@ namespace LMSF_Utilities
 
         private static ObservableCollection<MetaItem> GetMetaList(string metaType)
         {
-            string filePath = GetFilePath(metaType);
-            if (filePath is null)
-            {
-                return null;
-            }
-            string line;
-            int counter = 0;
             ObservableCollection<MetaItem> outList = new ObservableCollection<MetaItem>();
 
-            //System.IO.StreamReader file = new System.IO.StreamReader(filePath, System.Text.Encoding.UTF8);
-            if (!File.Exists(filePath))
+            //Open the metaList.xml document (MetaIdFilePath), if it exists
+            XmlNode rootNode;
+            XmlDocument xmlDoc = new XmlDocument(); ;
+            if (File.Exists(MetaIdFilePath))
             {
-                StartNewMetaList(metaType, filePath);
-            }
-            System.IO.StreamReader file = new System.IO.StreamReader(filePath);
-            string[] lineStrings;
-            string newID;
-            int newNum;
-            string newName;
-            while ((line = file.ReadLine()) != null)
-            {
-                if (counter>0)
+                //Load existing XML document if it exists
+                xmlDoc.Load(MetaIdFilePath);
+                rootNode = xmlDoc.SelectSingleNode("metadata");
+
+                XmlNodeList detailNodeList;
+
+                string detailNodeStr = metaType;
+                string key = "";
+                if (metaType == "media")
                 {
-                    lineStrings = line.Split(Delimeter);
-                    newID = lineStrings[0].Trim('"');
-                    newName = lineStrings[2].Trim('"');
-                    if (Int32.TryParse(lineStrings[1], out newNum))
-                    {
-                        outList.Add(new MetaItem(newID, newNum, newName, metaType));
-                    }
-                    else
-                    {
-                        outList.Add(new MetaItem(newID, 0, newName, metaType));
-                    }
+                    detailNodeStr = "medium";
                 }
-                counter++;
+                if (metaType == "antibiotic")
+                {
+                    detailNodeStr = "additive";
+                    key = "antibiotic";
+
+                    detailNodeList = rootNode.SelectNodes($"descendant::{detailNodeStr}[@useKey = \"{key}\"]");
+                }
+                else
+                {
+                    detailNodeList = rootNode.SelectNodes($"descendant::{detailNodeStr}");
+                }
+
+                foreach (XmlNode node in detailNodeList)
+                {
+                    outList.Add(new MetaItem(node, metaType));
+                }
             }
-            file.Close();
+
+            SortMetaList(outList);
 
             return outList;
         }
@@ -189,9 +189,9 @@ namespace LMSF_Utilities
             }
         }
 
-        //In SortAndSaveMetaList, the selectedIndex has its TimesUsed property incremented to account for it just being used again
+        //In SaveMetaList, the selectedIndex has its TimesUsed property incremented to account for it just being used again
         //    if selectedIndex < 0, the method does not increment, but just sorts and saves.
-        private static void SortAndSaveMetaList(ObservableCollection<MetaItem> listToSort, string metaType, int selectedIndex)
+        private static void SaveMetaList(ObservableCollection<MetaItem> listToSort, string metaType, int selectedIndex)
         {
             string filePath = GetFilePath(metaType);
             if (filePath is null)
@@ -203,7 +203,7 @@ namespace LMSF_Utilities
             {
                 listToSort.ElementAt(selectedIndex).TimesUsed += 1;
             }
-            SortMetaList(listToSort);
+            //SortMetaList(listToSort);
 
             //get the header line with a read
             //System.IO.StreamReader readFile = new System.IO.StreamReader(filePath, System.Text.Encoding.UTF8);
@@ -542,7 +542,7 @@ namespace LMSF_Utilities
             }
 
             //Re-sort the MetaList to keep most used identifiers at the top
-            SortAndSaveMetaList(metaList, metaType, metaIndex);
+            SaveMetaList(metaList, metaType, metaIndex);
 
             return metaID;
         }
@@ -729,7 +729,10 @@ namespace LMSF_Utilities
                 ObservableCollection<MetaItem> listPlusNew = new ObservableCollection<MetaItem>(metaList);
                 listPlusNew.Add(new MetaItem(newIdent, 0, newLongName, metaType));
 
-                SortAndSaveMetaList(listPlusNew, metaType, -1);
+                SaveMetaList(listPlusNew, metaType, -1);
+
+                //Add additional info to XML doc here:
+
             }
         }
 
