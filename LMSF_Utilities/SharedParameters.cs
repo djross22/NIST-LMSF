@@ -25,6 +25,10 @@ namespace LMSF_Utilities
         public static string OverlordFolderPath => "C:\\Shared Files\\Overlord-Venus\\";
         public static string HamiltonFolderPath => "C:\\Program Files (x86)\\HAMILTON\\LMSF_FrontEnd\\";
 
+        //User parameters
+        public static string UserFolderPath => MetadataFolderPath + "UserList\\";
+        public static string UserFilePath => UserFolderPath + "UserList.csv";
+
         //Media parameters
         public static string MediaFolderPath => MetadataFolderPath + "MediaList\\";
         public static string MediaFilePath => MediaFolderPath + "MediaList.csv";
@@ -60,7 +64,25 @@ namespace LMSF_Utilities
         {
             return !(GetFilePath(metaType) is null);
         }
-        
+
+        private static void StartNewMetaList(string metaType, string filePath)
+        {
+            string headerLine = $"{metaType}_identifier,times_used,long_name";
+
+            //create directroy if necessary
+            string dir = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            //then save the file with just the header line
+            FileStream fs = new FileStream(filePath, FileMode.Create);
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(fs))
+            {
+                file.WriteLine(headerLine);
+            }
+        }
+
         private static ObservableCollection<MetaItem> GetMetaList(string metaType)
         {
             string filePath = GetFilePath(metaType);
@@ -73,6 +95,10 @@ namespace LMSF_Utilities
             ObservableCollection<MetaItem> outList = new ObservableCollection<MetaItem>();
 
             //System.IO.StreamReader file = new System.IO.StreamReader(filePath, System.Text.Encoding.UTF8);
+            if (!File.Exists(filePath))
+            {
+                StartNewMetaList(metaType, filePath);
+            }
             System.IO.StreamReader file = new System.IO.StreamReader(filePath);
             string[] lineStrings;
             string newID;
@@ -107,6 +133,9 @@ namespace LMSF_Utilities
 
             switch (metaType)
             {
+                case "user":
+                    filePath = UserFilePath;
+                    break;
                 case "media":
                     filePath = MediaFilePath;
                     break;

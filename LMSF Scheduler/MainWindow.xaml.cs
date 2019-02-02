@@ -2204,6 +2204,9 @@ namespace LMSF_Scheduler
                 case "note":
                     GetNote();
                     break;
+                case "user":
+                    GetUser();
+                    break;
                 default:
                     GetDefault();
                     break;
@@ -2272,9 +2275,27 @@ namespace LMSF_Scheduler
                 }
             }
 
+            void GetUser()
+            {
+                //Default prompt for user
+                if (promptStr == "")
+                {
+                    promptStr = $"Select your user ID: ";
+                }
+
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr; });
+
+                //Then save to XML document if...
+                if (isCollectingXml)
+                {
+                    AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
+                }
+            }
+
             void GetDefault()
             {
-                //Default prompt for everything except concentration and notes
+                //Default prompt for everything else
                 if (promptStr == "")
                 {
                     promptStr = $"Select the {keyStr} for this protocol: ";
