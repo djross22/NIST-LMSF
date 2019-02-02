@@ -423,9 +423,17 @@ namespace LMSF_Scheduler
             bool didSave;
             if (ExperimentFileName != "")
             {
-                File.WriteAllText(ExperimentFileName, InputText);
-                InputChanged = false;
-                didSave = true;
+                try
+                {
+                    File.WriteAllText(ExperimentFileName, InputText);
+                    InputChanged = false;
+                    didSave = true;
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    MessageBox.Show($"{e.Message} Try saving with a temporary file name, then restart LMSF Scheduler");
+                    didSave = SaveAs();
+                }
             }
             else
             {
@@ -2097,6 +2105,7 @@ namespace LMSF_Scheduler
             }
             catch (ArgumentException e)
             {
+                MessageBox.Show("Warning: Unrecognized escape characters.");
                 messageStr = args[2];
             }
             string titleStr = args[1];
