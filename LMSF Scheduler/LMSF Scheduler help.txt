@@ -110,10 +110,16 @@ Commands:
 			
 			
 	SaveXML
-		Saves the XML metadata document. The SaveXML step does not take any parameters
+		Saves the XML metadata document.
+		By default, this command also appends the "protocol finished" node to the dateTime node in the XML document.
+		If the optional argument, "not finished" is used, the "protocol finished" node will not be appended.
 		
 		Syntax:
-			SaveXML/
+			SaveXML{/ not finished (optinal)}
+			
+		Examples:
+			SaveXML/ 
+			SaveXML/ not finished
 			
 			
 	AddXML

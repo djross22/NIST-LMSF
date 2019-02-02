@@ -1130,7 +1130,7 @@ namespace LMSF_Scheduler
                 // no arguments to check, so go straigt to running it
                 if (!isValidating)
                 {
-                    RunSaveXml();
+                    RunSaveXml(num, stepArgs);
                 }
             }
 
@@ -2053,24 +2053,37 @@ namespace LMSF_Scheduler
             parentNode.AppendChild(newNode);
         }
 
-        private void RunSaveXml()
+        private void RunSaveXml(int num, string[] args)
         {
-            //Add protocol finishing time to XML output
-            DateTime dt = DateTime.Now;
-            XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::protocol/dateTime");
-            XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
-            XmlNode timeFiniNode = xmlDoc.CreateElement("time");
-            timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
-            XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
-            statusFiniAtt.Value = "protocol finished";
-            timeFiniNode.Attributes.Append(statusFiniAtt);
-            dateNode.AppendChild(timeFiniNode);
+            bool isFini = false;
+            if (args.Length>1)
+            {
+                isFini = !(args[1] == "not finished");
+            }
+            else
+            {
+                isFini = true;
+            }
 
+            if (isFini)
+            {
+                //Add protocol finishing time to XML output
+                DateTime dt = DateTime.Now;
+                XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::protocol/dateTime");
+                XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
+                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                statusFiniAtt.Value = "protocol finished";
+                timeFiniNode.Attributes.Append(statusFiniAtt);
+                dateNode.AppendChild(timeFiniNode);
+            }
+            
             //Save the XML document
             xmlDoc.Save(metaDataFilePath);
 
             //turn off metadata collection
-            isCollectingXml = false;
+            //isCollectingXml = false;
         }
 
         private void RunUserPrompt(int num, string[] args)
