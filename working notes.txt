@@ -284,22 +284,37 @@ Add abort button to UserPromptDialog
 
 Experiment ID dialog: "choose XML file to save metadata:"
 
+LMSF Scheduler: Add new command: AddXML/ <parentNode> / <newNode>/ <innerText>
 
+LMSF Scheduler: In SaveXML/ add option argument "not finished" to not add "protocol finished" attribute
 
+LMSF Scheduler: Change "Start/" command to "StartPrompt/"
+
+LMSF Scheduler: Change "UserPrompt/ <title>/ <message>..." comand so that character escape sequences in the <message> are interpretted, this allows multi-line messages (\n) and tabs (\t). 
+
+LMSF Scheduler: Add Get/ user/... - to get user ID for metadata; LMSF_Utilities: Add code to automatically create metaList.csv file if it does not exist 
+
+LMSF_Utilities: Add saving MetaLists to XML document (MetaIdLists.xml); Protocol/experiment XML document, change projectID from Attribute to Element/Node 
+
+LMSF_Utilities: Change GetMetaList() so that it gets the lists from the XML document, MetaIdLists.xml (instead of a bunch of .csv files)
+
+Add parent info and notes (for strains and plasmids) to MetaIdLists.xml
 
 
 TODOs-
 
-New command: AddXML/ <parentNode> / <newNode>/ <innerText>
 
-Add output/worklist file and path info to metadata
+
+
 
 New command to enter/verify other output files?
+
+control-s shortcut to save
 
 
 Add cells now/later dialog, w/ 'now', 'later', and 'abort' buttons
 
-Review Experiment Dialog? at end of set-up, with 'OK' and 'Abort' buttons
+Review Experiment Dialog? at end of set-up, with 'OK' and 'Abort' buttons (Can use UserPrompt command with escape characters to do this) 
 
 
 
