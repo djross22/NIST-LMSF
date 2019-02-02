@@ -20,6 +20,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using LMSF_Utilities;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace LMSF_Scheduler
 {
@@ -2088,7 +2089,16 @@ namespace LMSF_Scheduler
 
         private void RunUserPrompt(int num, string[] args)
         {
-            string messageStr = args[2];
+            //string messageStr = args[2];
+            string messageStr;// = Regex.Unescape(args[2]);
+            try
+            {
+                messageStr = Regex.Unescape(args[2]);
+            }
+            catch (ArgumentException e)
+            {
+                messageStr = args[2];
+            }
             string titleStr = args[1];
             bool? oKToGo = false;
             if (args.Length < 4)

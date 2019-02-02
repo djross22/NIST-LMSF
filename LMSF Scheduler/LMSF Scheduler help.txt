@@ -138,6 +138,11 @@ Commands:
 			
 	UserPrompt
 		Opens a message dialog box to prompt the user.
+		The <message> string parameter is interpretted using string escape sequences ("\t" for tab, "\n" for new line).
+			So, multi-line messages can be formateed and displayed.
+			For a complete list of escape sequences, see https://blogs.msdn.microsoft.com/csharpfaq/2004/03/12/what-character-escape-sequences-are-available/
+				Not all of the escape sequences on that list work as expected in the context of this command, so try them.
+				If <message> includes an unrecognized escape sequence, the entire message will be displayed as a litteral string ignoring all escape sequences.
 		
 		Syntax:
 			UserPrompt/ <title>/ <message>{/ <image file path (optional)>}
@@ -145,6 +150,7 @@ Commands:
 		Examples:
 			UserPrompt/ Add Bacteria/ Add bacteria to growth plate, put plate in reader, and click 'OK'
 			UserPrompt/ Add Bacteria/ Add bacteria to growth plate and click 'OK'/ C:\Users\djross\Documents\temp\spinner.PNG 
+			UserPrompt/ Add Bacteria/ Add bacteria to growth plate, \nput plate in reader, and click 'OK'
 			
 			
 	GetExpId
