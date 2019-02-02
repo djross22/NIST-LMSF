@@ -295,7 +295,7 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "Start", "NewXML", "AppendXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "Start", "NewXML", "AppendXML", "AddXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
@@ -745,6 +745,9 @@ namespace LMSF_Scheduler
                         break;
                     case "AppendXML":
                         ParseAppendXml();
+                        break;
+                    case "AddXML":
+                        ParseAddXml();
                         break;
                     case "SaveXML":
                         ParseSaveXml();
@@ -1220,6 +1223,49 @@ namespace LMSF_Scheduler
                         {
                             
                         }
+                    }
+                }
+            }
+
+            void ParseAddXml()
+            {
+                //UserPrompt takes 2 or 3 arguments
+                //First two arguments are parentNode and newNode names
+                string parentNodeStr;
+                string newNodeStr;
+                //third argument is the inner text
+                string innerText;
+
+                //string for start of output from ParseStep()
+                outString += "AddXML: ";
+
+                //Booleans to track validity of arguments
+                bool argsOk = false;
+
+                //UserPrompt requires at least two arguments:
+                if (numArgs < 3)
+                {
+                    //Message for missing argument or not enough arguments:
+                    outString += "Missing arguments; AddXML requires at least two arguments (parentNode and newNodee).";
+                    valFailed.Add(num);
+                    argsOk = false;
+                }
+                //All arguments can be any string, so no additional validation checks
+                else
+                {
+                    argsOk = true;
+                }
+
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        //Run the step
+                        RunAddXml(num, stepArgs);
+                    }
+                    else
+                    {
+                        //When validating, ...
                     }
                 }
             }
@@ -1973,6 +2019,38 @@ namespace LMSF_Scheduler
             //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
             metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
             metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
+        }
+
+        private void RunAddXml(int num, string[] args)
+        {
+            string parentNodeStr = args[1];
+            string newNodeStr = args[2];
+            string innerText = "";
+            if (args.Length > 3)
+            {
+                innerText = args[3];
+            }
+
+            XmlNode parentNode;
+            XmlNode newNode;
+
+            //Adds metadata to the current protocolNode
+            //look for the parent node and append to it or create it if it does not exist
+            XmlNodeList baseNodeList = protocolNode.SelectNodes($"descendant::{parentNodeStr}");
+            if (baseNodeList.Count > 0)
+            {
+                parentNode = baseNodeList.Item(baseNodeList.Count - 1);
+            }
+            else
+            {
+                parentNode = xmlDoc.CreateElement(parentNodeStr);
+                protocolNode.AppendChild(parentNode);
+            }
+
+            //Add the new node
+            newNode = xmlDoc.CreateElement(newNodeStr);
+            newNode.InnerText = innerText;
+            parentNode.AppendChild(newNode);
         }
 
         private void RunSaveXml()

@@ -116,6 +116,20 @@ Commands:
 			SaveXML/
 			
 			
+	AddXML
+		Adds a new node to the XML metadata document. 
+		The name of the new node is <newNode>. It is added as a child to an existing node, <parentNode>.
+		If the <parentNode> does not exist, it is added to the protocol node, with <newNode> as a child node.
+		The inner text of the new node is set to <innerText>.
+		
+		Syntax:
+			AddXML/ <parentNode> / <newNode>{/ <innerText (opyional)>}
+			
+		Examples:
+			AddXML/ additive/ newNode/
+			AddXML/ newNode/ testNewNode/ new node inner text
+			
+			
 	UserPrompt
 		Opens a message dialog box to prompt the user.
 		
