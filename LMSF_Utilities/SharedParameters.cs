@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace LMSF_Utilities
 {
@@ -25,6 +26,9 @@ namespace LMSF_Utilities
         public static string MetadataFolderPath => "C:\\Shared Files\\MetaData Schema\\";
         public static string OverlordFolderPath => "C:\\Shared Files\\Overlord-Venus\\";
         public static string HamiltonFolderPath => "C:\\Program Files (x86)\\HAMILTON\\LMSF_FrontEnd\\";
+
+        //XML file for saving metaLists
+        public static string MetaIdFilePath => MetadataFolderPath + "MetaIdLists.xml";
 
         //User parameters
         public static string UserFolderPath => MetadataFolderPath + "UserList\\";
@@ -219,6 +223,113 @@ namespace LMSF_Utilities
                 }
             }
 
+            //Save or append the list to the metaList.xml document (MetaIdFilePath)
+            XmlNode rootNode;
+            XmlDocument xmlDoc = new XmlDocument(); ;
+            if (File.Exists(MetaIdFilePath))
+            {
+                //Load existing XML document if it exists
+                xmlDoc.Load(MetaIdFilePath);
+                rootNode = xmlDoc.SelectSingleNode("metadata");
+            }
+            else
+            {
+                //create and configure the root node
+                rootNode = xmlDoc.CreateElement("metadata");
+                XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
+                sourceAtt.Value = "NIST LMSF";
+                rootNode.Attributes.Append(sourceAtt);
+                //add the root node to the document
+                xmlDoc.AppendChild(rootNode);
+            }
+
+            XmlNode baseNode;
+            //XmlNode detailNode;
+            XmlElement detailNode;
+            XmlNode idNode;
+            XmlNode longNameNode;
+            XmlNode timesUsedNode;
+
+            string baseNodeStr = $"{metaType}s";
+            string detailNodeStr = metaType;
+            string idNodeStr = $"{metaType}Id";
+            string longNameNodeStr = $"{metaType}LongName";
+            string timesUsedNodeStr = $"timesUsed";
+            string key = "";
+            if (metaType == "media")
+            {
+                baseNodeStr = "media";
+                detailNodeStr = "medium";
+                idNodeStr = "mediaId";
+                longNameNodeStr = "mediaLongName";
+            }
+            if (metaType == "antibiotic")
+            {
+                baseNodeStr = "additives";
+                detailNodeStr = "additive";
+                idNodeStr = "additiveId";
+                longNameNodeStr = "additiveLongName";
+                key = "antibiotic";
+            }
+
+            //Adds metadata to the rootNode
+            //look for the base node and append to it or create it if it does not exist
+            XmlNodeList baseNodeList = rootNode.SelectNodes($"descendant::{baseNodeStr}");
+            if (baseNodeList.Count > 0)
+            {
+                baseNode = baseNodeList.Item(baseNodeList.Count - 1);
+            }
+            else
+            {
+                baseNode = xmlDoc.CreateElement(baseNodeStr);
+                rootNode.AppendChild(baseNode);
+            }
+
+            //Then, for each item in the list, create if it is not already there;
+            //   otherwise append the detail node to the baseNode
+            string iDString;
+            string longName;
+            string timesUsed;
+            foreach (MetaItem item in listToSort)
+            {
+                iDString = item.ShortID;
+                longName = item.Name;
+                timesUsed = item.TimesUsed.ToString();
+
+                XmlNodeList detailNodeList = baseNode.SelectNodes($"descendant::{detailNodeStr}[{idNodeStr}='{iDString}']");
+                if (detailNodeList.Count > 0)
+                {
+                    detailNode = (XmlElement)detailNodeList.Item(detailNodeList.Count - 1);
+
+                    //if the detailNode already exists, just update the timesUsedNode
+                    timesUsedNode = detailNode.SelectSingleNode(timesUsedNodeStr);
+                    timesUsedNode.InnerText = timesUsed;
+                }
+                else
+                {
+                    detailNode = xmlDoc.CreateElement(detailNodeStr);
+                    baseNode.AppendChild(detailNode);
+
+                    //Then add idNode, longNameNode, and timesUsedNode
+                    idNode = xmlDoc.CreateElement(idNodeStr);
+                    idNode.InnerText = iDString;
+                    detailNode.AppendChild(idNode);
+                    longNameNode = xmlDoc.CreateElement(longNameNodeStr);
+                    longNameNode.InnerText = longName;
+                    detailNode.AppendChild(longNameNode);
+                    timesUsedNode = xmlDoc.CreateElement(timesUsedNodeStr);
+                    timesUsedNode.InnerText = timesUsed;
+                    detailNode.AppendChild(timesUsedNode);
+                }
+                //  Set attribute useKey if key!=""
+                if (key != "")
+                {
+                    detailNode.SetAttribute("useKey", key);
+                }
+            }
+
+            //Finally, save teh XML document
+            xmlDoc.Save(MetaIdFilePath);
         }
 
         //If the proposed new Identifier is valid, this method returns an empty string.

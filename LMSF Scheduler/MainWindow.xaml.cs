@@ -1993,15 +1993,17 @@ namespace LMSF_Scheduler
 
             //New project node
             projectNode = xmlDoc.CreateElement("project");
-            //ID attribute for project node
-            XmlAttribute projectIdAtt = xmlDoc.CreateAttribute("projectId");
+            ////ID attribute for project node
+            //XmlAttribute projectIdAtt = xmlDoc.CreateAttribute("projectId");
+            //Project ID node
+            XmlNode projectIdNode = xmlDoc.CreateElement("projectId");
 
             //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-            this.Dispatcher.Invoke(() => { projectIdAtt.Value = GetProjectIdentifier(); });
+            this.Dispatcher.Invoke(() => { projectIdNode.InnerText = GetProjectIdentifier(); });
             //projectIdAtt.Value = SharedParameters.GetMetaIdentifier("project", "Select the Project Identifier for this experiment:");
 
 
-            projectNode.Attributes.Append(projectIdAtt);
+            projectNode.AppendChild(projectIdNode);
             //add the project node to the root node
             rootNode.AppendChild(projectNode);
 
@@ -2024,7 +2026,7 @@ namespace LMSF_Scheduler
 
             //Also add the protocol type and projectID to the metaDictionary
             metaDictionary["protocol type"] = protocolType;
-            metaDictionary["projectId"] = projectIdAtt.Value;
+            metaDictionary["projectId"] = projectIdNode.InnerText;
             //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
             metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
             metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
