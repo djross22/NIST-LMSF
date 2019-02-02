@@ -215,16 +215,16 @@ Commands:
 			Set/ strain/ MG1655
 			
 			
-	Start
+	StartPrompt
 		Opens a message dialog box for the start of a protocol. Lists the protocol requirements and offers 'OK' or 'Abort'.
 		The protocol title appears near the top of the dialog
 		The list file is a text file with a list of requirements. The contents of the list file will be displayed in the dialog exactly as they are in the text file.
 		
 		Syntax:
-			Start/ <protocol title>/ <list file path>
+			StartPrompt/ <protocol title>/ <list file path>
 			
 		Examples:
-			Start/ Inducer Gradient Plus Bacteria/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Inducer gradient plus 1000x bacteria-list.txt
+			StartPrompt/ Inducer Gradient Plus Bacteria/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Inducer gradient plus 1000x bacteria-list.txt
 			
 
 Metadata Dictionary:

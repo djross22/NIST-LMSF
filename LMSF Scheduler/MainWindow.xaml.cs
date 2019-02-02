@@ -295,7 +295,7 @@ namespace LMSF_Scheduler
             
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "Start", "NewXML", "AppendXML", "AddXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
@@ -764,8 +764,8 @@ namespace LMSF_Scheduler
                     case "GetExpID":
                         ParseGetExpId();
                         break;
-                    case "Start":
-                        ParseStart();
+                    case "StartPrompt":
+                        ParseStartPrompt();
                         break;
                     default:
                         valFailed.Add(num);
@@ -1473,7 +1473,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseStart()
+            void ParseStartPrompt()
             {
                 //UserPrompt takes 2 arguments
                 //First two arguments are title and listFilePath
@@ -1490,7 +1490,7 @@ namespace LMSF_Scheduler
                 if (numArgs < 3)
                 {
                     //Message for missing argument or not enough arguments:
-                    outString += "Missing arguments; Start requires two arguments (title and list file path).";
+                    outString += "Missing arguments; StartPrompt requires two arguments (title and list file path).";
                     valFailed.Add(num);
                     argsOk = false;
                 }
