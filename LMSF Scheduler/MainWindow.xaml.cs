@@ -1774,27 +1774,64 @@ namespace LMSF_Scheduler
 
         private void AddXmlProtocol(string typeStr, string sourceStr)
         {
-            //turn on metadata collection
-            isCollectingXml = true;
+            //First check if there is already a protocol of this type attached to the experiment,
+            //    and if so, give a warning
+            XmlNodeList nodeList = experimentNode.SelectNodes($"descendant::protocol[@type = \"{typeStr}\"]");
+            XmlNode existingNode;
+            
+            AbortAppendOverwriteDialog.Response dlgResponse = AbortAppendOverwriteDialog.Response.Abort;
+            if (nodeList.Count == 0)
+            {
+                dlgResponse = AbortAppendOverwriteDialog.Response.Append;
+            }
+            else
+            {
+                existingNode = nodeList[nodeList.Count - 1];
 
-            //New protocol node
-            protocolNode = xmlDoc.CreateElement("protocol");
+                string messageStr = $"A {typeStr} protocol is already attached to this experiment. \n\tSelect 'Append' to append the new protocol, \n\t'Overwrite' to replace the existing protocol information, \n\tor 'Abort' to abort.";
+                string titleStr = $"Existing {SharedParameters.ToTitleCase(typeStr)} Protocol";
+                ;
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => {
+                    dlgResponse = SharedParameters.ShowAbortAppendOverwrite(messageStr, titleStr);
+                    if (dlgResponse == AbortAppendOverwriteDialog.Response.Abort)
+                    {
+                        AbortCalled = true;
+                    }
+                });
 
-            //type attribute for step node
-            XmlAttribute stepIdAtt = xmlDoc.CreateAttribute("type");
-            stepIdAtt.Value = typeStr;
-            protocolNode.Attributes.Append(stepIdAtt);
+                if (dlgResponse == AbortAppendOverwriteDialog.Response.Overwrite)
+                {
+                    //delete the existing protocol node
+                    experimentNode.RemoveChild(existingNode);
+                }
+            }
 
-            //source attribute for step node
-            XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
-            sourceAtt.Value = sourceStr;
-            protocolNode.Attributes.Append(sourceAtt);
+            if (dlgResponse != AbortAppendOverwriteDialog.Response.Abort)
+            {
+                //turn on metadata collection
+                isCollectingXml = true;
 
-            startDateTime = DateTime.Now;
-            AddDateTimeNodes(startDateTime, protocolNode, "protocol started");
+                //New protocol node
+                protocolNode = xmlDoc.CreateElement("protocol");
 
-            //add the step node to the experiment node
-            experimentNode.AppendChild(protocolNode);
+                //type attribute for step node
+                XmlAttribute stepIdAtt = xmlDoc.CreateAttribute("type");
+                stepIdAtt.Value = typeStr;
+                protocolNode.Attributes.Append(stepIdAtt);
+
+                //source attribute for step node
+                XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
+                sourceAtt.Value = sourceStr;
+                protocolNode.Attributes.Append(sourceAtt);
+
+                startDateTime = DateTime.Now;
+                AddDateTimeNodes(startDateTime, protocolNode, "protocol started");
+
+                //add the step node to the experiment node
+                experimentNode.AppendChild(protocolNode);
+            }
+
         }
 
         private void AddXmlMetaDetail(string metaType, string idStr, string key, string notes)

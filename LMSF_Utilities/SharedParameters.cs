@@ -879,7 +879,7 @@ namespace LMSF_Utilities
             
         }
 
-        private static string ToTitleCase(string inString)
+        public static string ToTitleCase(string inString)
         {
             return char.ToUpper(inString[0]) + inString.Substring(1);
         }
@@ -945,7 +945,28 @@ namespace LMSF_Utilities
                 return null;
             }
 
-                
+
+        }
+
+        public static AbortAppendOverwriteDialog.Response ShowAbortAppendOverwrite(string messageText, string title)
+        {
+            AbortAppendOverwriteDialog dlg = new AbortAppendOverwriteDialog(title, messageText);
+
+            int numLines = messageText.Split('\n').Length;
+
+            double height = (numLines + 1) * 21 + 175;
+
+            dlg.Height = height;
+
+            bool? dlgRetunr = dlg.ShowDialog();
+            if (dlgRetunr == true)
+            {
+                return dlg.UserResponse;
+            }
+            else
+            {
+                return AbortAppendOverwriteDialog.Response.Abort;
+            }
         }
 
         public static bool? ShowPrompt(string messageText, string title)
