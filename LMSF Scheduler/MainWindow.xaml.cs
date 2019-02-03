@@ -1077,6 +1077,7 @@ namespace LMSF_Scheduler
                     else
                     {
                         metaDictionary["protocol type"] = stepArgs[1];
+                        metaDictionary["projectId"] = "place-holder-projectId";
                         DateTime startDt = DateTime.Now;
                         metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
                         metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
@@ -1135,6 +1136,10 @@ namespace LMSF_Scheduler
                             DateTime startDt = DateTime.Now;
                             metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
                             metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
+
+                            metaDictionary["experimentId"] = "place-holder-expId";
+                            metaDictionary["projectId"] = "place-holder-projectId";
+                            metaDictionary["dataDirectory"] = "place-holder-dataDirectory";
                         }
                         
                     }
@@ -1990,9 +1995,11 @@ namespace LMSF_Scheduler
                 //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
                 metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
                 metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
-                //add experiment ID to metaDictionary
+                //add experimentId, projectId, and dataDirectory to metaDictionary
                 metaDictionary["experimentId"] = expIdStr;
+                metaDictionary["projectId"] = xmlDoc.SelectSingleNode("descendant::projectId").InnerText;
                 metaDictionary["dataDirectory"] = argsBack[2];
+                metaDictionary["protocol type"] = protocolTypeStr;
             }
             
         }
