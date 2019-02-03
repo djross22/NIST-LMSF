@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Utilities"
         mc:Ignorable="d"
-        Title="Protocol Start" Width="580" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="500" MinHeight="250"
-        WindowStartupLocation="CenterScreen" Height="250">
+        Title="Protocol Start" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="500" MinHeight="250"
+        WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="Black" Offset="0"/>

@@ -1058,11 +1058,11 @@ namespace LMSF_Utilities
         {
             AbortAppendOverwriteDialog dlg = new AbortAppendOverwriteDialog(title, messageText);
 
-            int numLines = messageText.Split('\n').Length;
+            //int numLines = messageText.Split('\n').Length;
 
-            double height = (numLines + 1) * 21 + 175;
+            //double height = (numLines + 1) * 21 + 175;
 
-            dlg.Height = height;
+            //dlg.Height = height;
 
             bool? dlgRetunr = dlg.ShowDialog();
             if (dlgRetunr == true)
@@ -1079,11 +1079,11 @@ namespace LMSF_Utilities
         {
             UserPromptDialog dlg = new UserPromptDialog(title, messageText);
 
-            int numLines = messageText.Split('\n').Length;
+            //int numLines = messageText.Split('\n').Length;
 
-            double height = (numLines + 1) * 21 + 175;
+            //double height = (numLines + 1) * 21 + 175;
 
-            dlg.Height = height;
+            //dlg.Height = height;
 
             return dlg.ShowDialog();
         }
@@ -1092,11 +1092,11 @@ namespace LMSF_Utilities
         {
             UserPromptImageDialog dlg = new UserPromptImageDialog(title, messageText, bitmapFilePath);
 
-            int numLines = messageText.Split('\n').Length;
+            //int numLines = messageText.Split('\n').Length;
 
-            double height = (numLines + 1) * 21 + 625;
+            //double height = (numLines + 1) * 21 + 625;
 
-            dlg.Height = height;
+            //dlg.Height = height;
 
             return dlg.ShowDialog();
         }
