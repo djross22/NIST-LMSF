@@ -1039,6 +1039,21 @@ namespace LMSF_Utilities
 
         }
 
+        public static YesNoDialog.Response ShowYesNoDialog(string messageText, string title)
+        {
+            YesNoDialog dlg = new YesNoDialog(title, messageText);
+            
+            bool? dlgRetunr = dlg.ShowDialog();
+            if (dlgRetunr == true)
+            {
+                return dlg.UserResponse;
+            }
+            else
+            {
+                return YesNoDialog.Response.No;
+            }
+        }
+
         public static AbortAppendOverwriteDialog.Response ShowAbortAppendOverwrite(string messageText, string title)
         {
             AbortAppendOverwriteDialog dlg = new AbortAppendOverwriteDialog(title, messageText);

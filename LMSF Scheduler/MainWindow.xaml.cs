@@ -296,7 +296,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
@@ -828,6 +828,9 @@ namespace LMSF_Scheduler
                     case "UserPrompt":
                         ParseUserPrompt();
                         break;
+                    case "GetUserYesNo":
+                        ParseUserYesNo();
+                        break;
                     case "Set":
                         ParseSet();
                         break;
@@ -1313,6 +1316,72 @@ namespace LMSF_Scheduler
                         else
                         {
 
+                        }
+                    }
+                }
+            }
+
+            void ParseUserYesNo()
+            {
+                //UserYesNo takes 3 arguments
+                //dictionary key, title, and message
+                string keyString = "";
+                string titleString = "";
+                string messageString = "";
+
+                //string for start of output from ParseStep()
+                outString += "GetUserYesNo: ";
+
+                //Booleans to track validity of arguments
+                bool argsOk = false;
+
+                //UserPrompt requires at least three arguments:
+                if (numArgs < 4)
+                {
+                    //Message for missing argument or not enough arguments:
+                    outString += "Missing arguments; GetUserYesNo/ requires at least three arguments (key, title, and message).";
+                    valFailed.Add(num);
+                    argsOk = false;
+                }
+                //Then check the validity of the arguments (file types, parsable as numbers, etc.)
+                else
+                {
+                    keyString = stepArgs[1];
+                    titleString = stepArgs[2];
+                    messageString = stepArgs[3];
+                    outString += $"user choice -> {keyString} ";
+
+                    if (true)
+                    {
+                        argsOk = true;
+                    }
+                    else
+                    {
+                        //Message to explain what is wrong
+                        outString += "Not a valid message string: ";
+                        valFailed.Add(num);
+                    }
+                    outString += messageString;
+                }
+
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        //Run the step
+                        RunUserYesNo(num, stepArgs);
+                    }
+                    else
+                    {
+                        //When validating, get actual user input for testing if IsValUserInput is true,
+                        // otherwise put placeholder value into dictionary
+                        if (IsValUserInput)
+                        {
+                            RunUserYesNo(num, stepArgs);
+                        }
+                        else
+                        {
+                            metaDictionary[keyString] = "place-holder-yes-no";
                         }
                     }
                 }
@@ -2368,6 +2437,22 @@ namespace LMSF_Scheduler
             //isCollectingXml = false;
         }
 
+        private void RunUserYesNo(int num, string[] args)
+        {
+            string keyStr = args[1];
+            string titleStr = args[2];
+            string messageStr = args[3];
+
+            YesNoDialog.Response userResponse = YesNoDialog.Response.No;
+
+            //this has to be delegated becasue it interacts with the GUI by calling up a dialog box
+            this.Dispatcher.Invoke(() => {
+                userResponse = SharedParameters.ShowYesNoDialog(messageStr, titleStr);
+            });
+
+            metaDictionary[keyStr] = userResponse.ToString();
+        }
+
         private void RunUserPrompt(int num, string[] args)
         {
             //string messageStr = args[2];
@@ -2385,7 +2470,7 @@ namespace LMSF_Scheduler
             bool? oKToGo = false;
             if (args.Length < 4)
             {
-                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                //this has to be delegated becasue it interacts with the GUI by calling up a dialog box
                 this.Dispatcher.Invoke(() => {
                     oKToGo = SharedParameters.ShowPrompt(messageStr, titleStr);
                     if (!(oKToGo == true))

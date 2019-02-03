@@ -80,6 +80,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="YesNoDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UserPromptImageDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -134,6 +138,9 @@
     </Compile>
     <Compile Include="AbortAppendOverwriteDialog.xaml.cs">
       <DependentUpon>AbortAppendOverwriteDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="YesNoDialog.xaml.cs">
+      <DependentUpon>YesNoDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserPromptImageDialog.xaml.cs">
       <DependentUpon>UserPromptImageDialog.xaml</DependentUpon>

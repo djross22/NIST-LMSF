@@ -171,6 +171,19 @@ Commands:
 			GetExpId/ {startDateTime}-{strain1}/ C:\Users\djross\Documents\LMSF data
 			
 			
+	GetUserYesNo
+		Opens a user dialog box to get a Yes/No response from the user.
+		The user's response is saved in teh Metadata Dictionary with the key given as the first argument.
+			The strings saved to the Dictionary are capitalized, "Yes" or "No".
+		
+		Syntax:
+			GetUserYesNo/ <key>/ <title>/ <prompt>
+			
+		Examples:
+			GetUserYesNo/ test/ title/ choose yes or no
+			GetUserYesNo/ gen5/ Normalize With OD?/ Use Gen5 output file to normalize cell density in cytometry plate?
+			
+			
 	GetFile
 		Opens a user dialog box to get the location of a file from the user.
 		The dialog starts by looking in the default data directory.
