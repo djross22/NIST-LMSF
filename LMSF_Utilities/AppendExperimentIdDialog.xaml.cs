@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -73,7 +74,7 @@ namespace LMSF_Utilities
             ExperimentId = defaultId;
             initialDirectory = initialDir;
             fileName = $"{defaultId}.xml";
-            SaveFilePath = initialDirectory + fileName;
+            SaveFilePath = System.IO.Path.Combine(initialDirectory, fileName);
         }
 
         protected void OnPropertyChanged(string name)
@@ -104,7 +105,7 @@ namespace LMSF_Utilities
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
             // Configure open file dialog box
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.FileName = fileName; // Default file name
             dlg.DefaultExt = ".xml"; // Default file extension
             dlg.Filter = "XML documents (.xml)|*.xml"; // Filter files by extension
@@ -119,6 +120,7 @@ namespace LMSF_Utilities
             {
                 // Open document
                 SaveFilePath = dlg.FileName;
+                ExperimentId = Directory.GetParent(SaveFilePath).Name;
             }
         }
     }

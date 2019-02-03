@@ -86,7 +86,7 @@ namespace LMSF_Scheduler
         private XmlNode experimentIdNode;
         string experimentID;
         private XmlNode protocolNode;
-        private static string stepSource = "LMSF Scheduler";
+        private static string protocolSource = "LMSF Scheduler";
         private bool isCollectingXml;
         private DateTime startDateTime;
 
@@ -1941,50 +1941,60 @@ namespace LMSF_Scheduler
             return pId;
         }
 
-        private string SelectXmlDocument()
+        private string[] SelectXmlDocForAppend()
         {
-            string filename = "temp.xml";
+            //return string[0] = experimentId
+            //return string[1] = XML file path
+            //return string[2] = saveDirectory
+            string[] getIdStrings = SharedParameters.XmlDocForAppend("");
+            string expIdStr = getIdStrings[0];
+            string metaDataFilePath = getIdStrings[1];
+            string saveDirectory = getIdStrings[2];
 
-            // Configure open file dialog box
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = filename; // Default file name
-            dlg.DefaultExt = ".xml"; // Default file extension
-            dlg.Filter = "XML documents (.xml)|*.xml"; // Filter files by extension
-            dlg.InitialDirectory = SharedParameters.LogFileFolderPath;
-            dlg.Title = "Select XML File to Append Metadata to:";
-
-            // Show open file dialog box
-            Nullable<bool> result = dlg.ShowDialog();
-
-            // Process open file dialog box results
-            if (result == true)
+            if (expIdStr == "")
             {
-                // Open document
-                filename = dlg.FileName;
+                AbortCalled = true;
             }
 
-            return filename;
+            return new string[] { expIdStr, metaDataFilePath, saveDirectory };
         }
 
         private void RunAppendXml(int num, string[] args)
         {
+            string protocolTypeStr = args[1];
+
+            string[] argsBack = new string[] { "", "", "" };
+            //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+            this.Dispatcher.Invoke(() => {
+                argsBack = SelectXmlDocForAppend();
+            });
+
             //auto-detect and/or prompt user to select existing XML file to append to
-            metaDataFilePath = SelectXmlDocument();
+            metaDataFilePath = argsBack[1];
 
-            //Load existing XML document
-            xmlDoc = new XmlDocument();
-            xmlDoc.Load(metaDataFilePath);
+            if (metaDataFilePath != "")
+            {
+                //Load existing XML document
+                xmlDoc = new XmlDocument();
+                xmlDoc.Load(metaDataFilePath);
 
-            //get the experiment node and append to it
-            XmlNodeList expNodeList = xmlDoc.SelectNodes("descendant::experiment");
-            experimentNode = expNodeList.Item(expNodeList.Count - 1);
+                //get the experiment node and append to it
+                XmlNodeList expNodeList = xmlDoc.SelectNodes("descendant::experiment");
+                experimentNode = expNodeList.Item(expNodeList.Count - 1);
 
-            //Add the current experiment protocol to the XML
-            AddXmlProtocol(args[1], stepSource);
+                string expIdStr = xmlDoc.SelectSingleNode("descendant::experimentId").InnerText;
 
-            //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
-            metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
-            metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
+                //Add the current experiment protocol to the XML
+                AddXmlProtocol(protocolTypeStr, protocolSource);
+
+                //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
+                metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
+                metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
+                //add experiment ID to metaDictionary
+                metaDictionary["experimentId"] = expIdStr;
+                metaDictionary["dataDirectory"] = argsBack[2];
+            }
+            
         }
 
         private void RunNewXml(int num, string[] args)
@@ -2032,7 +2042,7 @@ namespace LMSF_Scheduler
             experimentNode.AppendChild(experimentIdNode);
 
             //Add the current experiment protocol to the XML
-            AddXmlProtocol(protocolType, stepSource);
+            AddXmlProtocol(protocolType, protocolSource);
 
             //Also add the protocol type and projectID to the metaDictionary
             metaDictionary["protocol type"] = protocolType;
@@ -2383,7 +2393,7 @@ namespace LMSF_Scheduler
 
             return new string[] { expIdStr, metaDataFilePath, saveDirectory };
         }
-        //If a projectID is gievn, use it in the default filePath, via the overloaded SharedParameters.GetExperimentId()
+        //If a projectID is given, use it in the default filePath, via the overloaded SharedParameters.GetExperimentId()
         private string[] GetExpId(string dataDirStr, string expIdStr, string projID)
         {
             //return string[0] = experimentId

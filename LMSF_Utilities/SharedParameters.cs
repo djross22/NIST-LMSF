@@ -324,6 +324,54 @@ namespace LMSF_Utilities
             return notValidReason;
         }
 
+        //XmlDocForAppend() gets both the experiment id and the XML save file path
+        //    return string[0] = experimentId
+        //    return string[1] = XML file path
+        //    return string[2] = saveDirectory
+        public static string[] XmlDocForAppend(string initialDir)
+        {
+            string experimentId = "";
+            string xmlFilePath = "";
+            string saveDirectory = "";
+
+            if (initialDir == "" || !Directory.Exists(initialDir))
+            {
+                initialDir = WorklistFolderPath;
+            }
+
+            string[] fileList = Directory.GetFiles(initialDir, "*.xml", SearchOption.AllDirectories);
+            if (fileList.Length == 0)
+            {
+                //if there are no .xml files to append to, return empty strings, which will result in an abort
+                return new string[] { experimentId, xmlFilePath, saveDirectory };
+            }
+            DateTime latestTime = new DateTime(1, 1, 1);
+            string latestFile = fileList[0];
+            foreach (string file in fileList)
+            {
+                if (File.GetLastWriteTime(file) > latestTime)
+                {
+                    latestFile = file;
+                    latestTime = File.GetLastWriteTime(file);
+                }
+            }
+
+            string defaultId = Directory.GetParent(latestFile).Name;
+            initialDir = Directory.GetParent(latestFile).FullName;
+            
+            AppendExperimentIdDialog dlg = new AppendExperimentIdDialog(initialDir, defaultId);
+
+            // Open the dialog box modally and get file/directroy info if 'OK'
+            if (dlg.ShowDialog() == true)
+            {
+                experimentId = dlg.ExperimentId;
+                xmlFilePath = dlg.SaveFilePath;
+                saveDirectory = Directory.GetParent(xmlFilePath).FullName;
+            }
+
+            return new string[] { experimentId, xmlFilePath, saveDirectory };
+        }
+
         //GetExperimentId() gets both the experiment id and the XML save file path
         //    return string[0] = experimentId
         //    return string[1] = XML file path
