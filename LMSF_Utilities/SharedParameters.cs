@@ -369,6 +369,8 @@ namespace LMSF_Utilities
                 saveDirectory = Directory.GetParent(xmlFilePath).FullName;
             }
 
+            saveDirectory = saveDirectory.Replace(@"\", @"\\");
+
             return new string[] { experimentId, xmlFilePath, saveDirectory };
         }
 
@@ -434,8 +436,8 @@ namespace LMSF_Utilities
                     }
                 }
             }
-            
-            
+
+            saveDirectory = saveDirectory.Replace(@"\", @"\\");
 
             return new string[] { experimentId, xmlFilePath, saveDirectory };
         }
