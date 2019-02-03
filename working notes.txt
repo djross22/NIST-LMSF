@@ -300,26 +300,34 @@ LMSF_Utilities: Change GetMetaList() so that it gets the lists from the XML docu
 
 Add parent info and notes (for strains and plasmids) to MetaIdLists.xml
 
+LMSF Scheduler: Add code to better handle AppendXml/ command: SelectXmlDocForAppend() (called by RunAppendXml()); 
+    also sets experimentId in dictionary automatically, so that GetExpID/ does not need to be called.
+	
+LMSF Scheduler: make sure projectId, experimentId, and data directory get saved to metaDictionary consistently
+
+LMSF Scheduler: In RunAppendXml() check if protocol type already exists and prompt with warning (new AbortAppendOverwriteDialog)
+
+LMSF Scheduler: Add "GetFile/ <file key>/ <file prompt>{/ <file filter>}" command; open user dialog to select file; add file path to dictionary
+
+LMSF Scheduler: Add "If/ <logical test>/ <other valid command>" to step parser, for basic run-time decision making driven by user inputs
+
+LMSF Scheduler: Add User yes/no choice, saves result to dictonary;
+
+
 
 TODOs-
 
 
-
-
-
-New command to enter/verify other output files?
 
 control-s shortcut to save
 
 
 Add cells now/later dialog, w/ 'now', 'later', and 'abort' buttons
 
-Review Experiment Dialog? at end of set-up, with 'OK' and 'Abort' buttons (Can use UserPrompt command with escape characters to do this) 
 
 
 
 
-Save Set/ to XML doc
 
 
 
