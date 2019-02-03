@@ -52,6 +52,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="AppendExperimentIdDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MediaIngredientsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -97,6 +101,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="Concentration.cs" />
+    <Compile Include="AppendExperimentIdDialog.xaml.cs">
+      <DependentUpon>AppendExperimentIdDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MediaIngredient.cs" />
     <Compile Include="ConcentrationDialog.xaml.cs">
       <DependentUpon>ConcentrationDialog.xaml</DependentUpon>
