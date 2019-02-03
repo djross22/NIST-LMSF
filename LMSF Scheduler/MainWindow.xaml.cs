@@ -645,6 +645,7 @@ namespace LMSF_Scheduler
             stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
             //Check for {key} entries in stepArgs and replace with dictionary values, or fail validation
+            //Note keys are replaced here.
             bool keysOk = true;
             for (int j = 0; j < stepArgs.Length; j++)
             {
@@ -729,9 +730,72 @@ namespace LMSF_Scheduler
                 return outString;
             }
 
+            bool ifResult = true;
+            if (stepArgs[0] == "If")
+            {
+                //this is an if statement, so the next argment needs to be the logical test
+                if (stepArgs.Length > 2)
+                {
+                    if (stepArgs[1].Contains("==") || stepArgs[1].Contains("!="))
+                    {
+                        //string stringToSplit = stepArgs[1].Replace(" ", "");
+                        string stringToSplit = stepArgs[1].Trim();
+                        string[] logicStrings = stringToSplit.Split(new[] { "==", "!=" }, StringSplitOptions.RemoveEmptyEntries);
+                        if (logicStrings.Length == 2)
+                        {
+                            string firstStr = logicStrings[0].Trim();
+                            string secondStr = logicStrings[1].Trim();
+                            outString += $"If: {stringToSplit}, ";
+                            if (stringToSplit.Contains("=="))
+                            {
+                                ifResult = (firstStr == secondStr);
+                            }
+                            else
+                            {
+                                ifResult = (firstStr != secondStr);
+                            }
+                            outString += $"{ifResult}. ";
+                            //always mark ifResult as true when validating, so that the remaining arguments always get validated
+                            if (isValidating)
+                            {
+                                ifResult = true;
+                            }
+                            //then take out the first two arguments and send the rest on to be parsed
+                            string[] newStepArgs = new string[stepArgs.Length - 2];
+                            for (int i=2; i<stepArgs.Length; i++)
+                            {
+                                newStepArgs[i-2] = stepArgs[i];
+                            }
+                            stepArgs = newStepArgs;
+                        }
+                        else
+                        {
+                            valFailed.Add(num);
+                            //exit the method early if the 2nd argument of an If/ command is not a logical comparison
+                            outString += "If/ commands need to have a valid logical test as the 2nd argument (e.g. {strain1}==MG1655, or {userChoice}!=No).\n\n";
+                            return outString;
+                        }
+                    }
+                    else
+                    {
+                        valFailed.Add(num);
+                        //exit the method early if the 2nd argument of an If/ command is not a logical comparison
+                        outString += "If/ commands need to have a logical test (with \"==\" or \"!=\") as the 2nd argument.\n\n";
+                        return outString;
+                    }
+                }
+                else
+                {
+                    valFailed.Add(num);
+                    //exit the method early if there are not enough arguments for an If/ command
+                    outString += "If/ commands need to have a logical test followed by a normal command line.\n\n";
+                    return outString;
+                }
+            }
+
             int numArgs = stepArgs.Length;
 
-            if (numArgs > 0)
+            if (numArgs > 0 & ifResult)//only excecute the command when ifResult==true
             {
                 string stepType = stepArgs[0];
 
@@ -788,10 +852,10 @@ namespace LMSF_Scheduler
                         }
                         break;
                 }
-
-                outString += "\r\n";
-                outString += "\r\n";
             }
+
+            outString += "\r\n";
+            outString += "\r\n";
 
             return outString;
 

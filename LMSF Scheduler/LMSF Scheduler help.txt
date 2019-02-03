@@ -255,6 +255,19 @@ Commands:
 		Examples:
 			StartPrompt/ Inducer Gradient Plus Bacteria/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Inducer gradient plus 1000x bacteria-list.txt
 			
+			
+	If
+		Any other command can be preceded by an If/ command, which can control whether or not the command is run.
+		This can be used to change the protocol steps in response to user input.
+		
+		Syntax:
+			If/ <logical test>/ <other valid command, with normal arguments>
+			
+		Examples:
+			If/ {a} == b/ UserPrompt/ Add Bacteria/ Add bacteria to growth plate, put plate in reader, and click 'OK'
+			If/ {num}==2/ Get/ strain/ strain1
+			If/ {num}!=2/ GetFile/ file/ Select file for input data/ CSV files (.csv)|*.csv/
+			
 
 Metadata Dictionary:
 	The LMSF Scheduler has two Dictionary objects that effectively give the user the ability to create, store, and access variables for use across multiple steps.
