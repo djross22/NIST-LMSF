@@ -67,7 +67,7 @@ namespace LMSF_Utilities
         //Check to see if type exists
         public static bool IsValidMetaType(string metaType)
         {
-            return !(GetFilePath(metaType) is null);
+            return !(GetMetaFilePath(metaType) is null);
         }
 
         private static void StartNewMetaList(string metaType, string filePath)
@@ -132,7 +132,7 @@ namespace LMSF_Utilities
             return outList;
         }
 
-        private static string GetFilePath(string metaType)
+        private static string GetMetaFilePath(string metaType)
         {
             string filePath = "";
 
@@ -570,6 +570,97 @@ namespace LMSF_Utilities
             SaveMetaList(metaList, metaType, metaIndex);
 
             return metaID;
+        }
+
+        public static string FindMostRecentDirectory(string fileFilter, string initialDir = "")
+        {
+            //First auto-find an initial directory, if one is not given
+            if (initialDir == "" || !Directory.Exists(initialDir))
+            {
+                initialDir = WorklistFolderPath;
+            }
+            //looking for directory with most recently modified files that match the fileFilter
+            List<string> patternList = new List<string>();
+            if (fileFilter != "" && fileFilter.Contains("|"))
+            {
+                string[] splitFilter = fileFilter.Split(new char[] { '|', ';' });
+
+                foreach (string s in splitFilter)
+                {
+                    if (s.StartsWith("*."))
+                    {
+                        patternList.Add(s);
+                    }
+                }
+            }
+            else
+            {
+                patternList.Add("*.*");
+            }
+            List<string> fileList = new List<string>();
+            foreach (string pattern in patternList)
+            {
+                string[] files = Directory.GetFiles(initialDir, pattern, SearchOption.AllDirectories);
+                foreach (string f in files)
+                {
+                    fileList.Add(f);
+                }
+            }
+
+            if (fileList.Count == 0)
+            {
+                initialDir = WorklistFolderPath;
+            }
+            else
+            {
+                DateTime latestTime = new DateTime(1, 1, 1);
+                string latestFile = fileList[0];
+                foreach (string file in fileList)
+                {
+                    if (File.GetLastWriteTime(file) > latestTime)
+                    {
+                        latestFile = file;
+                        latestTime = File.GetLastWriteTime(file);
+                    }
+                }
+                initialDir = Directory.GetParent(latestFile).FullName;
+            }
+
+            return initialDir;
+        }
+
+        public static string GetFile(string filePrompt, string fileFilter, string initialDir = "")
+        {
+            //examples for fileFilter: 
+            //    "XML documents (.xml)|*.xml"
+            //    "Office Files|*.doc;*.xls;*.ppt"
+            //    "Word Documents|*.doc|Excel Worksheets|*.xls|PowerPoint Presentations|*.ppt"
+            string retFile = "";
+
+            //First auto-find an initial directory, if one is not given
+            if (initialDir == "" || !Directory.Exists(initialDir))
+            {
+                initialDir = WorklistFolderPath;
+            }
+            
+            // Instantiate the dialog box
+            ChooseFileDialog dlg = new ChooseFileDialog(initialDir, fileFilter);
+            // Configure the dialog box
+            dlg.PromptText = filePrompt;
+
+            // Open the dialog box modally and abort if it does not returns true
+            if (dlg.ShowDialog() == true)
+            {
+                retFile = dlg.ChooseFilePath;
+            }
+            else
+            {
+                retFile = "";
+            }
+
+            retFile = retFile.Replace(@"\", @"\\");
+
+            return retFile;
         }
 
         public static string GetNotes(string titleText, string notesPrompt)

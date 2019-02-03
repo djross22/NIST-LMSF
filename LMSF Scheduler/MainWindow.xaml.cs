@@ -50,7 +50,7 @@ namespace LMSF_Scheduler
         private bool isOneStep = false;
         private bool isValidating = false;
         private bool isValUserInput;
-        private List<int> valFailed; 
+        private List<int> valFailed;
         //Validation failure is signaled by adding/having one or more entires in the valFailed list
         //    valFailed is intialized to an empty list at the beginning of each run,
         //    if a step fails a validation check, the step number is added to the valFailed list
@@ -265,7 +265,7 @@ namespace LMSF_Scheduler
                     stepButton.Background = Brushes.Transparent;
                     statusTextBlock.Text = "Running";
                 }
-                
+
                 inputTextBox.IsEnabled = false;
                 insertFileButton.IsEnabled = false;
                 mainMenu.IsEnabled = false;
@@ -293,10 +293,10 @@ namespace LMSF_Scheduler
         {
             InitializeComponent();
             runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
-            
+
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "Set", "Get", "GetExpID" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
@@ -335,7 +335,7 @@ namespace LMSF_Scheduler
             {
                 OutputText += con + "\n";
             }
-            
+
         }
 
         private void UpdateTitle()
@@ -500,7 +500,7 @@ namespace LMSF_Scheduler
                 inputTextBox.SelectionStart = caretPos + newText.Length;
                 inputTextBox.SelectionLength = 0;
             }
-            
+
             inputTextBox.Focus();
         }
 
@@ -573,7 +573,7 @@ namespace LMSF_Scheduler
                     Step();
                 }
             }
-            
+
         }
 
         private void RunSteps()
@@ -598,7 +598,7 @@ namespace LMSF_Scheduler
                 {
                     File.AppendAllText(logFilePath, "Method Aborted.\n");
                 }
-                this.Dispatcher.Invoke(() => { IsRunning = false;  });
+                this.Dispatcher.Invoke(() => { IsRunning = false; });
             }
             else
             {
@@ -611,7 +611,7 @@ namespace LMSF_Scheduler
                     {
                         File.AppendAllText(logFilePath, newText);
                     }
-                    
+
                     stepNum++;
                 }
                 else
@@ -628,7 +628,7 @@ namespace LMSF_Scheduler
 
                 this.Dispatcher.Invoke(() => { IsOneStep = false; });
             }
-            
+
         }
 
         private string ParseStep(int num, string step)
@@ -636,7 +636,7 @@ namespace LMSF_Scheduler
             //Note on step validation:
             //    valFailed is intialized to an empty list at the beginning of each run,
             //    if a step fails a validation check, the step number is added to the valFailed list
-            
+
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
             string[] stepArgs = step.Split(new[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
@@ -646,7 +646,7 @@ namespace LMSF_Scheduler
 
             //Check for {key} entries in stepArgs and replace with dictionary values, or fail validation
             bool keysOk = true;
-            for (int j=0; j<stepArgs.Length; j++)
+            for (int j = 0; j < stepArgs.Length; j++)
             {
                 string arg = stepArgs[j];
                 string newArg = arg;
@@ -684,7 +684,7 @@ namespace LMSF_Scheduler
                     {
                         int startInd = newArg.IndexOf('{');
                         int endInd = newArg.IndexOf('}');
-                        
+
                         string beforeString = newArg.Substring(0, startInd);
                         string keyStr = newArg.Substring(startInd + 1, (endInd - startInd) - 1);
                         string afterString = newArg.Substring(endInd + 1, newArg.Length - endInd - 1);
@@ -773,6 +773,9 @@ namespace LMSF_Scheduler
                     case "GetExpID":
                         ParseGetExpId();
                         break;
+                    case "GetFile":
+                        ParseGetFile();
+                        break;
                     case "StartPrompt":
                         ParseStartPrompt();
                         break;
@@ -789,7 +792,7 @@ namespace LMSF_Scheduler
                 outString += "\r\n";
                 outString += "\r\n";
             }
-            
+
             return outString;
 
             //Local functions to parse each type of step
@@ -815,7 +818,7 @@ namespace LMSF_Scheduler
                         outString += stepArgs[1];
                         valFailed.Add(num);
                     }
-                    if (numArgs>2)
+                    if (numArgs > 2)
                     {
                         //check passed variables to make sure they have to correct format
                         string varString = stepArgs[2];
@@ -823,13 +826,13 @@ namespace LMSF_Scheduler
 
                         //Needs to be an even number of varArgs
                         int numVarArgs = varArgs.Length;
-                        if (numVarArgs%2 == 0)
+                        if (numVarArgs % 2 == 0)
                         {
                             varArgsOk = true;
                             //And even arguments need to start with "[" and end with "]"
                             for (int i = 0; i < varArgs.Length; i += 2)
                             {
-                                if (!( varArgs[i].StartsWith("[") && varArgs[i].EndsWith("]") ) )
+                                if (!(varArgs[i].StartsWith("[") && varArgs[i].EndsWith("]")))
                                 {
                                     varArgsOk = false;
                                 }
@@ -873,7 +876,7 @@ namespace LMSF_Scheduler
                     if (ovpExists)
                     {
                         outString += stepArgs[1];
-                        if (stepArgs.Length>2)
+                        if (stepArgs.Length > 2)
                         {
                             outString += ", " + stepArgs[2];
                         }
@@ -892,7 +895,7 @@ namespace LMSF_Scheduler
                     }
                 }
             }
-            
+
             void ParseHamiltonStep()
             {
                 outString += "Running Hamilton Venus Method: ";
@@ -943,7 +946,7 @@ namespace LMSF_Scheduler
             {
                 outString += "Running Timer: ";
                 int waitTime = 0;
-                
+
                 bool argsOk = false;
                 if (numArgs < 2)
                 {
@@ -1139,9 +1142,9 @@ namespace LMSF_Scheduler
 
                             metaDictionary["experimentId"] = "place-holder-expId";
                             metaDictionary["projectId"] = "place-holder-projectId";
-                            metaDictionary["dataDirectory"] = "place-holder-dataDirectory";
+                            metaDictionary["dataDirectory"] = SharedParameters.WorklistFolderPath;
                         }
-                        
+
                     }
                 }
             }
@@ -1195,12 +1198,12 @@ namespace LMSF_Scheduler
                     else
                     {
                         //Message to explain what is wrong
-                        outString += "Not a valid message string: ";    
+                        outString += "Not a valid message string: ";
                         valFailed.Add(num);
                     }
                     outString += messageString;
 
-                    if (argsOk && (numArgs > 3) )
+                    if (argsOk && (numArgs > 3))
                     {
                         //check 3rd argument; needs to be a .bmp or .png
                         //example checking for argumant that is a .ovp file path
@@ -1245,7 +1248,7 @@ namespace LMSF_Scheduler
                         }
                         else
                         {
-                            
+
                         }
                     }
                 }
@@ -1406,11 +1409,11 @@ namespace LMSF_Scheduler
                             {
                                 metaDictionary[keyStr] = $"place-holder-{typeStr}";
                             }
-                            
+
                         }
-                        
+
                     }
-                    
+
                 }
             }
 
@@ -1455,7 +1458,7 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        if (numArgs>2)
+                        if (numArgs > 2)
                         {
                             //check 2nd argument if there is one
                             dataDirStr = stepArgs[2];
@@ -1489,7 +1492,99 @@ namespace LMSF_Scheduler
                         else
                         {
                             metaDictionary["experimentId"] = $"place-holder-experimentId";
-                            metaDictionary["dataDirectory"] = $"place-holder-directory";
+                            metaDictionary["dataDirectory"] = SharedParameters.WorklistFolderPath;
+                        }
+
+                    }
+
+                }
+            }
+
+            void ParseGetFile()
+            {
+                //GetFile takes 2, 3, or 4 arguments
+                //The first argument is the file key for saving the file path in the metaDictionary
+                string fileKey = "";
+                //The second argument is the promt for the get file dialog
+                string promptStr = "";
+                //Third (optional) argument is a file filter string
+                string fileFilter = "";
+                //Fourth (optional) argument is the default data directory
+                string dataDirStr = "";
+
+                //string for start of output from ParseStep()
+                outString += $"Getting File from user: ";
+
+                //one or more Booleans used to track validity of arguments/parameters
+                bool argsOk = true;
+
+                //If the command requires a certain number of arguments, check that first:
+                if (numArgs < 3)
+                {
+                    argsOk = false;
+                    //Message for missing argument or not enough arguments:
+                    outString += "GetFile command requries at least two arguments (file key, and message).";
+                    valFailed.Add(num);
+                }
+                //Then check the validity of the arguments
+                else
+                {
+                    //no validity checks for first two arguments, any string is allowed
+                    fileKey = stepArgs[1];
+                    promptStr = stepArgs[2];
+                    if (numArgs > 3)
+                    {
+                        //check 3rd argument
+                        fileFilter = stepArgs[3];
+                        //needs to be a valid path file filter string
+                        OpenFileDialog dlg = new OpenFileDialog();
+                        try
+                        {
+                            dlg.Filter = fileFilter;
+                        }
+                        catch (ArgumentException)
+                        {
+                            argsOk = false;
+                            //Message for bad file filter argument
+                            outString += "Third argument must be a valid file filter string, see help document. ";
+                            valFailed.Add(num);
+                        }
+                    }
+
+                    if (numArgs > 4)
+                    {
+                        //check 4th argument
+                        dataDirStr = stepArgs[4];
+                        //needs to be a valid path to a directory
+                        if (!Directory.Exists(dataDirStr))
+                        {
+                            argsOk = false;
+                            //Message for bad dataDirStr argument
+                            outString += "Fourth argument must be a path to a valid directory; ";
+                            outString += dataDirStr;
+                            valFailed.Add(num);
+                        }
+                    }
+
+                }
+
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        RunGetFile(num, stepArgs);
+                    }
+                    else
+                    {
+                        //When validating, get actual user input for testing if IsValUserInput is true,
+                        // otherwise put placeholder value into dictionary
+                        if (IsValUserInput)
+                        {
+                            RunGetFile(num, stepArgs);
+                        }
+                        else
+                        {
+                            metaDictionary[fileKey] = $"place-holder-file-path";
                         }
 
                     }
@@ -1684,7 +1779,7 @@ namespace LMSF_Scheduler
                     Play();
                 }
             }
-            
+
         }
 
         private void Play()
@@ -1778,7 +1873,7 @@ namespace LMSF_Scheduler
             //    and if so, give a warning
             XmlNodeList nodeList = experimentNode.SelectNodes($"descendant::protocol[@type = \"{typeStr}\"]");
             XmlNode existingNode;
-            
+
             AbortAppendOverwriteDialog.Response dlgResponse = AbortAppendOverwriteDialog.Response.Abort;
             if (nodeList.Count == 0)
             {
@@ -1866,7 +1961,7 @@ namespace LMSF_Scheduler
             //Adds metadata to the current protocolNode
             //look for the base node and append to it or create it if it does not exist
             XmlNodeList baseNodeList = protocolNode.SelectNodes($"descendant::{baseNodeStr}");
-            if (baseNodeList.Count>0)
+            if (baseNodeList.Count > 0)
             {
                 baseNode = baseNodeList.Item(baseNodeList.Count - 1);
             }
@@ -1877,7 +1972,7 @@ namespace LMSF_Scheduler
             }
 
             //Plasmid details get attached to the last "strain" detail node if there is one
-            if (metaType=="plasmid")
+            if (metaType == "plasmid")
             {
                 XmlNodeList nodeList = baseNode.SelectNodes("descendant::strain");
                 if (nodeList.Count > 0)
@@ -1901,7 +1996,7 @@ namespace LMSF_Scheduler
                 //Then create and append the detail node
                 //    with attribute useKey if key!=""
                 detailNode = xmlDoc.CreateElement(detailNodeStr);
-                if ((key != "") && (metaType!="note"))
+                if ((key != "") && (metaType != "note"))
                 {
                     XmlAttribute keyAtt = xmlDoc.CreateAttribute("useKey");
                     keyAtt.Value = key;
@@ -1929,7 +2024,7 @@ namespace LMSF_Scheduler
                     detailNode.AppendChild(notesNode);
                 }
             }
-                
+
 
         }
 
@@ -1999,6 +2094,54 @@ namespace LMSF_Scheduler
             }
 
             return new string[] { expIdStr, metaDataFilePath, saveDirectory };
+        }
+
+        private string SelectFile(string filePrompt, string fileFilter, string initialDir)
+        {
+            //examples for fileFilter: 
+            //    "XML documents (.xml)|*.xml"
+            //    "Office Files|*.doc;*.xls;*.ppt"
+            //    "Word Documents|*.doc|Excel Worksheets|*.xls|PowerPoint Presentations|*.ppt"
+            string retFile = "";
+
+            retFile = SharedParameters.GetFile(filePrompt, fileFilter, initialDir);
+
+            if (retFile == "")
+            {
+                AbortCalled = true;
+            }
+
+            return retFile;
+        }
+        
+        private void RunGetFile(int num, string[] args)
+        {
+            string fileKey = args[1];
+            string filePrompt = args[2];
+            string fileFilter = "";
+            string dataDirStr = "";
+            if (args.Length>3)
+            {
+                fileFilter = args[3];
+            }
+            if (args.Length > 4)
+            {
+                dataDirStr = args[4];
+            }
+
+            string filePath = "";
+
+            //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+            this.Dispatcher.Invoke(() => {
+                filePath = SelectFile(filePrompt, fileFilter, dataDirStr);
+            });
+
+            if (filePath != "")
+            {
+                //Add the file path to the metaDictionary
+                metaDictionary[fileKey] = filePath;
+            }
+
         }
 
         private void RunAppendXml(int num, string[] args)

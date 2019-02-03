@@ -170,6 +170,28 @@ Commands:
 			GetExpId/ {startDateTime}-{strain1}
 			GetExpId/ {startDateTime}-{strain1}/ C:\Users\djross\Documents\LMSF data
 			
+			
+	GetFile
+		Opens a user dialog box to get the location of a file from the user.
+		The dialog starts by looking in the default data directory.
+		If no <default data directory> parameter is given, "C:\Shared Files\Data" is used.
+		The <file key> parameter is the key used to save the file path in the Metadata Dictionary.
+		The <file prompt> is the prompt displayed to the user in the dialog box.
+		The optional <file filter> parameter is a file filter string used to select only specific types of files (by their extensions).
+			Some examples of valid file filter strings are:
+				XML documents (.xml)|*.xml"
+				Office Files|*.doc;*.xls;*.ppt"
+				Word Documents|*.doc|Excel Worksheets|*.xls|PowerPoint Presentations|*.ppt"
+			For more details on file filters, see: https://docs.microsoft.com/en-us/dotnet/api/microsoft.win32.filedialog.filter?view=netframework-4.7.2
+		
+		Syntax:
+			GetFile/ <file key>/ <file prompt>{/ <file filter (optional)>/ <default data directory (optional)>}
+			
+		Examples:
+			GetFile/ file/ Select file for input data
+			GetFile/ file/ Select file for input data/ CSV files (.csv)|*.csv/
+			GetFile/ file/ Select file for input data/ CSV files (.csv)|*.csv/ {dataDirectory}
+			
 
 	Get
 		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.

@@ -48,6 +48,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ChooseFileDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ConcentrationDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -104,6 +108,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Compile Include="ChooseFileDialog.xaml.cs">
+      <DependentUpon>ChooseFileDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Concentration.cs" />
     <Compile Include="AppendExperimentIdDialog.xaml.cs">
       <DependentUpon>AppendExperimentIdDialog.xaml</DependentUpon>
