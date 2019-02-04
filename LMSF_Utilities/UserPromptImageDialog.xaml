@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Utilities"
         mc:Ignorable="d"
-        Title="Information:" Height="707.496" Width="677" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="500" MinHeight="250"
+        Title="Information:" Icon="LMSF icon.ico" ResizeMode="CanResizeWithGrip" MinWidth="500" MinHeight="250"
         WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -20,7 +20,7 @@
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
         <TextBlock x:Name="promptTextBlock" Margin="50,29,50,10" TextWrapping="Wrap" Text="{Binding PromptText}" Foreground="White" FontSize="16"/>
-        <Image Margin="50,10,50,0" Grid.Row="1" Source="{Binding Picture}"/>
+        <Image Margin="40,10,40,0" Grid.Row="1" Source="{Binding Picture}" Width="400" HorizontalAlignment="Left"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="30" Margin="0" Grid.Row="2" VerticalAlignment="Center" Width="170">
             <Button x:Name="okButton" Content="OK" Margin="0" VerticalAlignment="Center" Grid.Row="1" Height="24" IsDefault="True" Click="OkButton_Click" Width="75" HorizontalAlignment="Left"/>
             <Button Content="Abort" Width="75" Height="24" Margin="20,0,0,0" IsCancel="True"/>
