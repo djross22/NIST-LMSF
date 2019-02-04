@@ -2870,15 +2870,19 @@ namespace LMSF_Scheduler
 
             string outPath = System.IO.Path.Combine(dir, fileName);
 
-            string header = String.Join(",", metaDictionary.Keys);
-            string values = String.Join(",", metaDictionary.Values);
+            //string header = String.Join(",", metaDictionary.Keys);
+            //string values = String.Join(",", metaDictionary.Values);
 
             try
             {
                 using (StreamWriter outputFile = new StreamWriter(outPath))
                 {
-                    outputFile.WriteLine(header);
-                    outputFile.WriteLine(values);
+                    //outputFile.WriteLine(header);
+                    //outputFile.WriteLine(values);
+                    foreach (string key in metaDictionary.Keys)
+                    {
+                        outputFile.WriteLine($"{key},{metaDictionary[key]}");
+                    }
                 }
             }
             catch (UnauthorizedAccessException e)
