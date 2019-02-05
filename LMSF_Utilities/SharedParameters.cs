@@ -369,7 +369,7 @@ namespace LMSF_Utilities
                 saveDirectory = Directory.GetParent(xmlFilePath).FullName;
             }
 
-            saveDirectory = saveDirectory.Replace(@"\", @"\\");
+            //saveDirectory = saveDirectory.Replace(@"\", @"\\");
 
             return new string[] { experimentId, xmlFilePath, saveDirectory };
         }
@@ -437,7 +437,7 @@ namespace LMSF_Utilities
                 }
             }
 
-            saveDirectory = saveDirectory.Replace(@"\", @"\\");
+            //saveDirectory = saveDirectory.Replace(@"\", @"\\");
 
             return new string[] { experimentId, xmlFilePath, saveDirectory };
         }
@@ -503,7 +503,7 @@ namespace LMSF_Utilities
             }
 
             //saveDirectory = Regex.Escape(saveDirectory);
-            saveDirectory = saveDirectory.Replace(@"\", @"\\");
+            //saveDirectory = saveDirectory.Replace(@"\", @"\\");
 
             return new string[] { experimentId, xmlFilePath, saveDirectory };
         }
@@ -658,7 +658,7 @@ namespace LMSF_Utilities
                 retFile = "";
             }
 
-            retFile = retFile.Replace(@"\", @"\\");
+            //retFile = retFile.Replace(@"\", @"\\");
 
             return retFile;
         }

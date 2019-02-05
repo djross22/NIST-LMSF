@@ -2400,7 +2400,8 @@ namespace LMSF_Scheduler
 
             //Add the new node
             newNode = xmlDoc.CreateElement(newNodeStr);
-            newNode.InnerText = innerText.Replace(@"\\",@"\");
+            //newNode.InnerText = innerText.Replace(@"\\",@"\");
+            newNode.InnerText = innerText;
             parentNode.AppendChild(newNode);
         }
 
@@ -2455,17 +2456,21 @@ namespace LMSF_Scheduler
 
         private void RunUserPrompt(int num, string[] args)
         {
-            //string messageStr = args[2];
-            string messageStr;// = Regex.Unescape(args[2]);
-            try
-            {
-                messageStr = Regex.Unescape(args[2]);
-            }
-            catch (ArgumentException e)
-            {
-                MessageBox.Show("Warning: Unrecognized escape characters.");
-                messageStr = args[2];
-            }
+            //
+            //string messageStr;// = Regex.Unescape(args[2]);
+            //try
+            //{
+            //    messageStr = Regex.Unescape(args[2]);
+            //}
+            //catch (ArgumentException e)
+            //{
+            //    MessageBox.Show("Warning: Unrecognized escape characters.");
+            //    messageStr = args[2];
+            //}
+            string messageStr = args[2];
+            messageStr = messageStr.Replace(@"\t", "\t");
+            messageStr = messageStr.Replace(@"\n", "\n");
+
             string titleStr = args[1];
             bool? oKToGo = false;
             if (args.Length < 4)
