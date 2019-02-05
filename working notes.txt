@@ -313,10 +313,17 @@ LMSF Scheduler: Add "If/ <logical test>/ <other valid command>" to step parser, 
 
 LMSF Scheduler: Add User yes/no choice, saves result to dictonary;
 
+Switch Hamilton parameters to Dictionary
+
 
 
 TODOs-
 
+
+LMSF Scheduler: Add copy file - to allow user to copy files into experiment data directory
+
+
+Boolean combinations in If/
 
 
 control-s shortcut to save
