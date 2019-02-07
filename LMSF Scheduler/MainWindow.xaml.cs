@@ -2374,6 +2374,7 @@ namespace LMSF_Scheduler
 
         private void RunAddXml(int num, string[] args)
         {
+            //Adds metadata to the current protocolNode
             string parentNodeStr = args[1];
             string newNodeStr = args[2];
             string innerText = "";
@@ -2385,18 +2386,27 @@ namespace LMSF_Scheduler
             XmlNode parentNode;
             XmlNode newNode;
 
-            //Adds metadata to the current protocolNode
-            //look for the parent node and append to it or create it if it does not exist
-            XmlNodeList baseNodeList = protocolNode.SelectNodes($"descendant::{parentNodeStr}");
-            if (baseNodeList.Count > 0)
+            //If parentNodeStr is "protocol" then add the new node directly to the protocol node
+            if (parentNodeStr == "protocol")
             {
-                parentNode = baseNodeList.Item(baseNodeList.Count - 1);
+                parentNode = protocolNode;
             }
             else
             {
-                parentNode = xmlDoc.CreateElement(parentNodeStr);
-                protocolNode.AppendChild(parentNode);
+                //If the parent node is not the protocol node, look for latest descendent node
+                //look for the parent node and append to it or create it if it does not exist
+                XmlNodeList baseNodeList = protocolNode.SelectNodes($"descendant::{parentNodeStr}");
+                if (baseNodeList.Count > 0)
+                {
+                    parentNode = baseNodeList.Item(baseNodeList.Count - 1);
+                }
+                else
+                {
+                    parentNode = xmlDoc.CreateElement(parentNodeStr);
+                    protocolNode.AppendChild(parentNode);
+                }
             }
+            
 
             //Add the new node
             newNode = xmlDoc.CreateElement(newNodeStr);
