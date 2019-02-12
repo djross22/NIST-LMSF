@@ -189,6 +189,29 @@ namespace LMSF_Gen5_Reader
         }
 
         //===========================================================================================
+        // BrowseForFolder
+        //===========================================================================================
+        public string BrowseForFolder()
+        {
+            string retStr = "";
+            if (Gen5App == null)
+            {
+                return retStr;
+            }
+
+            try
+            {
+                retStr = Gen5App.BrowseForFolder("");
+            }
+            catch (COMException exception)
+            {
+                return retStr;
+            }
+
+            return retStr;
+        }
+
+        //===========================================================================================
         // CarrierIn
         //===========================================================================================
         private string CarrierIn()
