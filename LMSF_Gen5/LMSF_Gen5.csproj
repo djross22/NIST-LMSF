@@ -95,4 +95,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Gen5_Reader\bin\$(Configuration)\LMSF_Gen5_Reader.dll" "$(ProjectDir)bin\$(Configuration)\LMSF_Gen5_Reader.dll"
+</PreBuildEvent>
+  </PropertyGroup>
 </Project>
