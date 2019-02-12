@@ -94,6 +94,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LMSF_Gen5_Reader\LMSF_Gen5_Reader.csproj">
+      <Project>{897c77ec-6533-4618-907f-78d9badf2368}</Project>
+      <Name>LMSF_Gen5_Reader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LMSF_Utilities\LMSF_Utilities.csproj">
+      <Project>{2c18fa64-2458-4788-901a-7d7fb8c7e513}</Project>
+      <Name>LMSF_Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Gen5_Reader\bin\$(Configuration)\LMSF_Gen5_Reader.dll" "$(ProjectDir)bin\$(Configuration)\LMSF_Gen5_Reader.dll"
