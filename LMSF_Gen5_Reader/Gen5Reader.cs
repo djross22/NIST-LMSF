@@ -31,7 +31,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // Start Gen5
         //===========================================================================================
-        private string StartGen5()
+        public string StartGen5()
         {
             string retStr = "Running StartGen5\n";
             try
@@ -53,7 +53,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // Terminate Gen5
         //===========================================================================================
-        private string TerminateGen5()
+        public string TerminateGen5()
         {
             string retStr = "Running TerminateGen5\n";
 
@@ -72,9 +72,17 @@ namespace LMSF_Gen5_Reader
         }
 
         //===========================================================================================
+        // Check if Gen5 App is active or null
+        //===========================================================================================
+        public bool IsGen5Active()
+        {
+            return !(Gen5App is null);
+        }
+
+        //===========================================================================================
         // NewExperiment
         //===========================================================================================
-        private string NewExperiment()
+        public string NewExperiment()
         {
             string retStr = "Running NewExperiment\n";
 
@@ -103,7 +111,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // NewExperiment
         //===========================================================================================
-        private string NewExperiment(string protocolPath)
+        public string NewExperiment(string protocolPath)
         {
             string retStr = "Running NewExperiment\n";
             ProtocolPath = protocolPath;
@@ -133,7 +141,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // ConfigureUSBReader
         //===========================================================================================
-        private string ConfigureUSBReader()
+        public string ConfigureUSBReader()
         {
             string retStr = "Running ConfigureUSBReader\n";
             if (Gen5App == null)
@@ -160,7 +168,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // SetClientWindow
         //===========================================================================================
-        private string SetClientWindow(Window win)
+        public string SetClientWindow(Window win)
         {
             string retStr = "Running SetClientWindow\n";
             if (Gen5App == null)
@@ -214,7 +222,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // CarrierIn
         //===========================================================================================
-        private string CarrierIn()
+        public string CarrierIn()
         {
             string retStr = "Running CarrierIn\n";
             if (Gen5App == null)
@@ -241,7 +249,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // CarrierOut
         //===========================================================================================
-        private string CarrierOut()
+        public string CarrierOut()
         {
             string retStr = "Running CarrierOut\n";
             if (Gen5App == null)
@@ -268,7 +276,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // TestReaderCommunication
         //===========================================================================================
-        private string TestReaderCommunication()
+        public string TestReaderCommunication()
         {
             string retStr = "Running TestReaderCommunication\n";
             if (Gen5App == null)
@@ -371,7 +379,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // GetReaderStatus
         //===========================================================================================
-        private string GetReaderStatus()
+        public string GetReaderStatus()
         {
             string retStr = "Running GetReaderStatus\n";
             if (Gen5App == null)
@@ -420,7 +428,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // RunReaderControlCommand
         //===========================================================================================
-        private string RunReaderControlCommand()
+        public string RunReaderControlCommand()
         {
             string retStr = "Running RunReaderControlCommand\n";
             if (Gen5App == null)
@@ -447,7 +455,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // SaveAs
         //===========================================================================================
-        private string ExpSaveAs()
+        public string ExpSaveAs()
         {
             string retStr = "Running ExpSaveAs\n";
             if (experiment == null)
@@ -476,7 +484,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // Save
         //===========================================================================================
-        private string ExpSave()
+        public string ExpSave()
         {
             string retStr = "Running ExpSave\n";
             if (experiment == null)
@@ -503,7 +511,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // Close
         //===========================================================================================
-        private string ExpClose()
+        public string ExpClose()
         {
             string retStr = "Running ExpSave\n";
             if (experiment == null)
@@ -531,7 +539,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // GetPlate
         //===========================================================================================
-        private string PlatesGetPlate()
+        public string PlatesGetPlate()
         {
             string retStr = "Running PlatesGetPlate\n";
             if (plates == null)
@@ -560,7 +568,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // StartRead
         //===========================================================================================
-        private string PlateStartRead()
+        public string PlateStartRead()
         {
             string retStr = "Running PlateStartRead\n";
             if (plate == null)
@@ -587,7 +595,7 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         // AbortRead
         //===========================================================================================
-        private string PlateAbortRead()
+        public string PlateAbortRead()
         {
             string retStr = "Running PlateAbortRead\n";
             if (plate == null)
