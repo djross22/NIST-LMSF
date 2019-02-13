@@ -453,6 +453,39 @@ namespace LMSF_Gen5_Reader
         }
 
         //===========================================================================================
+        // GetCurrentTemperature
+        //===========================================================================================
+        public string GetCurrentTemperature()
+        {
+            string retStr = "Running GetCurrentTemperature\n";
+            if (Gen5App == null)
+            {
+                retStr += "gen5App is null\n";
+                return retStr;
+            }
+
+            try
+            {
+                object tempValue = 0;
+                object tempStatus = 0;
+
+                Gen5App.GetCurrentTemperature(ref tempValue, ref tempStatus);
+
+                retStr += "GetCurrentTemperature Successful\n";
+                retStr += $"tempValue: {(int)tempValue}\n";
+                retStr += $"tempStatus: {(int)tempStatus}\n";
+            }
+            catch (COMException exception)
+            {
+                retStr += $"GetCurrentTemperature Failed, {exception}.";
+            }
+
+            retStr += "\n";
+
+            return retStr;
+        }
+
+        //===========================================================================================
         // SaveAs
         //===========================================================================================
         public string ExpSaveAs()

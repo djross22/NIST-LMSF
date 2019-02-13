@@ -44,6 +44,7 @@
             </Grid.RowDefinitions>
             <Button x:Name="startButton" Content="Start" HorizontalAlignment="Left" Margin="49,50,0,0" VerticalAlignment="Top" Width="75" Click="StartButton_Click"/>
             <Button x:Name="newExpButton" Content="New Exp" HorizontalAlignment="Left" Margin="49,89,0,0" VerticalAlignment="Top" Width="75" Click="NewExpButton_Click"/>
+            <Button x:Name="temperatureButton" Content="Get Temperature" HorizontalAlignment="Left" Margin="253,90,0,0" VerticalAlignment="Top" Click="TemperatureButton_Click"/>
         </Grid>
 
     </Grid>

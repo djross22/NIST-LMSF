@@ -141,5 +141,10 @@ namespace LMSF_Gen5
 
             TextOut += gen5Reader.PlatesGetPlate();
         }
+
+        private void TemperatureButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.GetCurrentTemperature();
+        }
     }
 }
