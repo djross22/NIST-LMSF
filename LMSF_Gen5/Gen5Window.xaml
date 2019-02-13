@@ -5,8 +5,46 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Gen5"
         mc:Ignorable="d"
-        Title="LMSF-Gen5" Height="450" Width="800" Background="{DynamicResource PurpleBackgroundBrush}">
+        Title="LMSF-Gen5" Height="750" Width="1250" Background="{DynamicResource PurpleBackgroundBrush}" MinWidth="1250" MinHeight="750" Closing="Window_Closing">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Margin="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="3*"/>
+            </Grid.RowDefinitions>
+            <TextBox x:Name="experimentIdTextBox" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Margin="80,127,80,0">
+                <TextBox.Text>
+                    <Binding Path="ExperimentId" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
+            <TextBox x:Name="protocolPathTextBox" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Margin="80,55,80,0" IsReadOnly="True" Background="#FFCBCBCB" >
+                <Binding Path="ProtocolPath" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                </Binding>
+            </TextBox>
+            <Button x:Name="selectProtocolButton" Content="..." HorizontalAlignment="Right" Margin="431,55,35,0" VerticalAlignment="Top" Width="25" Grid.ColumnSpan="2" Height="25" Click="SelectProtocolButton_Click"/>
+            <TextBlock x:Name="promptTextBlock" HorizontalAlignment="Left" Margin="50,29,0,0" TextWrapping="Wrap" Text="Protocol File Path:" VerticalAlignment="Top" Foreground="White" FontSize="16"/>
+            <TextBlock x:Name="promptTextBlock_Copy" HorizontalAlignment="Left" Margin="50,101,0,0" TextWrapping="Wrap" Text="Experiment ID:" VerticalAlignment="Top" Foreground="White" FontSize="16"/>
+            <TextBlock x:Name="promptTextBlock_Copy1" HorizontalAlignment="Left" Margin="50,178,0,0" TextWrapping="Wrap" Text="Experiment Data Folder:" VerticalAlignment="Top" Foreground="White" FontSize="16"/>
+            <TextBox x:Name="expFolderTextBox" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Margin="80,204,80,0" IsReadOnly="True" Background="#FFCBCBCB" Text="{Binding ExpFolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Button x:Name="selectExpFolderButton" Content="..." HorizontalAlignment="Right" Margin="0,204,35,0" VerticalAlignment="Top" Width="25" Height="25" Click="SelectExpFolderButton_Click"/>
+            <TextBox x:Name="tempOutTextBox" Margin="20" Grid.Row="1" TextWrapping="Wrap" Text="{Binding TextOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+        </Grid>
+        <Grid Grid.Column="1" Margin="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Button x:Name="startButton" Content="Start" HorizontalAlignment="Left" Margin="49,50,0,0" VerticalAlignment="Top" Width="75" Click="StartButton_Click"/>
+            <Button x:Name="newExpButton" Content="New Exp" HorizontalAlignment="Left" Margin="49,89,0,0" VerticalAlignment="Top" Width="75" Click="NewExpButton_Click"/>
+        </Grid>
+
     </Grid>
 </Window>
