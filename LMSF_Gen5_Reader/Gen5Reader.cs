@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Gen5;
+using System.Threading;
+using System.ComponentModel;
 
 namespace LMSF_Gen5_Reader
 {
@@ -21,7 +23,9 @@ namespace LMSF_Gen5_Reader
         public string ExperimentID { get; set; }
         public string ProtocolPath { get; set; }
         public string ExperimentPath { get; set; }
+        public string ExportFilePath { get; set; }
         public string ExperimentFolderPath { get; set; }
+        //public Gen5Window gen5Window { get; set; }
 
         public Gen5Reader()
         {
@@ -96,7 +100,9 @@ namespace LMSF_Gen5_Reader
             try
             {
                 experiment = (Gen5.Experiment)Gen5App.NewExperiment(ProtocolPath);
+                plates = (Gen5.Plates)experiment.Plates;
                 retStr += "NewExperiment successful\n";
+                //retStr += $"plates: {plates}\n";
             }
             catch (System.Runtime.InteropServices.COMException exception)
             {
@@ -126,7 +132,8 @@ namespace LMSF_Gen5_Reader
             try
             {
                 experiment = (Gen5.Experiment)Gen5App.NewExperiment(ProtocolPath);
-                retStr += "NewExperiment successful\n";
+                plates = (Gen5.Plates)experiment.Plates;
+                retStr += "NewExperiment successful, with plates\n";
             }
             catch (System.Runtime.InteropServices.COMException exception)
             {
@@ -651,6 +658,167 @@ namespace LMSF_Gen5_Reader
 
             return retStr;
         }
+
+        //===========================================================================================
+        // PlateReadStatus
+        //===========================================================================================
+        public string PlateReadStatus(ref Gen5ReadStatus status)
+        {
+            string retStr = "Running PlateReadStatus\n";
+
+            if (plate == null)
+            {
+                retStr += "plate is null\n";
+                return retStr;
+            }
+
+            try
+            {
+                status = plate.ReadStatus;
+                retStr += $"{status.ToString()}\n";
+            }
+            catch (COMException exception)
+            {
+                retStr += $"ReadStatus Failed, {exception}\n";
+            }
+
+            retStr += "\n";
+
+            return retStr;
+        }
+
+        //===========================================================================================
+        // FileExport
+        //===========================================================================================
+        public string PlateFileExport()
+        {
+            string retStr = "Running PlateFileExport\n";
+            if (plate == null)
+            {
+                retStr += "plate is null\n";
+                return retStr;
+            }
+
+            try
+            {
+                ExportFilePath = System.IO.Path.Combine(ExperimentFolderPath, ExperimentID);
+                ExportFilePath += ".txt";
+
+                plate.FileExport(ExportFilePath);
+                retStr += "FileExport Successful";
+            }
+            catch (COMException exception)
+            {
+                retStr += $"FileExport Failed, {exception}";
+            }
+
+            retStr += "\n";
+
+            return retStr;
+        }
+
+        //===========================================================================================
+        // WaitForFinishThenExport
+        //===========================================================================================
+        public string WaitForFinishThenExportAndClose()
+        {
+            string retStr = "Running WaitForFinishThenExportAndClose\n";
+
+            BackgroundWorker readerMonitorWorker = new BackgroundWorker();
+            readerMonitorWorker.WorkerReportsProgress = false;
+            readerMonitorWorker.DoWork += ReaderMonitor_DoWork;
+            readerMonitorWorker.RunWorkerCompleted += ReaderMonitor_RunWorkerCompleted;
+
+            readerMonitorWorker.RunWorkerAsync();
+
+            retStr += "    ... waiting...\n";
+
+            return retStr;
+        }
+
+        void ReaderMonitor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
+            bool liveData = Gen5App.DataExportEnabled;
+
+            while (status == Gen5ReadStatus.eReadInProgress)
+            {
+                Thread.Sleep(100);
+                PlateReadStatus(ref status);
+                //TODO: handle live data stream
+            }
+
+        }
+
+        void ReaderMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
+            //TODO: Handle outcomes other than "eReadCompleted" or "eReadAborted"
+            PlateFileExport();
+            ExpSave();
+            ExpClose();
+
+            plateReadMonitor = null;
+            plates = null;
+            plate = null;
+            experiment = null;
+        }
+
+        //===========================================================================================
+        // GetFileExportNames
+        //===========================================================================================
+        //public string GetFileExportNames()
+        //{
+        //    string retStr = "Running GetFileExportNames\n";
+
+        //    unsafe
+        //    {
+        //        int[] iArray = new int[10];
+        //        fixed (int* ptr = iArray)
+        //        {
+
+        //        }
+
+        //        string[] sArray = new string[10];
+        //        fixed (object* ptr = sArray)
+        //        {
+
+        //        }
+        //        //fixed (string* ptr = sArray)
+        //        //{
+
+        //        //}
+
+        //        string[] exportNames = new string[] { };
+        //        fixed (string* ptr = exportNames)
+        //        {
+
+        //        }
+        //    }
+
+        //        Object pvNames = (Object)exportNames;
+
+        //    if (plate != null)
+        //    {
+        //        try
+        //        {
+        //            plate.GetFileExportNames(false, ref pvNames);
+        //            foreach (string n in exportNames)
+        //            {
+        //                retStr += $"{n}, ";
+        //            }
+        //            retStr += "\n";
+        //        }
+        //        catch (COMException exception)
+        //        {
+        //            retStr += $"GetFileExportNames Failed, {exception}\n";
+        //        }
+        //    }
+
+        //    retStr += "\n";
+
+        //    return retStr;
+        //}
 
     }
 }

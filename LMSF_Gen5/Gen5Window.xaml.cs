@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using LMSF_Utilities;
 using LMSF_Gen5_Reader;
+using Gen5;
 
 namespace LMSF_Gen5
 {
@@ -39,6 +40,10 @@ namespace LMSF_Gen5
             DataContext = this;
 
             gen5Reader = new Gen5Reader();
+
+            TextOut = gen5Reader.StartGen5();
+            TextOut += gen5Reader.SetClientWindow(this);
+            TextOut += gen5Reader.ConfigureUSBReader();
         }
 
         #region Properties Getters and Setters
@@ -113,14 +118,7 @@ namespace LMSF_Gen5
 
         private void SelectExpFolderButton_Click(object sender, RoutedEventArgs e)
         {
-            expFolderPath = gen5Reader.BrowseForFolder();
-        }
-
-        private void StartButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextOut = gen5Reader.StartGen5();
-            TextOut += gen5Reader.SetClientWindow(this);
-            TextOut += gen5Reader.ConfigureUSBReader();
+            ExpFolderPath = gen5Reader.BrowseForFolder();
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -142,9 +140,50 @@ namespace LMSF_Gen5
             TextOut += gen5Reader.PlatesGetPlate();
         }
 
+        private void RunExpButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.PlateStartRead();
+
+            TextOut += gen5Reader.WaitForFinishThenExportAndClose();
+        }
+
+        private void OpenButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.CarrierOut();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.CarrierIn();
+        }
+
+        //Button Click event handlers to be deleted after initial testing
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut = gen5Reader.StartGen5();
+            TextOut += gen5Reader.SetClientWindow(this);
+            TextOut += gen5Reader.ConfigureUSBReader();
+        }
+
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.PlateFileExport();
+        }
+
         private void TemperatureButton_Click(object sender, RoutedEventArgs e)
         {
             TextOut += gen5Reader.GetCurrentTemperature();
+        }
+
+        private void StatusButton_Click(object sender, RoutedEventArgs e)
+        {
+            Gen5ReadStatus status = Gen5ReadStatus.eReadNotStarted;
+            TextOut += gen5Reader.PlateReadStatus(ref status);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.ExpSave();
         }
     }
 }

@@ -110,6 +110,17 @@
   <ItemGroup>
     <Resource Include="LMSF icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Gen5">
+      <Guid>{80BC3D0F-EA45-49B3-8F79-4E0B1D635711}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>copy /y /d "C:\Users\djross\source\repos\NIST LMSF\LMSF_Gen5_Reader\bin\$(Configuration)\LMSF_Gen5_Reader.dll" "$(ProjectDir)bin\$(Configuration)\LMSF_Gen5_Reader.dll"
