@@ -32,6 +32,8 @@ namespace LMSF_Gen5_Reader
             gen5Window = win;
         }
 
+        public bool IsReading { get; private set; }
+
         //===========================================================================================
         // Start Gen5
         //===========================================================================================
@@ -42,7 +44,7 @@ namespace LMSF_Gen5_Reader
             {
                 Gen5App = new Gen5.Application();
                 retStr += "Gen5App created Successfully\n";
-
+                IsReading = false;
             }
             catch (COMException exception)
             {
@@ -102,7 +104,7 @@ namespace LMSF_Gen5_Reader
                 experiment = (Gen5.Experiment)Gen5App.NewExperiment(ProtocolPath);
                 plates = (Gen5.Plates)experiment.Plates;
                 retStr += "NewExperiment successful\n";
-                //retStr += $"plates: {plates}\n";
+                IsReading = false;
             }
             catch (System.Runtime.InteropServices.COMException exception)
             {
@@ -134,6 +136,7 @@ namespace LMSF_Gen5_Reader
                 experiment = (Gen5.Experiment)Gen5App.NewExperiment(ProtocolPath);
                 plates = (Gen5.Plates)experiment.Plates;
                 retStr += "NewExperiment successful, with plates\n";
+                IsReading = false;
             }
             catch (System.Runtime.InteropServices.COMException exception)
             {
@@ -624,6 +627,7 @@ namespace LMSF_Gen5_Reader
             try
             {
                 plateReadMonitor = (Gen5.PlateReadMonitor)plate.StartReadEx(true);
+                IsReading = true;
                 retStr += "StartRead Successful, reverse plate orientation.\n";
             }
             catch (COMException exception)
@@ -766,6 +770,8 @@ namespace LMSF_Gen5_Reader
             plates = null;
             plate = null;
             experiment = null;
+
+            IsReading = false;
 
             gen5Window.TextOut += "            ... Done.\n";
         }
