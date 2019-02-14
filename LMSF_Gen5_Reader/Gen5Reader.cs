@@ -619,8 +619,8 @@ namespace LMSF_Gen5_Reader
 
             try
             {
-                plateReadMonitor = (Gen5.PlateReadMonitor)plate.StartRead();
-                retStr += "StartRead Successful\n";
+                plateReadMonitor = (Gen5.PlateReadMonitor)plate.StartReadEx(true);
+                retStr += "StartRead Successful, reverse plate orientation.\n";
             }
             catch (COMException exception)
             {
