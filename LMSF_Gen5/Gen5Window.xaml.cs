@@ -155,6 +155,11 @@ namespace LMSF_Gen5
 
         private void NewExpButton_Click(object sender, RoutedEventArgs e)
         {
+            NewExp();
+        }
+
+        private void NewExp()
+        {
             //Set button and other controls disabled
             newExpButton.IsEnabled = false;
             experimentIdTextBox.IsEnabled = false;
@@ -171,6 +176,11 @@ namespace LMSF_Gen5
         }
 
         private void RunExpButton_Click(object sender, RoutedEventArgs e)
+        {
+            RunExp();
+        }
+
+        private void RunExp()
         {
             TextOut += gen5Reader.PlateStartRead();
 
@@ -249,10 +259,20 @@ namespace LMSF_Gen5
 
         private void CarrierInButton_Click(object sender, RoutedEventArgs e)
         {
+            CarrierIn();
+        }
+
+        private void CarrierIn()
+        {
             TextOut += gen5Reader.CarrierIn();
         }
 
         private void CarrierOutButton_Click(object sender, RoutedEventArgs e)
+        {
+            CarrierOut();
+        }
+
+        private void CarrierOut()
         {
             TextOut += gen5Reader.CarrierOut();
         }
