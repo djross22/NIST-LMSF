@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.ComponentModel;
 using System.Windows.Controls;
@@ -31,6 +32,8 @@ namespace LMSF_Gen5
         private string expFolderPath;
         private string protocolPath;
         private string textOut;
+        private bool isReadRunning;
+        private BackgroundWorker readerMonitorWorker;
 
         private Gen5Reader gen5Reader;
 
@@ -47,6 +50,26 @@ namespace LMSF_Gen5
         }
 
         #region Properties Getters and Setters
+        public bool IsReadRunning
+        {
+            get { return this.isReadRunning; }
+            set
+            {
+                this.isReadRunning = value;
+                OnPropertyChanged("IsReadRunning");
+                if (isReadRunning)
+                {
+                    statusBorder.Background = Brushes.LimeGreen;
+                    statusTextBlock.Text = "Read In Progress";
+                }
+                else
+                {
+                    statusBorder.Background = Brushes.Red;
+                    statusTextBlock.Text = "Reader Idle";
+                }
+            }
+        }
+
         public string TextOut
         {
             get { return this.textOut; }
@@ -145,7 +168,69 @@ namespace LMSF_Gen5
         {
             TextOut += gen5Reader.PlateStartRead();
 
-            TextOut += gen5Reader.WaitForFinishThenExportAndClose();
+            TextOut += WaitForFinishThenExportAndClose();
+        }
+
+        public string WaitForFinishThenExportAndClose()
+        {
+            string retStr = "Running WaitForFinishThenExportAndClose\n";
+
+            if (!(readerMonitorWorker is null))
+            {
+                if (readerMonitorWorker.IsBusy)
+                {
+                    retStr += "Read in progress, abort read or wait until end of read before starting a new read.\n";
+                    return retStr;
+                }
+            }
+
+            readerMonitorWorker = new BackgroundWorker();
+            readerMonitorWorker.WorkerReportsProgress = false;
+            readerMonitorWorker.DoWork += ReaderMonitor_DoWork;
+            readerMonitorWorker.RunWorkerCompleted += ReaderMonitor_RunWorkerCompleted;
+
+            readerMonitorWorker.RunWorkerAsync();
+
+            retStr += "    ... Read in Progress...\n";
+
+            return retStr;
+        }
+
+        void ReaderMonitor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
+            bool liveData = gen5Reader.Gen5App.DataExportEnabled;
+
+            while (status == Gen5ReadStatus.eReadInProgress)
+            {
+                Thread.Sleep(100);
+                gen5Reader.PlateReadStatus(ref status); //Note: the PlateReadStatus sets the IsReading Property according to state of reader.
+
+                //TODO: Handle live data stream
+
+                this.Dispatcher.Invoke(() => {
+                    if (status == Gen5ReadStatus.eReadInProgress)
+                    {
+                        IsReadRunning = true;
+                    }
+                    else
+                    {
+                        IsReadRunning = false;
+                    }
+                });
+            }
+
+        }
+
+        void ReaderMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
+            //TODO: Handle outcomes other than "eReadCompleted" or "eReadAborted"
+            gen5Reader.PlateFileExport();
+            gen5Reader.ExpSave();
+            gen5Reader.ExpClose();
+
+            TextOut += "            ... Done.\n";
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)

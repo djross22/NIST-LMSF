@@ -60,6 +60,10 @@
                 <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="396,128,0,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="temperatureButton" Content="Get Temperature" HorizontalAlignment="Left" Margin="396,155,0,0" VerticalAlignment="Top" Click="TemperatureButton_Click" Grid.Row="1" RenderTransformOrigin="1.688,0.773" Focusable="False"/>
                 <TextBlock HorizontalAlignment="Left" Margin="20,10,0,0" TextWrapping="Wrap" Text="Status Monitor:" VerticalAlignment="Top" Foreground="White" Grid.Row="1"/>
+
+                <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Height="24" Margin="272,10,0,0" VerticalAlignment="Top" Width="110" Background="Red">
+                    <TextBlock x:Name="statusTextBlock" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Reader Idle" VerticalAlignment="Center" FontWeight="Bold"/>
+                </Border>
             </Grid>
         </Grid>
 

@@ -14,12 +14,11 @@ namespace LMSF_Gen5_Reader
 {
     public class Gen5Reader
     {
-        private Gen5.Application Gen5App;
+        public Gen5.Application Gen5App { get; private set; }
         private Gen5.Experiment experiment;
         private Gen5.Plates plates;
         private Gen5.Plate plate;
         private Gen5.PlateReadMonitor plateReadMonitor;
-        private BackgroundWorker readerMonitorWorker;
 
         public string ExperimentID { get; set; }
         public string ProtocolPath { get; set; }
@@ -672,6 +671,13 @@ namespace LMSF_Gen5_Reader
             {
                 experiment.Close();
                 retStr += "Close Successful\n";
+
+                plateReadMonitor = null;
+                plates = null;
+                plate = null;
+                experiment = null;
+
+                IsReading = false; //just in case
             }
             catch (COMException exception)
             {
@@ -854,66 +860,6 @@ namespace LMSF_Gen5_Reader
             retStr += "\n";
 
             return retStr;
-        }
-
-        //===========================================================================================
-        // WaitForFinishThenExport
-        //===========================================================================================
-        public string WaitForFinishThenExportAndClose()
-        {
-            string retStr = "Running WaitForFinishThenExportAndClose\n";
-
-            if (!(readerMonitorWorker is null))
-            {
-                if (readerMonitorWorker.IsBusy)
-                {
-                    retStr += "Read in progress, abort read or wait until end of read before starting a new read.\n";
-                    return retStr;
-                }
-            }
-
-            readerMonitorWorker = new BackgroundWorker();
-            readerMonitorWorker.WorkerReportsProgress = false;
-            readerMonitorWorker.DoWork += ReaderMonitor_DoWork;
-            readerMonitorWorker.RunWorkerCompleted += ReaderMonitor_RunWorkerCompleted;
-
-            readerMonitorWorker.RunWorkerAsync();
-
-            retStr += "    ... Read in Progress...\n";
-
-            return retStr;
-        }
-
-        void ReaderMonitor_DoWork(object sender, DoWorkEventArgs e)
-        {
-            Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
-            bool liveData = Gen5App.DataExportEnabled;
-
-            while (status == Gen5ReadStatus.eReadInProgress)
-            {
-                Thread.Sleep(100);
-                PlateReadStatus(ref status); //Note: the PlateReadStatus sets the IsReading Property according to state of reader.
-                //TODO: handle live data stream
-            }
-
-        }
-
-        void ReaderMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
-            //TODO: Handle outcomes other than "eReadCompleted" or "eReadAborted"
-            PlateFileExport();
-            ExpSave();
-            ExpClose();
-
-            plateReadMonitor = null;
-            plates = null;
-            plate = null;
-            experiment = null;
-
-            IsReading = false; //just in case
-
-            gen5Window.TextOut += "            ... Done.\n";
         }
 
         //===========================================================================================
