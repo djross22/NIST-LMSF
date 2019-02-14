@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="BTIStatusCodes.cs" />
     <Compile Include="Gen5Reader.cs" />
+    <Compile Include="IReaderTextOut.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
