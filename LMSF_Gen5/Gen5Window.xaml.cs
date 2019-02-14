@@ -191,9 +191,12 @@ namespace LMSF_Gen5
 
         private void RunExp()
         {
+            string startText = gen5Reader.PlateStartRead();
             TextOut += gen5Reader.PlateStartRead();
-
-            TextOut += WaitForFinishThenExportAndClose();
+            if (startText.Contains("StartRead Successful"))
+            {
+                TextOut += WaitForFinishThenExportAndClose();
+            }
         }
 
         public string WaitForFinishThenExportAndClose()
