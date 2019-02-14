@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -155,6 +156,14 @@ namespace LMSF_Gen5
 
         private void NewExpButton_Click(object sender, RoutedEventArgs e)
         {
+            string filePath = gen5Reader.GetExperimentFilePath(ExpFolderPath, ExperimentId);
+            if (File.Exists(filePath)) {
+                MessageBoxResult res = MessageBox.Show("That Gen5 epxeriment file already exists. Ok to overwrite?", "Overwrite File", MessageBoxButton.YesNo);
+                if (res ==  MessageBoxResult.No)
+                {
+                    return;
+                }
+            }
             NewExp();
         }
 

@@ -585,6 +585,13 @@ namespace LMSF_Gen5_Reader
             return retStr;
         }
 
+        public string GetExperimentFilePath(string folder, string id)
+        {
+            string expPath = System.IO.Path.Combine(folder, id);
+            expPath += ".xpt";
+            return expPath;
+        }
+
         //===========================================================================================
         // SaveAs
         //===========================================================================================
@@ -606,8 +613,9 @@ namespace LMSF_Gen5_Reader
 
             try
             {
-                ExperimentPath = System.IO.Path.Combine(ExperimentFolderPath,ExperimentID);
-                ExperimentPath += ".xpt";
+                //ExperimentPath = System.IO.Path.Combine(ExperimentFolderPath,ExperimentID);
+                //ExperimentPath += ".xpt";
+                ExperimentPath = GetExperimentFilePath(ExperimentFolderPath, ExperimentID);
                 experiment.SaveAs(ExperimentPath);
                 retStr += "SaveAs Successful\n";
             }
