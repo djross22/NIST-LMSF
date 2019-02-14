@@ -247,11 +247,29 @@ namespace LMSF_Gen5
             TextOut += "            ... Done.\n\n";
         }
 
-        private void OpenButton_Click(object sender, RoutedEventArgs e)
+        private void CarrierInButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.CarrierIn();
+        }
+
+        private void CarrierOutButton_Click(object sender, RoutedEventArgs e)
         {
             TextOut += gen5Reader.CarrierOut();
         }
 
+        private void CloseExpButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.ExpClose();
+
+            //Set relevant controls enabled
+            newExpButton.IsEnabled = true;
+            experimentIdTextBox.IsEnabled = true;
+            selectExpFolderButton.IsEnabled = true;
+            selectProtocolButton.IsEnabled = true;
+        }
+
+        //===============================================================
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //Button Click event handlers to be deleted after initial testing
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
@@ -279,27 +297,6 @@ namespace LMSF_Gen5
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             TextOut += gen5Reader.ExpSave();
-        }
-
-        private void CarrierInButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextOut += gen5Reader.CarrierIn();
-        }
-
-        private void CarrierOutButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextOut += gen5Reader.CarrierOut();
-        }
-
-        private void CloseExpButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextOut += gen5Reader.ExpClose();
-
-            //Set relevant controls enabled
-            newExpButton.IsEnabled = true;
-            experimentIdTextBox.IsEnabled = true;
-            selectExpFolderButton.IsEnabled = true;
-            selectProtocolButton.IsEnabled = true;
         }
     }
 }
