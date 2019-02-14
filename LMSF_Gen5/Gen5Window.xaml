@@ -44,9 +44,10 @@
             </Grid.RowDefinitions>
             <Button x:Name="newExpButton" Content="New Exp" HorizontalAlignment="Left" Margin="31,35,0,0" VerticalAlignment="Top" Width="75" Click="NewExpButton_Click" Focusable="False"/>
             <Button x:Name="runExpButton" Content="Run Exp" HorizontalAlignment="Left" Margin="31,70,0,0" VerticalAlignment="Top" Width="75" Click="RunExpButton_Click" Focusable="False"/>
+            <Button x:Name="closeExpButton" Content="Close Exp" HorizontalAlignment="Left" Margin="124,70,0,0" VerticalAlignment="Top" Width="75" Click="CloseExpButton_Click"/>
             <TextBlock HorizontalAlignment="Left" Margin="31,10,0,0" TextWrapping="Wrap" Text="Control Buttons:" VerticalAlignment="Top" Foreground="White"/>
-            <Button x:Name="openButton" Content="Carrier Out" HorizontalAlignment="Left" Margin="160,35,0,0" VerticalAlignment="Top" Width="75" Click="OpenButton_Click" Focusable="False"/>
-            <Button x:Name="closeButton" Content="Carrier In" HorizontalAlignment="Left" Margin="160,70,0,0" VerticalAlignment="Top" Width="75" Click="CloseButton_Click" Focusable="False"/>
+            <Button x:Name="carrierOutButton" Content="Carrier Out" HorizontalAlignment="Left" Margin="222,35,0,0" VerticalAlignment="Top" Width="75" Click="CarrierOutButton_Click" Focusable="False"/>
+            <Button x:Name="carrierInButton" Content="Carrier In" HorizontalAlignment="Left" Margin="222,70,0,0" VerticalAlignment="Top" Width="75" Click="CarrierInButton_Click" Focusable="False"/>
             <Grid Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="113"/>
@@ -54,16 +55,17 @@
                 </Grid.RowDefinitions>
                 <TextBox x:Name="tempOutTextBox" Margin="20,30,115,20" Grid.Row="1" TextWrapping="Wrap" Text="{Binding TextOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
                 <TextBlock HorizontalAlignment="Left" Margin="396,10,0,0" TextWrapping="Wrap" Text="Test Buttons (to be deleted)" VerticalAlignment="Top" Foreground="White" Width="82" Grid.Row="1"/>
-                <Button x:Name="startButton" Content="Start Gen5" HorizontalAlignment="Left" Margin="396,47,0,0" VerticalAlignment="Top" Width="75" Click="StartButton_Click" Grid.Row="1" Focusable="False"/>
-                <Button x:Name="exportButton" Content="File Export" HorizontalAlignment="Left" Margin="396,74,0,0" VerticalAlignment="Top" Click="ExportButton_Click" MinWidth="75" Grid.Row="1" Focusable="False"/>
-                <Button x:Name="statusButton" Content="Plate Status" HorizontalAlignment="Left" Margin="396,101,0,0" VerticalAlignment="Top" Width="75" Click="StatusButton_Click" Grid.Row="1" Focusable="False"/>
-                <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="396,128,0,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" Grid.Row="1" Focusable="False"/>
-                <Button x:Name="temperatureButton" Content="Get Temperature" HorizontalAlignment="Left" Margin="396,155,0,0" VerticalAlignment="Top" Click="TemperatureButton_Click" Grid.Row="1" RenderTransformOrigin="1.688,0.773" Focusable="False"/>
+                <Button x:Name="startButton" Content="Start Gen5" HorizontalAlignment="Right" Margin="0,47,10,0" VerticalAlignment="Top" Width="75" Click="StartButton_Click" Grid.Row="1" Focusable="False"/>
+                <Button x:Name="exportButton" Content="File Export" HorizontalAlignment="Right" Margin="0,74,10,0" VerticalAlignment="Top" Click="ExportButton_Click" MinWidth="75" Grid.Row="1" Focusable="False"/>
+                <Button x:Name="statusButton" Content="Plate Status" HorizontalAlignment="Right" Margin="0,101,10,0" VerticalAlignment="Top" Width="75" Click="StatusButton_Click" Grid.Row="1" Focusable="False"/>
+                <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Right" Margin="0,128,10,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" Grid.Row="1" Focusable="False"/>
+                <Button x:Name="temperatureButton" Content="Get Temperature" HorizontalAlignment="Right" Margin="0,155,5,0" VerticalAlignment="Top" Click="TemperatureButton_Click" Grid.Row="1" RenderTransformOrigin="1.688,0.773" Focusable="False"/>
                 <TextBlock HorizontalAlignment="Left" Margin="20,10,0,0" TextWrapping="Wrap" Text="Status Monitor:" VerticalAlignment="Top" Foreground="White" Grid.Row="1"/>
 
-                <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Height="24" Margin="272,10,0,0" VerticalAlignment="Top" Width="110" Background="Red">
+                <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="0,10,50,0" VerticalAlignment="Top" Width="110" Background="Red">
                     <TextBlock x:Name="statusTextBlock" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Reader Idle" VerticalAlignment="Center" FontWeight="Bold"/>
                 </Border>
+                
             </Grid>
         </Grid>
 

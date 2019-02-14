@@ -155,6 +155,12 @@ namespace LMSF_Gen5
 
         private void NewExpButton_Click(object sender, RoutedEventArgs e)
         {
+            //Set button and other controls disabled
+            newExpButton.IsEnabled = false;
+            experimentIdTextBox.IsEnabled = false;
+            selectExpFolderButton.IsEnabled = false;
+            selectProtocolButton.IsEnabled = false;
+
             TextOut += gen5Reader.NewExperiment(ProtocolPath);
 
             gen5Reader.ExperimentID = ExperimentId;
@@ -230,17 +236,20 @@ namespace LMSF_Gen5
             gen5Reader.ExpSave();
             gen5Reader.ExpClose();
 
+            this.Dispatcher.Invoke(() => {
+                //Set relevant controls enabled
+                newExpButton.IsEnabled = true;
+                experimentIdTextBox.IsEnabled = true;
+                selectExpFolderButton.IsEnabled = true;
+                selectProtocolButton.IsEnabled = true;
+            });
+
             TextOut += "            ... Done.\n";
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
             TextOut += gen5Reader.CarrierOut();
-        }
-
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextOut += gen5Reader.CarrierIn();
         }
 
         //Button Click event handlers to be deleted after initial testing
@@ -270,6 +279,27 @@ namespace LMSF_Gen5
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             TextOut += gen5Reader.ExpSave();
+        }
+
+        private void CarrierInButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.ExpClose();
+        }
+
+        private void CarrierOutButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.CarrierIn();
+        }
+
+        private void CloseExpButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.ExpClose();
+
+            //Set relevant controls enabled
+            newExpButton.IsEnabled = true;
+            experimentIdTextBox.IsEnabled = true;
+            selectExpFolderButton.IsEnabled = true;
+            selectProtocolButton.IsEnabled = true;
         }
     }
 }
