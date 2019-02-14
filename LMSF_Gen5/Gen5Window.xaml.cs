@@ -244,7 +244,7 @@ namespace LMSF_Gen5
                 selectProtocolButton.IsEnabled = true;
             });
 
-            TextOut += "            ... Done.\n";
+            TextOut += "            ... Done.\n\n";
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
@@ -283,12 +283,12 @@ namespace LMSF_Gen5
 
         private void CarrierInButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.ExpClose();
+            TextOut += gen5Reader.CarrierIn();
         }
 
         private void CarrierOutButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.CarrierIn();
+            TextOut += gen5Reader.CarrierOut();
         }
 
         private void CloseExpButton_Click(object sender, RoutedEventArgs e)
