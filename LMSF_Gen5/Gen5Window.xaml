@@ -48,6 +48,10 @@
             <TextBlock HorizontalAlignment="Left" Margin="31,10,0,0" TextWrapping="Wrap" Text="Control Buttons:" VerticalAlignment="Top" Foreground="White"/>
             <Button x:Name="carrierOutButton" Content="Carrier Out" HorizontalAlignment="Left" Margin="222,35,0,0" VerticalAlignment="Top" Width="75" Click="CarrierOutButton_Click" Focusable="False"/>
             <Button x:Name="carrierInButton" Content="Carrier In" HorizontalAlignment="Left" Margin="222,70,0,0" VerticalAlignment="Top" Width="75" Click="CarrierInButton_Click" Focusable="False"/>
+            <Button x:Name="temperatureButton" Content="Get Temperature" HorizontalAlignment="Left" Margin="320,70,0,0" VerticalAlignment="Top" Click="TemperatureButton_Click" RenderTransformOrigin="1.688,0.773" Focusable="False" Width="100"/>
+            <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="0,10,50,0" VerticalAlignment="Top" Width="110" Background="Red">
+                <TextBlock x:Name="statusTextBlock" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Reader Idle" VerticalAlignment="Center" FontWeight="Bold"/>
+            </Border>
             <Grid Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="113"/>
@@ -59,13 +63,11 @@
                 <Button x:Name="exportButton" Content="File Export" HorizontalAlignment="Right" Margin="0,74,10,0" VerticalAlignment="Top" Click="ExportButton_Click" MinWidth="75" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="statusButton" Content="Plate Status" HorizontalAlignment="Right" Margin="0,101,10,0" VerticalAlignment="Top" Width="75" Click="StatusButton_Click" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Right" Margin="0,128,10,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" Grid.Row="1" Focusable="False"/>
-                <Button x:Name="temperatureButton" Content="Get Temperature" HorizontalAlignment="Right" Margin="0,155,5,0" VerticalAlignment="Top" Click="TemperatureButton_Click" Grid.Row="1" RenderTransformOrigin="1.688,0.773" Focusable="False"/>
+                
                 <TextBlock HorizontalAlignment="Left" Margin="20,10,0,0" TextWrapping="Wrap" Text="Status Monitor:" VerticalAlignment="Top" Foreground="White" Grid.Row="1"/>
 
-                <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="0,10,50,0" VerticalAlignment="Top" Width="110" Background="Red">
-                    <TextBlock x:Name="statusTextBlock" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Reader Idle" VerticalAlignment="Center" FontWeight="Bold"/>
-                </Border>
                 
+
             </Grid>
         </Grid>
 

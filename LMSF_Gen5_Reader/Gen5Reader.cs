@@ -566,14 +566,14 @@ namespace LMSF_Gen5_Reader
 
             try
             {
-                object tempValue = 0;
-                object tempStatus = 0;
+                long temperatureValue = 0;
+                Gen5TemperatureStatus temperatureStatus = Gen5TemperatureStatus.eTemperatureInValid;
 
-                Gen5App.GetCurrentTemperature(ref tempValue, ref tempStatus);
+                GetTemperatureWrapper(ref temperatureValue, ref temperatureStatus);
 
                 retStr += "GetCurrentTemperature Successful\n";
-                retStr += $"tempValue: {(int)tempValue}\n";
-                retStr += $"tempStatus: {(int)tempStatus}\n";
+                retStr += $"tempValue: {temperatureValue}\n";
+                retStr += $"tempStatus: {temperatureStatus}\n";
             }
             catch (COMException exception)
             {
@@ -583,6 +583,37 @@ namespace LMSF_Gen5_Reader
             retStr += "\n";
 
             return retStr;
+        }
+
+        private BTIStatusCodes GetTemperatureWrapper(ref long varTemperatureValue, ref Gen5TemperatureStatus varTemperatureStatus)
+        {
+            BTIStatusCodes evStatusCode = BTIStatusCodes.BTI_OK;
+
+            // Wrap for COM interoperability.
+            object varWrappedTempValue = new VariantWrapper(varTemperatureValue);
+            object varWrappedTempStatus = new VariantWrapper(varTemperatureStatus);
+
+            //Exit if we do not have a valid dispatch
+            if (Gen5App == null) return BTIStatusCodes.BTI_UNABLE_TO_PROCESS_REQUEST;
+
+            try
+            {
+                Gen5App.GetCurrentTemperature(ref varWrappedTempValue, ref varWrappedTempStatus);
+
+                varTemperatureValue = Convert.ToInt64(varWrappedTempValue);
+                varTemperatureStatus = (Gen5TemperatureStatus)Convert.ToInt16(varWrappedTempStatus);
+
+            }
+            catch (COMException exception)
+            {
+                MessageBox.Show($"COMException: {exception}.");
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show($"Exception: {exception}.");
+            }
+
+            return evStatusCode;
         }
 
         public string GetExperimentFilePath(string folder, string id)

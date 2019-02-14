@@ -391,6 +391,11 @@ namespace LMSF_Gen5
             selectProtocolButton.IsEnabled = true;
         }
 
+        private void TemperatureButton_Click(object sender, RoutedEventArgs e)
+        {
+            TextOut += gen5Reader.GetCurrentTemperature();
+        }
+
         //===============================================================
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //Button Click event handlers to be deleted after initial testing
@@ -404,11 +409,6 @@ namespace LMSF_Gen5
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             TextOut += gen5Reader.PlateFileExport();
-        }
-
-        private void TemperatureButton_Click(object sender, RoutedEventArgs e)
-        {
-            TextOut += gen5Reader.GetCurrentTemperature();
         }
 
         private void StatusButton_Click(object sender, RoutedEventArgs e)
