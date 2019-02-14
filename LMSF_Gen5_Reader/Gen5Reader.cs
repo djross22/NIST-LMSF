@@ -25,11 +25,11 @@ namespace LMSF_Gen5_Reader
         public string ExperimentPath { get; set; }
         public string ExportFilePath { get; set; }
         public string ExperimentFolderPath { get; set; }
-        //public Gen5Window gen5Window { get; set; }
+        public IReaderTextOut gen5Window { get; set; }
 
-        public Gen5Reader()
+        public Gen5Reader(IReaderTextOut win)
         {
-
+            gen5Window = win;
         }
 
         //===========================================================================================
@@ -731,7 +731,7 @@ namespace LMSF_Gen5_Reader
 
             readerMonitorWorker.RunWorkerAsync();
 
-            retStr += "    ... waiting...\n";
+            retStr += "    ... Read in Progress...\n";
 
             return retStr;
         }
@@ -762,6 +762,8 @@ namespace LMSF_Gen5_Reader
             plates = null;
             plate = null;
             experiment = null;
+
+            gen5Window.TextOut += "            ... Done.\n";
         }
 
         //===========================================================================================

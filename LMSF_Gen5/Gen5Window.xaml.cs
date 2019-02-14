@@ -22,7 +22,7 @@ namespace LMSF_Gen5
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class Gen5Window : Window, INotifyPropertyChanged
+    public partial class Gen5Window : Window, INotifyPropertyChanged, IReaderTextOut
     {
         //Property change notification event required for INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -39,7 +39,7 @@ namespace LMSF_Gen5
             InitializeComponent();
             DataContext = this;
 
-            gen5Reader = new Gen5Reader();
+            gen5Reader = new Gen5Reader(this);
 
             TextOut = gen5Reader.StartGen5();
             TextOut += gen5Reader.SetClientWindow(this);
