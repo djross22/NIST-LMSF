@@ -139,6 +139,10 @@ namespace LMSF_Gen5_Reader
             {
                 retStr += $"NewExperiment Failed, {exception}.\n";
             }
+            catch (Exception exception)
+            {
+                retStr += $"NewExperiment Failed, {exception}.\n";
+            }
 
             retStr += "\n";
 
