@@ -78,6 +78,7 @@ namespace LMSF_Gen5
             {
                 this.textOut = value;
                 OnPropertyChanged("TextOut");
+                tempOutTextBox.ScrollToEnd();
             }
         }
 
