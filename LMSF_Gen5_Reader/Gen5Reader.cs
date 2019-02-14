@@ -19,6 +19,7 @@ namespace LMSF_Gen5_Reader
         private Gen5.Plates plates;
         private Gen5.Plate plate;
         private Gen5.PlateReadMonitor plateReadMonitor;
+        private BackgroundWorker readerMonitorWorker;
 
         public string ExperimentID { get; set; }
         public string ProtocolPath { get; set; }
@@ -40,6 +41,13 @@ namespace LMSF_Gen5_Reader
         public string StartGen5()
         {
             string retStr = "Running StartGen5\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before starting Gen5.\n";
+                return retStr;
+            }
+
             try
             {
                 Gen5App = new Gen5.Application();
@@ -62,6 +70,12 @@ namespace LMSF_Gen5_Reader
         public string TerminateGen5()
         {
             string retStr = "Running TerminateGen5\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before terminating Gen5.\n";
+                return retStr;
+            }
 
             plateReadMonitor = null;
             plates = null;
@@ -92,11 +106,17 @@ namespace LMSF_Gen5_Reader
         {
             string retStr = "Running NewExperiment\n";
 
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before creating new experiment.\n";
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
 
                 retStr += "Gen5App is null\n";
-                return retStr; 
+                return retStr;
             }
 
             try
@@ -104,7 +124,6 @@ namespace LMSF_Gen5_Reader
                 experiment = (Gen5.Experiment)Gen5App.NewExperiment(ProtocolPath);
                 plates = (Gen5.Plates)experiment.Plates;
                 retStr += "NewExperiment successful\n";
-                IsReading = false;
             }
             catch (System.Runtime.InteropServices.COMException exception)
             {
@@ -124,6 +143,12 @@ namespace LMSF_Gen5_Reader
             string retStr = "Running NewExperiment\n";
             ProtocolPath = protocolPath;
 
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before creating new experiment.\n";
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
 
@@ -136,7 +161,6 @@ namespace LMSF_Gen5_Reader
                 experiment = (Gen5.Experiment)Gen5App.NewExperiment(ProtocolPath);
                 plates = (Gen5.Plates)experiment.Plates;
                 retStr += "NewExperiment successful, with plates\n";
-                IsReading = false;
             }
             catch (System.Runtime.InteropServices.COMException exception)
             {
@@ -158,6 +182,13 @@ namespace LMSF_Gen5_Reader
         public string ConfigureUSBReader()
         {
             string retStr = "Running ConfigureUSBReader\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before configuring reader.\n";
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
                 retStr += "gen5App is null\n";
@@ -185,6 +216,13 @@ namespace LMSF_Gen5_Reader
         public string SetClientWindow(Window win)
         {
             string retStr = "Running SetClientWindow\n";
+
+            if (IsReading)
+            {
+                //do nothing
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
                 retStr += "gen5App is null\n";
@@ -216,6 +254,13 @@ namespace LMSF_Gen5_Reader
         public string BrowseForFolder()
         {
             string retStr = "";
+
+            if (IsReading)
+            {
+                //do nothing
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
                 return retStr;
@@ -239,6 +284,13 @@ namespace LMSF_Gen5_Reader
         public string CarrierIn()
         {
             string retStr = "Running CarrierIn\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before moving carrier in or out.\n";
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
                 retStr += "gen5App is null\n";
@@ -266,6 +318,13 @@ namespace LMSF_Gen5_Reader
         public string CarrierOut()
         {
             string retStr = "Running CarrierOut\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before moving carrier in or out.\n";
+                return retStr;
+            }
+            
             if (Gen5App == null)
             {
                 retStr += "gen5App is null\n";
@@ -293,6 +352,13 @@ namespace LMSF_Gen5_Reader
         public string TestReaderCommunication()
         {
             string retStr = "Running TestReaderCommunication\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before testing communication.\n";
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
                 retStr += "gen5App is null\n";
@@ -445,6 +511,13 @@ namespace LMSF_Gen5_Reader
         public string RunReaderControlCommand()
         {
             string retStr = "Running RunReaderControlCommand\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before running the reader control command.\n";
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
                 retStr += "gen5App is null\n";
@@ -472,6 +545,13 @@ namespace LMSF_Gen5_Reader
         public string GetCurrentTemperature()
         {
             string retStr = "Running GetCurrentTemperature\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before getting the temperature.\n";
+                return retStr;
+            }
+
             if (Gen5App == null)
             {
                 retStr += "gen5App is null\n";
@@ -505,6 +585,13 @@ namespace LMSF_Gen5_Reader
         public string ExpSaveAs()
         {
             string retStr = "Running ExpSaveAs\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before saving.\n";
+                return retStr;
+            }
+
             if (experiment == null)
             {
                 retStr += "experiment is null\n";
@@ -534,6 +621,13 @@ namespace LMSF_Gen5_Reader
         public string ExpSave()
         {
             string retStr = "Running ExpSave\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before saving.\n";
+                return retStr;
+            }
+
             if (experiment == null)
             {
                 retStr += "experiment is null\n";
@@ -560,7 +654,14 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         public string ExpClose()
         {
-            string retStr = "Running ExpSave\n";
+            string retStr = "Running ExpClose\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before closing experiment.\n";
+                return retStr;
+            }
+
             if (experiment == null)
             {
                 retStr += "experiment is null\n";
@@ -589,6 +690,13 @@ namespace LMSF_Gen5_Reader
         public string PlatesGetPlate()
         {
             string retStr = "Running PlatesGetPlate\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before running this method.\n";
+                return retStr;
+            }
+
             if (plates == null)
             {
                 retStr += "plates is null\n";
@@ -618,6 +726,13 @@ namespace LMSF_Gen5_Reader
         public string PlateStartRead()
         {
             string retStr = "Running PlateStartRead\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before starting a new read.\n";
+                return retStr;
+            }
+
             if (plate == null)
             {
                 retStr += "plate is null\n";
@@ -656,6 +771,7 @@ namespace LMSF_Gen5_Reader
             {
                 plate.AbortRead();
                 retStr += "AbortRead Successful\n";
+                //IsReading = false; Don't want to do this here becasue the reader may not aboort immediately; want to wait until status check indicates that read has been aborted
             }
             catch (COMException exception)
             {
@@ -684,6 +800,14 @@ namespace LMSF_Gen5_Reader
             {
                 status = plate.ReadStatus;
                 retStr += $"{status.ToString()}\n";
+                if (status == Gen5ReadStatus.eReadInProgress)
+                {
+                    IsReading = true;
+                }
+                else
+                {
+                    IsReading = false;
+                }
             }
             catch (COMException exception)
             {
@@ -701,6 +825,13 @@ namespace LMSF_Gen5_Reader
         public string PlateFileExport()
         {
             string retStr = "Running PlateFileExport\n";
+
+            if (IsReading)
+            {
+                retStr += "Read in progress, abort read or wait until end of read before exporting plate data.\n";
+                return retStr;
+            }
+
             if (plate == null)
             {
                 retStr += "plate is null\n";
@@ -732,7 +863,16 @@ namespace LMSF_Gen5_Reader
         {
             string retStr = "Running WaitForFinishThenExportAndClose\n";
 
-            BackgroundWorker readerMonitorWorker = new BackgroundWorker();
+            if (!(readerMonitorWorker is null))
+            {
+                if (readerMonitorWorker.IsBusy)
+                {
+                    retStr += "Read in progress, abort read or wait until end of read before starting a new read.\n";
+                    return retStr;
+                }
+            }
+
+            readerMonitorWorker = new BackgroundWorker();
             readerMonitorWorker.WorkerReportsProgress = false;
             readerMonitorWorker.DoWork += ReaderMonitor_DoWork;
             readerMonitorWorker.RunWorkerCompleted += ReaderMonitor_RunWorkerCompleted;
@@ -752,7 +892,7 @@ namespace LMSF_Gen5_Reader
             while (status == Gen5ReadStatus.eReadInProgress)
             {
                 Thread.Sleep(100);
-                PlateReadStatus(ref status);
+                PlateReadStatus(ref status); //Note: the PlateReadStatus sets the IsReading Property according to state of reader.
                 //TODO: handle live data stream
             }
 
@@ -771,7 +911,7 @@ namespace LMSF_Gen5_Reader
             plate = null;
             experiment = null;
 
-            IsReading = false;
+            IsReading = false; //just in case
 
             gen5Window.TextOut += "            ... Done.\n";
         }
