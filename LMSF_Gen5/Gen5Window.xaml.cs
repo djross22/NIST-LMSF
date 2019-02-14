@@ -43,11 +43,18 @@ namespace LMSF_Gen5
             InitializeComponent();
             DataContext = this;
 
-            gen5Reader = new Gen5Reader(this);
+            try
+            {
+                gen5Reader = new Gen5Reader(this);
 
-            TextOut = gen5Reader.StartGen5();
-            TextOut += gen5Reader.SetClientWindow(this);
-            TextOut += gen5Reader.ConfigureUSBReader();
+                TextOut = gen5Reader.StartGen5();
+                TextOut += gen5Reader.SetClientWindow(this);
+                TextOut += gen5Reader.ConfigureUSBReader();
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at initilization of Gen5, {exc}./n";
+            }
         }
 
         #region Properties Getters and Setters
@@ -143,28 +150,52 @@ namespace LMSF_Gen5
 
         private void SelectExpFolderButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.SetClientWindow(this);
-            ExpFolderPath = gen5Reader.BrowseForFolder();
+            try
+            {
+                TextOut += gen5Reader.SetClientWindow(this);
+                ExpFolderPath = gen5Reader.BrowseForFolder();
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at SelectExpFolderButton_Click, {exc}./n";
+            }
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (gen5Reader.IsGen5Active())
+            try
             {
-                TextOut += gen5Reader.TerminateGen5();
+                if (gen5Reader.IsGen5Active())
+                {
+                    TextOut += gen5Reader.TerminateGen5();
+                }
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at termination of Gen5, {exc}./n";
             }
         }
 
         private void NewExpButton_Click(object sender, RoutedEventArgs e)
         {
-            string filePath = gen5Reader.GetExperimentFilePath(ExpFolderPath, ExperimentId);
-            if (File.Exists(filePath)) {
-                MessageBoxResult res = MessageBox.Show("That Gen5 epxeriment file already exists. Ok to overwrite?", "Overwrite File", MessageBoxButton.YesNo);
-                if (res ==  MessageBoxResult.No)
+            try
+            {
+                string filePath = gen5Reader.GetExperimentFilePath(ExpFolderPath, ExperimentId);
+                if (File.Exists(filePath))
                 {
-                    return;
+                    MessageBoxResult res = MessageBox.Show("That Gen5 epxeriment file already exists. Ok to overwrite?", "Overwrite File", MessageBoxButton.YesNo);
+                    if (res == MessageBoxResult.No)
+                    {
+                        return;
+                    }
                 }
             }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at NewExpButton_Click, {exc}./n";
+                return;
+            }
+
             NewExp();
         }
 
@@ -176,13 +207,20 @@ namespace LMSF_Gen5
             selectExpFolderButton.IsEnabled = false;
             selectProtocolButton.IsEnabled = false;
 
-            TextOut += gen5Reader.NewExperiment(ProtocolPath);
+            try
+            {
+                TextOut += gen5Reader.NewExperiment(ProtocolPath);
 
-            gen5Reader.ExperimentID = ExperimentId;
-            gen5Reader.ExperimentFolderPath = ExpFolderPath;
-            TextOut += gen5Reader.ExpSaveAs();
+                gen5Reader.ExperimentID = ExperimentId;
+                gen5Reader.ExperimentFolderPath = ExpFolderPath;
+                TextOut += gen5Reader.ExpSaveAs();
 
-            TextOut += gen5Reader.PlatesGetPlate();
+                TextOut += gen5Reader.PlatesGetPlate();
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at NewExp, {exc}./n";
+            }
         }
 
         private void RunExpButton_Click(object sender, RoutedEventArgs e)
@@ -192,8 +230,17 @@ namespace LMSF_Gen5
 
         private void RunExp()
         {
-            string startText = gen5Reader.PlateStartRead();
-            TextOut += gen5Reader.PlateStartRead();
+            string startText = "";
+            try
+            {
+                startText = gen5Reader.PlateStartRead();
+                TextOut += gen5Reader.PlateStartRead();
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at RunExp, {exc}./n";
+            }
+
             if (startText.Contains("StartRead Successful"))
             {
                 TextOut += WaitForFinishThenExportAndClose();
@@ -228,12 +275,27 @@ namespace LMSF_Gen5
         void ReaderMonitor_DoWork(object sender, DoWorkEventArgs e)
         {
             Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
-            bool liveData = gen5Reader.Gen5App.DataExportEnabled;
+            try
+            {
+                bool liveData = gen5Reader.Gen5App.DataExportEnabled;
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at ReaderMonitor_DoWork, {exc}./n";
+            }
 
             while (status == Gen5ReadStatus.eReadInProgress)
             {
                 Thread.Sleep(100);
-                gen5Reader.PlateReadStatus(ref status); //Note: the PlateReadStatus sets the IsReading Property according to state of reader.
+
+                try
+                {
+                    gen5Reader.PlateReadStatus(ref status); //Note: the PlateReadStatus sets the IsReading Property according to state of reader.
+                }
+                catch (Exception exc)
+                {
+                    TextOut += $"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n";
+                }
 
                 //TODO: Handle live data stream
 
@@ -255,9 +317,16 @@ namespace LMSF_Gen5
         {
             Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
             //TODO: Handle outcomes other than "eReadCompleted" or "eReadAborted"
-            gen5Reader.PlateFileExport();
-            gen5Reader.ExpSave();
-            gen5Reader.ExpClose();
+            try
+            {
+                gen5Reader.PlateFileExport();
+                gen5Reader.ExpSave();
+                gen5Reader.ExpClose();
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at ReaderMonitor_RunWorkerCompleted, {exc}./n";
+            }
 
             this.Dispatcher.Invoke(() => {
                 //Set relevant controls enabled
@@ -277,7 +346,14 @@ namespace LMSF_Gen5
 
         private void CarrierIn()
         {
-            TextOut += gen5Reader.CarrierIn();
+            try
+            {
+                TextOut += gen5Reader.CarrierIn();
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at CarrierIn, {exc}./n";
+            }
         }
 
         private void CarrierOutButton_Click(object sender, RoutedEventArgs e)
@@ -287,12 +363,26 @@ namespace LMSF_Gen5
 
         private void CarrierOut()
         {
-            TextOut += gen5Reader.CarrierOut();
+            try
+            {
+                TextOut += gen5Reader.CarrierOut();
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at CarrierOut, {exc}./n";
+            }
         }
 
         private void CloseExpButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.ExpClose();
+            try
+            {
+                TextOut += gen5Reader.ExpClose();
+            }
+            catch (Exception exc)
+            {
+                TextOut += $"Error at CloseExpButton_Click, {exc}./n";
+            }
 
             //Set relevant controls enabled
             newExpButton.IsEnabled = true;
