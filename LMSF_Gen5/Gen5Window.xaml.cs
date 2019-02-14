@@ -118,6 +118,7 @@ namespace LMSF_Gen5
 
         private void SelectExpFolderButton_Click(object sender, RoutedEventArgs e)
         {
+            TextOut += gen5Reader.SetClientWindow(this);
             ExpFolderPath = gen5Reader.BrowseForFolder();
         }
 
