@@ -316,8 +316,55 @@ LMSF Scheduler: Add User yes/no choice, saves result to dictonary;
 Switch Hamilton parameters to Dictionary
 
 
+Add new projects for creating Gen5 reader: LMSF_Gen5_Reader.dll and LMSF_Gen5.exe (WFP Window)
+
+LMSF_Gen5_Reader: Change PlateStartRead() to read plate in reverse orientation.
+
+LMSF_Gen5_Reader: Add generic exception handling in NewExperiment().
+
+LMSF_Gen5_Reader: Fix issue with folder browser window opening behind everything, by adding SetClientWindow(this) call.
+
+LMSF_Gen5: Set Focusable Property to false for all buttons (to avoid accidental button pushing via keyboard)
+
+LMSF_Gen5_Reader: Add IsReading Property
+
+LMSF_Gen5_Reader: Add checks to make sure IsReading=false before any call to Gen5 methods that should not be called while a read in in progress.
+
+Test over-writing previous experiment file
+
+Move WaitForFinishThenExport() to Gen5Window - so it can more easily manipulate GUI; Add "Read In Progress"/"Reader Idle" status indicator to GUI
+
+On pressing NewExp Button: disable experimentId text box, file/folder buttons, and NewExp button; 
+    add "Close Experiment" button; re-enable controls at end of read;
+    rename CarrierIn and CarrierOut buttons (previously were openButton and closeButton)
+	
+LMSF_Gen5_Reader.CarrierIn(): Retry 3 times on carrier bump error
+
+LMSF_Gen5: Move NewExp, RunExp, CarrierIn, and CarrierOut to stand-alone methods (instead of button click event handlers) so they can be called by remote control TcpListener thread (TBD).
+
+LMSF_Gen5: On NewExp ButtonClick, check if experiment file exists and ask ok to overwrite-
+
+LMSF_Gen5: Check that Read Starts Sucessfully before calling WaitForFinishThenExportAndClose();
+
+LMSF_Gen5: Set output textbox to autoscroll to end of messages
+
+LMSF_Gen5: Add generic error handling try-catch wrapper to all calls to LMSF_Gen5_Reader.dll
+
 
 TODOs-
+
+Add real-time plotting
+
+Test RunReaderControlCommand()
+
+TCP client/listener
+	send connection requests from Main LMSF
+
+
+
+Add validation check to experimentID textbox
+
+
 
 
 LMSF Scheduler: Add copy file - to allow user to copy files into experiment data directory
