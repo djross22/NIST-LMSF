@@ -61,7 +61,7 @@ namespace LMSF_Gen5
         public bool IsReadRunning
         {
             get { return this.isReadRunning; }
-            set
+            private set
             {
                 this.isReadRunning = value;
                 OnPropertyChanged("IsReadRunning");
