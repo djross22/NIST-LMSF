@@ -40,10 +40,15 @@ namespace LMSF_Gen5
 
         private Gen5Reader gen5Reader;
 
+        //variables for TCP communication
+        private string computerName;
+
         public Gen5Window()
         {
             InitializeComponent();
             DataContext = this;
+
+            ComputerName = Environment.MachineName;
 
             try
             {
@@ -60,6 +65,16 @@ namespace LMSF_Gen5
         }
 
         #region Properties Getters and Setters
+        public string ComputerName
+        {
+            get { return this.computerName; }
+            set
+            {
+                this.computerName = value;
+                OnPropertyChanged("ComputerName");
+            }
+        }
+
         public bool IsRemoteControlled
         {
             get { return this.isRemoteControlled; }
