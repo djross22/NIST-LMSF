@@ -34,6 +34,7 @@ namespace LMSF_Gen5
         private string protocolPath;
         private string textOut;
         private bool isReadRunning;
+        private bool isExperimentQueuedOrRunning;
         private bool isRemoteControlled;
         private BackgroundWorker readerMonitorWorker;
 
@@ -78,6 +79,16 @@ namespace LMSF_Gen5
                     remoteTextBlock.Text = "Local";
                     remoteTextBlock.Foreground = Brushes.White;
                 }
+            }
+        }
+
+        public bool IsExperimentQueuedOrRunning
+        {
+            get { return this.isExperimentQueuedOrRunning; }
+            private set
+            {
+                this.isExperimentQueuedOrRunning = value;
+                OnPropertyChanged("IsExperimentQueuedOrRunning");
             }
         }
 
@@ -148,6 +159,22 @@ namespace LMSF_Gen5
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+            UpdateControlEnabledStatus();
+        }
+
+        private void UpdateControlEnabledStatus()
+        {
+            //This sets the IsEnabled property for the entire window
+            IsEnabled = !IsRemoteControlled;
+
+            //When in local control mode, set the enabled properties according to whether or not an experiment has beed queued or is running
+            if (!IsRemoteControlled)
+            {
+                newExpButton.IsEnabled = !IsExperimentQueuedOrRunning;
+                experimentIdTextBox.IsEnabled = !IsExperimentQueuedOrRunning;
+                selectExpFolderButton.IsEnabled = !IsExperimentQueuedOrRunning;
+                selectProtocolButton.IsEnabled = !IsExperimentQueuedOrRunning;
             }
         }
 
@@ -224,11 +251,8 @@ namespace LMSF_Gen5
 
         private void NewExp()
         {
-            //Set button and other controls disabled
-            newExpButton.IsEnabled = false;
-            experimentIdTextBox.IsEnabled = false;
-            selectExpFolderButton.IsEnabled = false;
-            selectProtocolButton.IsEnabled = false;
+            //Property change calls UpdateControlEnabledStatus(), which sets button and other controls disabled
+            IsExperimentQueuedOrRunning = true;
 
             try
             {
@@ -352,11 +376,8 @@ namespace LMSF_Gen5
             }
 
             this.Dispatcher.Invoke(() => {
-                //Set relevant controls enabled
-                newExpButton.IsEnabled = true;
-                experimentIdTextBox.IsEnabled = true;
-                selectExpFolderButton.IsEnabled = true;
-                selectProtocolButton.IsEnabled = true;
+                //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
+                IsExperimentQueuedOrRunning = false;
             });
 
             TextOut += "            ... Done.\n\n";
@@ -407,11 +428,8 @@ namespace LMSF_Gen5
                 TextOut += $"Error at CloseExpButton_Click, {exc}./n";
             }
 
-            //Set relevant controls enabled
-            newExpButton.IsEnabled = true;
-            experimentIdTextBox.IsEnabled = true;
-            selectExpFolderButton.IsEnabled = true;
-            selectProtocolButton.IsEnabled = true;
+            //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
+            IsExperimentQueuedOrRunning = false;
         }
 
         private void TemperatureButton_Click(object sender, RoutedEventArgs e)
