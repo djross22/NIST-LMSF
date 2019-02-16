@@ -38,9 +38,6 @@
     <ApplicationIcon>LMSF icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SimpleTCP, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SimpleTCP.1.0.24\lib\net45\SimpleTCP.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -109,6 +106,10 @@
     <ProjectReference Include="..\LMSF_Utilities\LMSF_Utilities.csproj">
       <Project>{2c18fa64-2458-4788-901a-7d7fb8c7e513}</Project>
       <Name>LMSF_Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleTCP\SimpleTCP.csproj">
+      <Project>{c9c99f87-e188-49d2-a323-09fe79f39f8d}</Project>
+      <Name>SimpleTCP</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
