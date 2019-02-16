@@ -34,6 +34,7 @@ namespace LMSF_Gen5
         private string protocolPath;
         private string textOut;
         private bool isReadRunning;
+        private bool isRemoteControlled;
         private BackgroundWorker readerMonitorWorker;
 
         private Gen5Reader gen5Reader;
@@ -58,6 +59,28 @@ namespace LMSF_Gen5
         }
 
         #region Properties Getters and Setters
+        public bool IsRemoteControlled
+        {
+            get { return this.isRemoteControlled; }
+            private set
+            {
+                this.isRemoteControlled = value;
+                OnPropertyChanged("IsRemoteControlled");
+                if (isRemoteControlled)
+                {
+                    remoteBorder.Background = Brushes.LimeGreen;
+                    remoteTextBlock.Text = "Remote";
+                    remoteTextBlock.Foreground = Brushes.Black;
+                }
+                else
+                {
+                    remoteBorder.Background = Brushes.Transparent;
+                    remoteTextBlock.Text = "Local";
+                    remoteTextBlock.Foreground = Brushes.White;
+                }
+            }
+        }
+
         public bool IsReadRunning
         {
             get { return this.isReadRunning; }
