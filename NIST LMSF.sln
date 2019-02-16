@@ -8,16 +8,22 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMSF Scheduler", "LMSF Scheduler\LMSF Scheduler.csproj", "{94345287-0318-460D-9AE8-46FE39EEDA7B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2C18FA64-2458-4788-901A-7D7FB8C7E513} = {2C18FA64-2458-4788-901A-7D7FB8C7E513}
+		{1D424A7D-4E0C-42C6-B650-6C76DB627123} = {1D424A7D-4E0C-42C6-B650-6C76DB627123}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMSF_Utilities", "LMSF_Utilities\LMSF_Utilities.csproj", "{2C18FA64-2458-4788-901A-7D7FB8C7E513}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMSF_Gen5", "LMSF_Gen5\LMSF_Gen5.csproj", "{02E5C062-BCF4-49D5-87B8-7335413931E8}"
 	ProjectSection(ProjectDependencies) = postProject
+		{1D424A7D-4E0C-42C6-B650-6C76DB627123} = {1D424A7D-4E0C-42C6-B650-6C76DB627123}
 		{897C77EC-6533-4618-907F-78D9BADF2368} = {897C77EC-6533-4618-907F-78D9BADF2368}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMSF_Gen5_Reader", "LMSF_Gen5_Reader\LMSF_Gen5_Reader.csproj", "{897C77EC-6533-4618-907F-78D9BADF2368}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpCommunicationLib", "TCP Libraries\TcpCommunicationLib\TcpCommunicationLib.csproj", "{1D424A7D-4E0C-42C6-B650-6C76DB627123}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerThreadLib", "TCP Libraries\WorkerThreadLib\WorkerThreadLib.csproj", "{2FF8611B-12A6-47CD-98A8-292D4D4331A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +51,14 @@ Global
 		{897C77EC-6533-4618-907F-78D9BADF2368}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{897C77EC-6533-4618-907F-78D9BADF2368}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{897C77EC-6533-4618-907F-78D9BADF2368}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D424A7D-4E0C-42C6-B650-6C76DB627123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D424A7D-4E0C-42C6-B650-6C76DB627123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D424A7D-4E0C-42C6-B650-6C76DB627123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D424A7D-4E0C-42C6-B650-6C76DB627123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FF8611B-12A6-47CD-98A8-292D4D4331A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FF8611B-12A6-47CD-98A8-292D4D4331A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FF8611B-12A6-47CD-98A8-292D4D4331A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FF8611B-12A6-47CD-98A8-292D4D4331A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
