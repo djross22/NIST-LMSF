@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using LMSF_Utilities;
 using LMSF_Gen5_Reader;
 using Gen5;
+using SimpleTCP;
 
 namespace LMSF_Gen5
 {
@@ -45,6 +46,8 @@ namespace LMSF_Gen5
 
         //variables for TCP communication
         private string computerName;
+        private SimpleTcpServer server;
+        private int tcpPort;
 
         public Gen5Window()
         {
@@ -55,6 +58,7 @@ namespace LMSF_Gen5
             startingButtonBackground = remoteButton.Background;
 
             ComputerName = Environment.MachineName;
+            SetPort();
 
             try
             {
@@ -514,6 +518,60 @@ namespace LMSF_Gen5
             TextOut += gen5Reader.GetCurrentTemperature();
         }
 
+        private void SetPort()
+        {
+            tcpPort = 42999;
+
+            switch (ComputerName)
+            {
+                case ("Main"):
+                    tcpPort = 42222;
+                    break;
+            }
+        }
+
+        private void StartTcpServer()
+        {
+            //Turn on TCP server
+            server = new SimpleTcpServer().Start(tcpPort);
+            server.Delimiter = 0x13;
+            server.ClientConnected += Server_ClientConnected;
+            server.ClientDisconnected += Server_ClientDisconnected;
+            server.DelimiterDataReceived += MessageReceived;
+        }
+
+        private void MessageReceived(object sender, Message e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Server_ClientDisconnected(object sender, System.Net.Sockets.TcpClient e)
+        {
+            IsConnected = false;
+        }
+
+        private void Server_ClientConnected(object sender, System.Net.Sockets.TcpClient e)
+        {
+            IsConnected = true;
+        }
+
+        private void RemoteButton_Click(object sender, RoutedEventArgs e)
+        {
+            IsRemoteControlled = !IsRemoteControlled;
+
+            if (IsRemoteControlled)
+            {
+                
+            }
+            else
+            {
+                if (server != null)
+                {
+                    server.Stop();
+                }
+            }
+        }
+
         //===============================================================
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //Button Click event handlers to be deleted after initial testing
@@ -538,11 +596,6 @@ namespace LMSF_Gen5
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             TextOut += gen5Reader.ExpSave();
-        }
-
-        private void RemoteButton_Click(object sender, RoutedEventArgs e)
-        {
-            IsRemoteControlled = !IsRemoteControlled;
         }
     }
 }
