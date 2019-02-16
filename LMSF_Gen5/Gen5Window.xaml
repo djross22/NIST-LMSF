@@ -36,13 +36,14 @@
             <TextBox x:Name="expFolderTextBox" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Margin="80,230,80,0" IsReadOnly="True" Background="#FFCBCBCB" Text="{Binding ExpFolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button x:Name="selectExpFolderButton" Content="..." HorizontalAlignment="Right" Margin="0,230,35,0" VerticalAlignment="Top" Width="25" Height="25" Click="SelectExpFolderButton_Click" Focusable="False"/>
 
-            <StackPanel HorizontalAlignment="Center" Height="25" Margin="0,10,0,0" VerticalAlignment="Top" Width="300" Orientation="Horizontal">
+            <StackPanel HorizontalAlignment="Center" Height="25" Margin="50,10,0,0" VerticalAlignment="Top" Width="400" Orientation="Horizontal">
                 <Border x:Name="computerNameBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="0" VerticalAlignment="Center" Width="110">
                     <TextBlock x:Name="computerNameTextBlock" TextWrapping="Wrap" Text="{Binding ComputerName, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
                 </Border>
                 <Border x:Name="remoteBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="20,0,0,0" VerticalAlignment="Center" Width="110">
-                    <TextBlock x:Name="remoteTextBlock" TextWrapping="Wrap" Text="Local" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                    <TextBlock x:Name="remoteTextBlock" TextWrapping="Wrap" Text="Not Connected" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
                 </Border>
+                <Button x:Name="remoteButton" Content="Local" Width="75" Margin="20,0,0,0" Click="RemoteButton_Click"/>
             </StackPanel>
 
         </Grid>
@@ -61,7 +62,7 @@
             <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="0,10,50,0" VerticalAlignment="Top" Width="110" Background="Red">
                 <TextBlock x:Name="statusTextBlock" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Reader Idle" VerticalAlignment="Center" FontWeight="Bold"/>
             </Border>
-            <Grid Margin="0">
+            <Grid x:Name="topRightGrid" Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="113"/>
                     <RowDefinition/>

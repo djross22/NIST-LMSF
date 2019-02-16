@@ -36,9 +36,12 @@ namespace LMSF_Gen5
         private bool isReadRunning;
         private bool isExperimentQueuedOrRunning;
         private bool isRemoteControlled;
+        private bool isConnected;
         private BackgroundWorker readerMonitorWorker;
 
         private Gen5Reader gen5Reader;
+
+        private Brush startingButtonBackground;
 
         //variables for TCP communication
         private string computerName;
@@ -47,6 +50,9 @@ namespace LMSF_Gen5
         {
             InitializeComponent();
             DataContext = this;
+
+            //Get the starting/default button background brush so I can re-set it later
+            startingButtonBackground = remoteButton.Background;
 
             ComputerName = Environment.MachineName;
 
@@ -84,14 +90,34 @@ namespace LMSF_Gen5
                 OnPropertyChanged("IsRemoteControlled");
                 if (isRemoteControlled)
                 {
+                    remoteButton.Background = Brushes.LimeGreen;
+                    remoteButton.Content = "Remote";
+                }
+                else
+                {
+                    remoteButton.Background = startingButtonBackground;
+                    remoteButton.Content = "Local";
+                }
+            }
+        }
+
+        public bool IsConnected
+        {
+            get { return this.isConnected; }
+            private set
+            {
+                this.isConnected = value;
+                OnPropertyChanged("IsConnected");
+                if (isRemoteControlled)
+                {
                     remoteBorder.Background = Brushes.LimeGreen;
-                    remoteTextBlock.Text = "Remote";
+                    remoteTextBlock.Text = "Connected";
                     remoteTextBlock.Foreground = Brushes.Black;
                 }
                 else
                 {
                     remoteBorder.Background = Brushes.Transparent;
-                    remoteTextBlock.Text = "Local";
+                    remoteTextBlock.Text = "Not Connected";
                     remoteTextBlock.Foreground = Brushes.White;
                 }
             }
@@ -180,8 +206,11 @@ namespace LMSF_Gen5
 
         private void UpdateControlEnabledStatus()
         {
-            //This sets the IsEnabled property for the entire window
-            IsEnabled = !IsRemoteControlled;
+            //This sets the IsEnabled property for all the controls in the window
+            SetEnableAllControl(!IsRemoteControlled);
+            //These two controls should always be enabled:
+            remoteButton.IsEnabled = true;
+            tempOutTextBox.IsEnabled = true;
 
             //When in local control mode, set the enabled properties according to whether or not an experiment has beed queued or is running
             if (!IsRemoteControlled)
@@ -190,6 +219,39 @@ namespace LMSF_Gen5
                 experimentIdTextBox.IsEnabled = !IsExperimentQueuedOrRunning;
                 selectExpFolderButton.IsEnabled = !IsExperimentQueuedOrRunning;
                 selectProtocolButton.IsEnabled = !IsExperimentQueuedOrRunning;
+            }
+        }
+
+        private void SetEnableAllControl(bool isEnabled)
+        {
+            foreach (Button b in FindVisualChildren<Button>(this))
+            {
+                b.IsEnabled = isEnabled;
+            }
+
+            foreach (TextBox b in FindVisualChildren<TextBox>(this))
+            {
+                b.IsEnabled = isEnabled;
+            }
+        }
+
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
             }
         }
 
@@ -476,6 +538,11 @@ namespace LMSF_Gen5
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             TextOut += gen5Reader.ExpSave();
+        }
+
+        private void RemoteButton_Click(object sender, RoutedEventArgs e)
+        {
+            IsRemoteControlled = !IsRemoteControlled;
         }
     }
 }
