@@ -130,6 +130,14 @@
     <Resource Include="checkmark-128.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LMSF_Gen5\LMSF_Gen5.csproj">
+      <Project>{02e5c062-bcf4-49d5-87b8-7335413931e8}</Project>
+      <Name>LMSF_Gen5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LMSF_Gen5_Reader\LMSF_Gen5_Reader.csproj">
+      <Project>{897c77ec-6533-4618-907f-78d9badf2368}</Project>
+      <Name>LMSF_Gen5_Reader</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LMSF_Utilities\LMSF_Utilities.csproj">
       <Project>{2c18fa64-2458-4788-901a-7d7fb8c7e513}</Project>
       <Name>LMSF_Utilities</Name>

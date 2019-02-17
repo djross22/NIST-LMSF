@@ -314,7 +314,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
 
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
@@ -856,6 +856,9 @@ namespace LMSF_Scheduler
                     case "Hamilton":
                         ParseHamiltonStep();
                         break;
+                    case "Gen5":
+                        ParseGen5Step();
+                        break;
                     case "WaitFor":
                         ParseWaitForStep();
                         break;
@@ -1058,6 +1061,146 @@ namespace LMSF_Scheduler
                 }
             }
 
+            void ParseGen5Step()
+            {
+                //Gen5 takes 2 or 5 arguments
+                //First two arguments are reader name and reader command
+                string name;
+                string command;
+                List<string> commandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
+                //arguments 3, 4 and 5 are the protocol path, experiment Id, and save folder path
+                string protocolPath;
+                string expIdStr;
+                string saveFolderPath;
+
+                outString += "Running Gen5 Command: ";
+
+                //Booleans to track validity of arguments
+                bool argsOk = false;
+
+                //Requires at least two arguments (plus Gen5 command itself)
+                if (numArgs < 3)
+                {
+                    outString += "Not enough arguments; Gen5 command requires at least 2 arguments: reader name, and reader command. ";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    name = stepArgs[1];
+                    command = stepArgs[2];
+                    // Check if 1st argument is valid reader name 
+                    if (ReaderList.Contains(name))
+                    {
+                        //Check if reader is connected
+                        if (GetConnectedReadersList().Contains(name))
+                        {
+                            //Check if 2nd argument is valid reader command
+                            if (commandList.Contains(command))
+                            {
+                                argsOk = true;
+                            }
+                            else
+                            {
+                                outString += "Not a valid reader command: ";
+                                outString += $"{command}. Valid reader commands are: ";
+                                foreach (string s in commandList)
+                                {
+                                    outString += $"{s}, ";
+                                }
+                                valFailed.Add(num);
+                            }
+                        }
+                        else
+                        {
+                            outString += $"{name} not connected. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {name} computer.";
+                            valFailed.Add(num);
+                        }
+                    }
+                    else
+                    {
+                        outString += "Not a valid reader name: ";
+                        outString += $"{name}. Valid reader names are: ";
+                        foreach (string r in ReaderList)
+                        {
+                            outString += $"{r}, ";
+                        }
+                        valFailed.Add(num);
+                    }
+
+                    //If arguments are ok so far, check additional arguments of RunExp command
+                    if (argsOk && command == "RunExp")
+                    {
+                        //With RunExp command, there need to be at least arguments (plus Gen5 command itself)
+                        if (numArgs < 6)
+                        {
+                            outString += "Not enough arguments; Gen5/ <reader name>/ RunExp/ command requires three additional: protocol path, experiment Id, and save folder path. ";
+                            valFailed.Add(num);
+                        }
+                        else
+                        {
+                            protocolPath = stepArgs[3];
+                            expIdStr = stepArgs[4];
+                            saveFolderPath = stepArgs[5];
+                            
+                            //Check if protocol path is valid file with .prt extension
+                            if (!protocolPath.EndsWith(".prt"))
+                            {
+                                outString += $"Protocol path needs to end with .prt, you enetered: {protocolPath} ";
+                                valFailed.Add(num);
+                                argsOk = false;
+                            }
+                            if (!File.Exists(protocolPath))
+                            {
+                                outString += $"Protocol file/path does not exist: {protocolPath} ";
+                                valFailed.Add(num);
+                                argsOk = false;
+                            }
+                            //check validity of expId
+                            //expIdStr needs to be usable in filenames, so make sure it only has just letters, numbers, or "-" or "_")
+                            ValidationResult valRes = ValidateExpId(expIdStr);
+                            if (!valRes.IsValid)
+                            {
+                                argsOk = false;
+                                //Message for bad Experiment ID argument
+                                outString += "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
+                                valFailed.Add(num);
+                            }
+                            //check if save file directory exists
+                            if (!Directory.Exists(saveFolderPath))
+                            {
+                                outString += $"Save folder path does not exist: {saveFolderPath} ";
+                                valFailed.Add(num);
+                                argsOk = false;
+                            }
+                            else
+                            {
+                                //Make sure user has write permission
+                                if (!SharedParameters.IsDirectoryWritable(saveFolderPath))
+                                {
+                                    outString += $"Write permission denied for save folder path: {saveFolderPath} ";
+                                    valFailed.Add(num);
+                                    argsOk = false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //If arguments are all ok, then run the step
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        //Run the step
+                        RunGen5(num, stepArgs);
+                    }
+                    else
+                    {
+                        //For anything that gets saved by the Run method to the dictionary, put placeholder values into dictionary
+                    }
+                }
+            }
+
             void ParseTimerStep()
             {
                 outString += "Running Timer: ";
@@ -1118,12 +1261,13 @@ namespace LMSF_Scheduler
                 outString += "WaitFor: ";
                 if (numArgs < 2)
                 {
-                    outString += "Must specify the process to WaitFor (Overlord or Timer)";
+                    outString += "Must specify the process to WaitFor (Overlord, Hamilton, Reader, or Timer)";
                     valFailed.Add(num);
                 }
                 else
                 {
-                    switch (stepArgs[1])
+                    string processWaitingFor = stepArgs[1];
+                    switch (processWaitingFor)
                     {
                         case "Overlord":
                             outString += "Overlord, Done.";
@@ -1147,9 +1291,20 @@ namespace LMSF_Scheduler
                             }
                             break;
                         default:
-                            outString += "WaitFor process not recognized: ";
-                            outString += stepArgs[1];
-                            valFailed.Add(num);
+                            if (GetConnectedReadersList().Contains(processWaitingFor))
+                            {
+                                outString += $"{processWaitingFor}, Done.";
+                                if (!isValidating)
+                                {
+                                    WaitForGen5(processWaitingFor);
+                                }
+                            }
+                            else
+                            {
+                                outString += "WaitFor process not recognized: ";
+                                outString += stepArgs[1];
+                                valFailed.Add(num);
+                            }
                             break;
                     }
                 }
@@ -2865,6 +3020,112 @@ namespace LMSF_Scheduler
             metaDictionary[keyStr] = valueStr;
         }
 
+        private void RunGen5(int num, string[] args)
+        {
+            //First two arguments are reader name and reader command
+            string readerName = args[1];
+            string command = args[2];
+            //arguments 3, 4 and 5 are the protocol path, experiment Id, and save folder path
+            string protocolPath="";
+            string expIdStr="";
+            string saveFolderPath="";
+            string msg;
+            if (command != "RunExp")
+            {
+                msg = command;
+            }
+            else
+            {
+                protocolPath = args[3];
+                expIdStr = args[4];
+                saveFolderPath = args[5];
+                msg = $"{command}/{protocolPath}/{expIdStr}/{saveFolderPath}";
+            }
+
+            string replyStatus = SendTcpMessage(readerName, msg);
+
+            //Send info to metadata if collecting
+            if (command == "RunExp" && isCollectingXml)
+            {
+                //Add <Gen5Experiment> node to metadata
+                XmlNode gen5Node = xmlDoc.CreateElement("Gen5Experiment");
+                //add the Gen5Experiment node to the step node
+                protocolNode.AppendChild(gen5Node);
+
+                //Protocol file
+                XmlNode protocolFileNode = xmlDoc.CreateElement("protocolFile");
+                protocolFileNode.InnerText = protocolPath;
+                gen5Node.AppendChild(protocolFileNode);
+
+                //Data file
+                XmlNode dataFileNode = xmlDoc.CreateElement("dataFile");
+                dataFileNode.InnerText = LMSF_Gen5_Reader.Gen5Reader.GetExperimentFilePath(saveFolderPath, expIdStr, readerName);
+                gen5Node.AppendChild(dataFileNode);
+
+                //Export file
+                XmlNode exportFileNode = xmlDoc.CreateElement("exportFile");
+                exportFileNode.InnerText = LMSF_Gen5_Reader.Gen5Reader.GetExperimentFilePath(saveFolderPath, expIdStr, readerName, true);
+                gen5Node.AppendChild(exportFileNode);
+
+                //Date and time
+                AddDateTimeNodes(DateTime.Now, gen5Node, "experiment started");
+            }
+        }
+
+        private void WaitForGen5(string reader)
+        {
+            WaitingForStepCompletion = true;
+
+            OutputText += "... waiting for Gen5 to finish.";
+
+            BackgroundWorker gen5MonitorWorker = new BackgroundWorker();
+            gen5MonitorWorker.WorkerReportsProgress = false;
+            gen5MonitorWorker.DoWork += Gen5Monitor_DoWork;
+            gen5MonitorWorker.RunWorkerCompleted += Gen5Monitor_RunWorkerCompleted;
+
+            List<object> arguments = new List<object>();
+            arguments.Add(reader);
+            gen5MonitorWorker.RunWorkerAsync(arguments);
+
+            while (WaitingForStepCompletion)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+
+            //Send info to metadata if collecting
+            if (isCollectingXml)
+            {
+                DateTime dt = DateTime.Now;
+
+                XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::Gen5Experiment/dateTime");
+                XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
+                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                statusFiniAtt.Value = "experiment finished";
+                timeFiniNode.Attributes.Append(statusFiniAtt);
+                dateNode.AppendChild(timeFiniNode);
+            }
+
+        }
+
+        void Gen5Monitor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            List<object> argsList = e.Argument as List<object>;
+            string reader = (string)argsList[0];
+
+            while (GetReaderStatus(reader) == $"{LMSF_Gen5.Gen5Window.ReaderStatus.Busy}")
+            {
+                Thread.Sleep(100);
+            }
+
+        }
+
+        void Gen5Monitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            WaitingForStepCompletion = false;
+        }
+
         private void RunOverlord(int num, string[] args)
         {
             //args[0] is "Overlord"
@@ -3361,9 +3622,16 @@ namespace LMSF_Scheduler
             }
         }
 
-        //This method sends message and handles re-sending if message is not received
-        private void SendTcpMessage(string reader, string msg)
+        private string GetReaderStatus(string reader)
         {
+            return SendTcpMessage(reader, "StatusCheck");
+        }
+
+        //This method sends message and handles wrapping the message with identifier and hash, and re-sending if message is not received
+        private string SendTcpMessage(string reader, string msg)
+        {
+            string replyStatus = "";
+
             SimpleTcpClient client = readerClients[reader];
             while (!client.IsConnected())
             {
@@ -3374,9 +3642,8 @@ namespace LMSF_Scheduler
                 if (result == MessageBoxResult.Cancel)
                 {
                     AbortCalled = true;
-                    return;
+                    return replyStatus;
                 }
-
             }
 
             //MessageBox.Show($"client connected: {client.IsConnected()}");
@@ -3417,8 +3684,9 @@ namespace LMSF_Scheduler
                 {
                     string[] messageParts = Message.UnwrapTcpMessage(wrappedMessage);
                     string[] replyParts = Message.UnwrapTcpMessage(replyMsg.MessageString);
+                    replyStatus = replyParts[1];
                     bool msgRecieved = false;
-                    if (replyParts[1] != "fail")
+                    if (replyStatus != "fail")
                     {
                         msgRecieved = (messageParts[0] == replyParts[0]) && (messageParts[0] == replyParts[0]);
                     }
@@ -3437,6 +3705,8 @@ namespace LMSF_Scheduler
                 }
             }
             OutputText += $"... done.\n";
+
+            return replyStatus;
         }
     }
 
