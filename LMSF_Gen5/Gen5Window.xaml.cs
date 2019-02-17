@@ -41,6 +41,7 @@ namespace LMSF_Gen5
         private BackgroundWorker readerMonitorWorker;
 
         private Gen5Reader gen5Reader;
+        private string readerName;
 
         private Brush startingButtonBackground;
 
@@ -48,6 +49,9 @@ namespace LMSF_Gen5
         private string computerName;
         private SimpleTcpServer server;
         private int tcpPort;
+        private bool isHandlingMessage;
+        private readonly object messageHandlingLock = new object();
+        private Queue<Message> messageQueue = new Queue<Message>();
 
         public Gen5Window()
         {
@@ -58,7 +62,7 @@ namespace LMSF_Gen5
             startingButtonBackground = remoteButton.Background;
 
             ComputerName = Environment.MachineName;
-            SetPort();
+            SetReaderNameAndPort();
 
             try
             {
@@ -112,7 +116,7 @@ namespace LMSF_Gen5
             {
                 this.isConnected = value;
                 OnPropertyChanged("IsConnected");
-                if (isRemoteControlled)
+                if (isConnected)
                 {
                     remoteBorder.Background = Brushes.LimeGreen;
                     remoteTextBlock.Text = "Connected";
@@ -518,14 +522,15 @@ namespace LMSF_Gen5
             TextOut += gen5Reader.GetCurrentTemperature();
         }
 
-        private void SetPort()
+        private void SetReaderNameAndPort()
         {
-            tcpPort = 42999;
+            tcpPort = 42222;
+            readerName = "Neo";
 
             switch (ComputerName)
             {
                 case ("Main"):
-                    tcpPort = 42222;
+                    readerName = "Neo";
                     break;
             }
         }
@@ -538,21 +543,39 @@ namespace LMSF_Gen5
             server.ClientConnected += Server_ClientConnected;
             server.ClientDisconnected += Server_ClientDisconnected;
             server.DelimiterDataReceived += MessageReceived;
+
+            //Create and start message handling thread
         }
 
-        private void MessageReceived(object sender, Message e)
+        private void MessageReceived(object sender, Message msg)
         {
-            throw new NotImplementedException();
+            lock (messageHandlingLock)
+            {
+                messageQueue.Enqueue(msg);
+            }
+
+            this.Dispatcher.Invoke(() =>
+            {
+                TextOut += $"message received {messageQueue.Count}: {msg.MessageString}\n";
+            });
         }
 
-        private void Server_ClientDisconnected(object sender, System.Net.Sockets.TcpClient e)
+        private void Server_ClientDisconnected(object sender, System.Net.Sockets.TcpClient client)
         {
-            IsConnected = false;
+            this.Dispatcher.Invoke(() =>
+            {
+                IsConnected = false;
+                TextOut += $"Client Disconnected\n";
+            });
         }
 
-        private void Server_ClientConnected(object sender, System.Net.Sockets.TcpClient e)
+        private void Server_ClientConnected(object sender, System.Net.Sockets.TcpClient client)
         {
-            IsConnected = true;
+            this.Dispatcher.Invoke(() =>
+            {
+                IsConnected = true;
+                TextOut += $"Client Connected\n";
+            });
         }
 
         private void RemoteButton_Click(object sender, RoutedEventArgs e)
@@ -561,7 +584,7 @@ namespace LMSF_Gen5
 
             if (IsRemoteControlled)
             {
-                
+                StartTcpServer();
             }
             else
             {

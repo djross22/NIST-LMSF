@@ -21,6 +21,7 @@ using Microsoft.Win32;
 using LMSF_Utilities;
 using System.Xml;
 using System.Text.RegularExpressions;
+using SimpleTCP;
 
 namespace LMSF_Scheduler
 {
@@ -313,10 +314,10 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            string test = SharedParameters.GetNumber("enter a number:");
-
-            OutputText += test;
-            OutputText += "\n";
+            var client = new SimpleTcpClient();
+            client.Delimiter = 0x13;
+            client.Connect("localhost", 42999);
+            client.WriteLine("test sending line");
         }
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
