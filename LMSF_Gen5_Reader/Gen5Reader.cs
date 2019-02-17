@@ -907,7 +907,7 @@ namespace LMSF_Gen5_Reader
 
             try
             {
-                ExportFilePath = System.IO.Path.Combine(ExperimentFolderPath, ExperimentID);
+                ExportFilePath = System.IO.Path.Combine(ExperimentFolderPath, $"{ExperimentID}_{ReaderName}");
                 ExportFilePath += ".txt";
 
                 plate.FileExport(ExportFilePath);
