@@ -564,15 +564,34 @@ namespace LMSF_Gen5
 
         private void MessageReceived(object sender, Message msg)
         {
+            bool goodMsg = false;
+
             lock (messageHandlingLock)
             {
-                messageQueue.Enqueue(msg);
+                goodMsg = Message.CheckMessageHash(msg.MessageString);
+                if (goodMsg && !messageQueue.Contains(msg))
+                {
+                    messageQueue.Enqueue(msg);
+                }
             }
 
-            this.Dispatcher.Invoke(() =>
+            string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
+            if (goodMsg)
             {
-                TextOut += $"message received {messageQueue.Count}: {msg.MessageString}\n";
-            });
+                this.Dispatcher.Invoke(() =>
+                {
+                    TextOut += $"message received {messageQueue.Count}: {msg.MessageString}\n";
+                });
+                //send back status if good message
+                string replyStr = $"{msgParts[0]},{status},{msgParts[2]}";
+                msg.ReplyLine(replyStr);
+            }
+            else
+            {
+                //send back "fail" if bad message
+                string replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
+                msg.ReplyLine(replyStr);
+            }
         }
 
         private void Server_ClientDisconnected(object sender, System.Net.Sockets.TcpClient client)
