@@ -354,10 +354,73 @@ LMSF_Gen5: Add IsExperimentQueuedOrRunning property, and move controls enabled s
 
 LMSF_Gen5: Add IsConnected property and button to switch between remote and local control
 
+LMSF_Gen5: Add initial TCP Server code with event handlers
+
+Switch SimpleTCP to local source instead of NuGet (might need to mofiy some of it)
+
+LMSF Scheduler: Add ComboBox to select reader for TCP configuration setting, also add variables for use with TCP communication
+
+LMSF Scheduler: Change ConfigureReader() so it could be called by other code: move user interaction (MessageBox) to combo box event handler
+
+LMSF_Gen5_Reader: Add code back to display reader name at top of window
+
+SimpleTCP: Add IsConnected() method
+
+Move WrapTcpMessage() to SimpleTCP.Message class as static method
+
+SimpleTCP: Add CheckMessageHash() method
+
+LMSF_Gen5: Change name of Property IsReadRunning -> IsReaderBusy; also set this property appropriately during CarrierIn(); and CarrierOut();
+
+SimpleTCP: Add UnwrapTcpMessage() method
+
+LMSF_Gen5: Add enum status {Idle, Busy}
+
+LMSF_Gen5: Add message unwrapping and reply to MessageReceived()
+
+LMSF Scheduler: Add SendTcpMessage() method
+
+LMSF_Gen5: change Remote/Local button lables to "Switch to..."
+
+LMSF Scheduler: Add GetConnectedReadersList() method for validation checks
+
+LMSF Scheduler: Add ValidateExpId() method and use it in parsing experiment IDs
+
+LMSF_Utilities: Add IsDirectoryWritable() method
+
+LMSF_Gen5_Reader: combine code for automatic generation of .xpt and export file names into a single method (GetExperimentFilePath()) to keep them consistent
+
+LMSF Scheduler: Add "Gen5/" and "WaitFor/ <reader>/" commands
+
+LMSF_Gen5: Add validation check to experimentID textbox
+
+
+TODO:
+
+
+Set ReaderName property correctly - based on computerName
+
+Set IPs for different readers
+
+LMSF_Gen5: De-queue and run commands that get recieved
+
+Test and merge into main branch
+
+
+SimpleTCP: test //DJR TODO: replace with DelimiterDataReceived in WriteLineAndGetReply()
+
+Reader initialization.
+
+
+Add quick connection test in SimpleTCP.IsConnected()
+	
+Set up maxRetries in Scheduler.SendTcpMessage()
+
+For remote readers, automatically change protocol path?
 
 
 
-TODOs-
+
 
 TCP client/listener
 	send connection requests from Main LMSF (clients)
@@ -368,6 +431,9 @@ TCP client/listener
 	TCP port numbers: 41798-42507 are Unassigned, but Unauthorized Use Known on port 42000
 	
 		So, use 42222, 42223, 42224..., 42999
+		
+		
+
 
 Add real-time plotting
 
@@ -375,7 +441,7 @@ Test RunReaderControlCommand()
 
 
 
-Add validation check to experimentID textbox
+
 
 
 
