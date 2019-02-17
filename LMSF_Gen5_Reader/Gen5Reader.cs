@@ -21,6 +21,7 @@ namespace LMSF_Gen5_Reader
         private Gen5.PlateReadMonitor plateReadMonitor;
 
         public string ExperimentID { get; set; }
+        public string ReaderName { get; set; }
         public string ProtocolPath { get; set; }
         public string ExperimentPath { get; set; }
         public string ExportFilePath { get; set; }
@@ -30,6 +31,20 @@ namespace LMSF_Gen5_Reader
         public Gen5Reader(IReaderTextOut win)
         {
             gen5Window = win;
+            SetReaderName();
+        }
+
+        private void SetReaderName()
+        {
+            ReaderName = "Neo";
+
+            string computerName = Environment.MachineName;
+            switch (computerName)
+            {
+                case ("Main"):
+                    ReaderName = "Neo";
+                    break;
+            }
         }
 
         public bool IsReading { get; private set; }
@@ -618,7 +633,7 @@ namespace LMSF_Gen5_Reader
 
         public string GetExperimentFilePath(string folder, string id)
         {
-            string expPath = System.IO.Path.Combine(folder, id);
+            string expPath = System.IO.Path.Combine(folder, $"{id}_{ReaderName}");
             expPath += ".xpt";
             return expPath;
         }

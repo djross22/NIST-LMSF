@@ -41,12 +41,12 @@ namespace LMSF_Gen5
         private BackgroundWorker readerMonitorWorker;
 
         private Gen5Reader gen5Reader;
-        private string readerName;
+        //private string readerName;
 
         private Brush startingButtonBackground;
 
         //variables for TCP communication
-        private string computerName;
+        //private string computerName;
         private SimpleTcpServer server;
         private int tcpPort;
         private bool isHandlingMessage;
@@ -61,7 +61,7 @@ namespace LMSF_Gen5
             //Get the starting/default button background brush so I can re-set it later
             startingButtonBackground = remoteButton.Background;
 
-            ComputerName = Environment.MachineName;
+            //ComputerName = Environment.MachineName;
             SetReaderNameAndPort();
 
             try
@@ -79,15 +79,15 @@ namespace LMSF_Gen5
         }
 
         #region Properties Getters and Setters
-        public string ComputerName
-        {
-            get { return this.computerName; }
-            set
-            {
-                this.computerName = value;
-                OnPropertyChanged("ComputerName");
-            }
-        }
+        //public string ComputerName
+        //{
+        //    get { return this.computerName; }
+        //    set
+        //    {
+        //        this.computerName = value;
+        //        OnPropertyChanged("ComputerName");
+        //    }
+        //}
 
         public bool IsRemoteControlled
         {
@@ -525,14 +525,14 @@ namespace LMSF_Gen5
         private void SetReaderNameAndPort()
         {
             tcpPort = 42222;
-            readerName = "Neo";
+            //readerName = "Neo";
 
-            switch (ComputerName)
-            {
-                case ("Main"):
-                    readerName = "Neo";
-                    break;
-            }
+            //switch (ComputerName)
+            //{
+            //    case ("Main"):
+            //        readerName = "Neo";
+            //        break;
+            //}
         }
 
         private void StartTcpServer()
