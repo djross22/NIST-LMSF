@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Gen5"
+        xmlns:LMSF_Utilities="clr-namespace:LMSF_Utilities;assembly=LMSF_Utilities"
         mc:Ignorable="d"
         Title="LMSF-Gen5" Height="750" Width="1250" Background="{DynamicResource PurpleBackgroundBrush}" MinWidth="1250" MinHeight="750" Closing="Window_Closing">
     <Grid>
@@ -20,7 +21,7 @@
                 <TextBox.Text>
                     <Binding Path="ExperimentId" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
-
+                            <LMSF_Utilities:RegexValidationRule RegexText = "^[-a-zA-Z0-9_]+$" ErrorMessage="Experiment identifiers can only contain letters, numbers, spaces, '_', or '-'." ValidationOptions="None"/>
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
