@@ -53,6 +53,8 @@ namespace LMSF_Gen5
         private bool isHandlingMessage;
         private readonly object messageHandlingLock = new object();
         private Queue<Message> messageQueue = new Queue<Message>();
+        public enum ReaderStatus { Idle, Busy };
+        private ReaderStatus status;
 
         public Gen5Window()
         {
@@ -154,11 +156,13 @@ namespace LMSF_Gen5
                 {
                     statusBorder.Background = Brushes.LimeGreen;
                     statusTextBlock.Text = "Reader Busy";
+                    status = ReaderStatus.Busy;
                 }
                 else
                 {
                     statusBorder.Background = Brushes.Red;
                     statusTextBlock.Text = "Reader Idle";
+                    status = ReaderStatus.Idle;
                 }
             }
         }
