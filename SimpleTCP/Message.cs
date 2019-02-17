@@ -70,6 +70,30 @@ namespace SimpleTCP
         public TcpClient TcpClient {  get { return _tcpClient; } }
 
         //DJR addition, 2019-02017
+        public static bool CheckMessageHash(string wrappedMessage)
+        {
+            string[] messageParts = wrappedMessage.Split(new[] { ',' }, StringSplitOptions.None);
+
+            if (messageParts.Length != 3)
+            {
+                if (messageParts.Length > 3)
+                {
+                    throw new ArgumentException($"Too many commas in wrapped message. Commas are reserved as separators between message ID, message text, and message hash.", "wrappedMessage");
+                    //return false;
+                }
+                else
+                {
+                    throw new ArgumentException($"Missing components of wrapped message. Wrapped message should be: \"<message ID>,<message text>,<message hash>\".", "wrappedMessage");
+                    //return false;
+                }
+            }
+
+            string msg = messageParts[1];
+            string hash = messageParts[2];
+
+            return $"{msg.GetHashCode()}" == hash;
+        }
+
         public static string WrapTcpMessage(string msg)
         {
             return $"{GetUniqueMsgId()},{msg},{msg.GetHashCode()}";
