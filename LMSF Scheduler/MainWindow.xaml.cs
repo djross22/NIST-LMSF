@@ -95,6 +95,13 @@ namespace LMSF_Scheduler
         private Dictionary<string, string> metaDictionary;
         private Dictionary<string, Concentration> concDictionary;
 
+        //variables for TCP communication
+        public List<string> ReaderList { get; set; }
+        public ObservableCollection<TextBlock> ReaderBlockList { get; set; }
+        private TextBlock selectedReaderBlock;
+        Dictionary<string, string> readerIps = new Dictionary<string, string>();
+        Dictionary<string, SimpleTcpClient> readerClients = new Dictionary<string, SimpleTcpClient>();
+
         #region Properties Getters and Setters
         public bool IsValUserInput
         {
@@ -103,6 +110,16 @@ namespace LMSF_Scheduler
             {
                 this.isValUserInput = value;
                 OnPropertyChanged("IsValUserInput");
+            }
+        }
+
+        public TextBlock SelectedReaderBlock
+        {
+            get { return this.selectedReaderBlock; }
+            set
+            {
+                this.selectedReaderBlock = value;
+                OnPropertyChanged("SelectedReaderBlock");
             }
         }
 
@@ -299,6 +316,19 @@ namespace LMSF_Scheduler
 
             CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
 
+            ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4" };
+            ReaderBlockList = new ObservableCollection<TextBlock>();
+            foreach (string s in ReaderList)
+            {
+                TextBlock tb = new TextBlock();
+                tb.Text = s;
+                ReaderBlockList.Add(tb);
+
+                readerClients[s] = null;
+            }
+            readerIps["Neo"] = "localhost";
+            //Set IPs for Epoch readers
+
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
         }
@@ -316,7 +346,7 @@ namespace LMSF_Scheduler
         {
             var client = new SimpleTcpClient();
             client.Delimiter = 0x13;
-            client.Connect("localhost", 42999);
+            client.Connect("localhost", 42222);
             client.WriteLine("test sending line");
         }
 
@@ -3250,6 +3280,75 @@ namespace LMSF_Scheduler
 
         }
 
+        private string wrapTcpMessage(string msg)
+        {
+            return $"{GetUniqueMsgId()},{msg},{msg.GetHashCode()}";
+        }
+
+        private string GetUniqueMsgId()
+        {
+            DateTime now = DateTime.Now;
+            return $"{now.ToString("yyyyMMddHHmmss")}{now.Millisecond}";
+        }
+
+        private void ReaderComboBox_DropDownClosed(object sender, EventArgs e)
+        {
+            ConfigureReader(SelectedReaderBlock);
+            //foreach (TextBlock tb in ReaderBlockList)
+            //{
+            //    tb.Background = Brushes.Transparent;
+            //}
+            //SelectedReaderBlock.Background = Brushes.LimeGreen;
+        }
+
+        private void ConfigureReader(TextBlock readerBlock)
+        {
+            string reader = readerBlock.Text;
+            string title = $"Remote Connection to {reader}";
+            string messageText = $"Do you want to make the remote connection to {reader}?\nSelect 'Yes' to establish or continue a connection, or 'No' to close an existing connection.";
+            YesNoDialog.Response userResp = SharedParameters.ShowYesNoDialog(messageText, title);
+            if (userResp == YesNoDialog.Response.Yes)
+            {
+                SelectedReaderBlock.Background = Brushes.LimeGreen;
+                if (readerClients[reader] == null)
+                {
+                    SimpleTcpClient client = new SimpleTcpClient();
+                    client.Delimiter = 0x13;
+                    try
+                    {
+                        client.Connect(readerIps[reader], 42222);
+                    }
+                    catch (System.Net.Sockets.SocketException e)
+                    {
+                        MessageBox.Show($"{reader} is not accepting the connection. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer. Then try again.");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Exception: {e}");
+                    }
+                    readerClients[reader] = client;
+                }
+                else
+                {
+                    SimpleTcpClient client = readerClients[reader];
+                    client.Delimiter = 0x13;
+                    client.Connect(readerIps[reader], 42222);
+                }
+            }
+            else
+            {
+                SelectedReaderBlock.Background = Brushes.Transparent;
+                if (readerClients[reader] == null)
+                {
+                    //do nothing
+                }
+                else
+                {
+                    SimpleTcpClient client = readerClients[reader];
+                    client.Disconnect(); // this sets client equal to null after closing the underlying TcpClient
+                }
+            }
+        }
     }
 
 }
