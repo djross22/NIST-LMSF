@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -1156,5 +1157,21 @@ namespace LMSF_Utilities
             }
         }
 
+        public static async void SleepWithUiUpdates(int milliSecs)
+        {
+            bool isDone = false;
+            await Task.Run(() => RunSleep());
+
+            while (!isDone)
+            {
+                Thread.Sleep(20);
+            }
+
+            void RunSleep()
+            {
+                Thread.Sleep(milliSecs);
+                isDone = true;
+            }
+        }
     }
 }
