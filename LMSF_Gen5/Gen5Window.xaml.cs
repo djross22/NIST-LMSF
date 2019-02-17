@@ -580,17 +580,19 @@ namespace LMSF_Gen5
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    TextOut += $"message received {messageQueue.Count}: {msg.MessageString}\n";
+                    TextOut += $"message received {messageQueue.Count}: {msg.MessageString}";
                 });
                 //send back status if good message
                 string replyStr = $"{msgParts[0]},{status},{msgParts[2]}";
                 msg.ReplyLine(replyStr);
+                TextOut += $"; reply sent, {status}.\n";
             }
             else
             {
                 //send back "fail" if bad message
                 string replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
                 msg.ReplyLine(replyStr);
+                TextOut += $"; reply sent, fail.\n";
             }
         }
 

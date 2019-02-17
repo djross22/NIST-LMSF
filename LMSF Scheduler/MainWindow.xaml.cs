@@ -3406,6 +3406,10 @@ namespace LMSF_Scheduler
                         SharedParameters.SleepWithUiUpdates(1000);
                         //MessageBox.Show("message not received properly, going to send again-");
                     }
+                    else
+                    {
+                        OutputText += $"reply received... ";
+                    }
                 }
             }
             OutputText += $"... done.\n";
