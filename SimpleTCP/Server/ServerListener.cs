@@ -61,14 +61,17 @@ namespace SimpleTCP.Server
         {
             while (!QueueStop)
             {
-                try
-                {
-                    RunLoopStep();
-                }
-                catch 
-                {
+                //DJR change 2019-02-16; stop swallowing exceptions
+                RunLoopStep();
+                //try
+                //{
+                //    RunLoopStep();
+                //}
+                //catch 
+                //{
 
-                }
+                //}
+                //end DJR change
 
                 System.Threading.Thread.Sleep(ReadLoopIntervalMs);
             }

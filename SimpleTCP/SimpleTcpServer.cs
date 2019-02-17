@@ -181,11 +181,14 @@ namespace SimpleTCP
             var ipSorted = GetIPAddresses().Where(ip => ip.AddressFamily == addressFamilyFilter);
             foreach (var ipAddr in ipSorted)
             {
-                try
-                {
-                    Start(ipAddr, port);
-                }
-                catch { }
+                //DJR change 2019-02-16; stop swallowing exceptions
+                Start(ipAddr, port);
+                //try
+                //{
+                //    Start(ipAddr, port);
+                //}
+                //catch { }
+                //End DJR change
             }
 
             return this;
