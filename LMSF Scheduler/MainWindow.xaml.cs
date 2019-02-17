@@ -344,10 +344,12 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            var client = new SimpleTcpClient();
-            client.Delimiter = 0x13;
-            client.Connect("localhost", 42222);
-            client.WriteLine("test sending line");
+            //var client = new SimpleTcpClient();
+            //client.Delimiter = 0x13;
+            //client.Connect("localhost", 42222);
+            //client.WriteLine("test sending line");
+
+            SendTcpMessage("Neo", "test message");
         }
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
@@ -3280,11 +3282,6 @@ namespace LMSF_Scheduler
 
         }
 
-        private string WrapTcpMessage(string msg)
-        {
-            return SimpleTCP.Message.WrapTcpMessage(msg);
-        }
-
         private void ReaderComboBox_DropDownClosed(object sender, EventArgs e)
         {
             string reader = SelectedReaderBlock.Text;
@@ -3338,6 +3335,80 @@ namespace LMSF_Scheduler
                     client.Disconnect(); // this sets client equal to null after closing the underlying TcpClient
                 }
             }
+        }
+
+        //This method sends message and handles re-sending if message is not received
+        private void SendTcpMessage(string reader, string msg)
+        {
+            SimpleTcpClient client = readerClients[reader];
+            while (!client.IsConnected())
+            {
+                string warningText = $"{reader} is not connected. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer.";
+                warningText += $"\nThen click 'OK' to try again, or 'Cancel' to abort.";
+
+                MessageBoxResult result = MessageBox.Show(warningText, $"{reader} Not Connected", MessageBoxButton.OKCancel);
+                if (result == MessageBoxResult.Cancel)
+                {
+                    AbortCalled = true;
+                    return;
+                }
+
+            }
+
+            //MessageBox.Show($"client connected: {client.IsConnected()}");
+
+            string wrappedMessage = Message.WrapTcpMessage(msg);
+            //For testing:
+            //wrappedMessage += "1";
+            //Note WriteLineAndGetReply() retruns null if server takes longer than timeout to send reply
+            Message replyMsg = null;
+            OutputText += "    sending message to reader... ";
+            //TODO: add maxRetries
+            int numTries = 0;
+            while (replyMsg == null)
+            {
+                numTries++;
+                OutputText += $"{numTries}, ";
+                replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
+                //try
+                //{
+                //    replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
+                //}
+                //catch (System.IO.IOException)
+                //{
+                //    try
+                //    {
+                //        client.Connect(readerIps[reader], 42222);
+                //    }
+                //    catch (System.Net.Sockets.SocketException e)
+                //    {
+                //        Thread.Sleep(250);
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        MessageBox.Show($"Exception: {e}");
+                //    }
+                //}
+                if (replyMsg != null)
+                {
+                    string[] messageParts = Message.UnwrapTcpMessage(wrappedMessage);
+                    string[] replyParts = Message.UnwrapTcpMessage(replyMsg.MessageString);
+                    bool msgRecieved = false;
+                    if (replyParts[1] != "fail")
+                    {
+                        msgRecieved = (messageParts[0] == replyParts[0]) && (messageParts[0] == replyParts[0]);
+                    }
+                    if (!msgRecieved)
+                    {
+                        //if the message did not get received properly, set replyMSg = null to try again.
+                        replyMsg = null;
+
+                        SharedParameters.SleepWithUiUpdates(1000);
+                        //MessageBox.Show("message not received properly, going to send again-");
+                    }
+                }
+            }
+            OutputText += $"... done.\n";
         }
     }
 

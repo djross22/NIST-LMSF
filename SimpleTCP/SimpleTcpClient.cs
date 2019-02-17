@@ -180,7 +180,8 @@ namespace SimpleTCP
 		public Message WriteLineAndGetReply(string data, TimeSpan timeout)
 		{
 			Message mReply = null;
-			this.DataReceived += (s, e) => { mReply = e; };
+            //DJR TODO: replace with DelimiterDataReceived?
+            this.DataReceived += (s, e) => { mReply = e; };
 			WriteLine(data);
 
 			Stopwatch sw = new Stopwatch();
