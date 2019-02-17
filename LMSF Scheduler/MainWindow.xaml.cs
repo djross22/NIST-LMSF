@@ -3280,15 +3280,9 @@ namespace LMSF_Scheduler
 
         }
 
-        private string wrapTcpMessage(string msg)
+        private string WrapTcpMessage(string msg)
         {
-            return $"{GetUniqueMsgId()},{msg},{msg.GetHashCode()}";
-        }
-
-        private string GetUniqueMsgId()
-        {
-            DateTime now = DateTime.Now;
-            return $"{now.ToString("yyyyMMddHHmmss")}{now.Millisecond}";
+            return SimpleTCP.Message.WrapTcpMessage(msg);
         }
 
         private void ReaderComboBox_DropDownClosed(object sender, EventArgs e)

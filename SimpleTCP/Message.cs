@@ -68,5 +68,18 @@ namespace SimpleTCP
         }
 
         public TcpClient TcpClient {  get { return _tcpClient; } }
+
+        //DJR addition, 2019-02017
+        public static string WrapTcpMessage(string msg)
+        {
+            return $"{GetUniqueMsgId()},{msg},{msg.GetHashCode()}";
+        }
+
+        private static string GetUniqueMsgId()
+        {
+            DateTime now = DateTime.Now;
+            return $"{now.ToString("yyyyMMddHHmmss")}{now.Millisecond}";
+        }
+        //end DJR addition
     }
 }
