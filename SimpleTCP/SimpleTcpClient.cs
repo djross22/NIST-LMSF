@@ -69,14 +69,17 @@ namespace SimpleTCP
 		{
 			while (!QueueStop)
 			{
-				try
-				{
-					RunLoopStep();
-				}
-				catch
-				{
+                //DJR change 2019-02-16, don't swallow errors without fixing them
+                RunLoopStep();
+                //try
+				//{
+				//	RunLoopStep();
+				//}
+				//catch
+				//{
 
-				}
+				//}
+                //End DJR change
 
 				System.Threading.Thread.Sleep(ReadLoopIntervalMs);
 			}
@@ -203,11 +206,14 @@ namespace SimpleTCP
 				QueueStop = true;
 				if (_client != null)
 				{
-					try
-					{
-						_client.Close();
-					}
-					catch { }
+                    //DJR change 2019-02-16, don't swallow errors without fixing them
+                    _client.Close();
+                    //try
+                    //{
+					//	_client.Close();
+					//}
+					//catch { }
+                    //End DJR change
 					_client = null;
 				}
 
