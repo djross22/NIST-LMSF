@@ -34,7 +34,7 @@ namespace LMSF_Gen5
         private string expFolderPath;
         private string protocolPath;
         private string textOut;
-        private bool isReadRunning;
+        private bool isReaderBusy;
         private bool isExperimentQueuedOrRunning;
         private bool isRemoteControlled;
         private bool isConnected;
@@ -143,17 +143,17 @@ namespace LMSF_Gen5
             }
         }
 
-        public bool IsReadRunning
+        public bool IsReaderBusy
         {
-            get { return this.isReadRunning; }
+            get { return this.isReaderBusy; }
             private set
             {
-                this.isReadRunning = value;
-                OnPropertyChanged("IsReadRunning");
-                if (isReadRunning)
+                this.isReaderBusy = value;
+                OnPropertyChanged("IsReaderBusy");
+                if (isReaderBusy)
                 {
                     statusBorder.Background = Brushes.LimeGreen;
-                    statusTextBlock.Text = "Read In Progress";
+                    statusTextBlock.Text = "Reader Busy";
                 }
                 else
                 {
@@ -364,6 +364,7 @@ namespace LMSF_Gen5
 
         private void RunExp()
         {
+            IsReaderBusy = true;
             string startText = "";
             try
             {
@@ -378,6 +379,10 @@ namespace LMSF_Gen5
             if (startText.Contains("StartRead Successful"))
             {
                 TextOut += WaitForFinishThenExportAndClose();
+            }
+            else
+            {
+                IsReaderBusy = false;
             }
         }
 
@@ -436,11 +441,11 @@ namespace LMSF_Gen5
                 this.Dispatcher.Invoke(() => {
                     if (status == Gen5ReadStatus.eReadInProgress)
                     {
-                        IsReadRunning = true;
+                        IsReaderBusy = true;
                     }
                     else
                     {
-                        IsReadRunning = false;
+                        IsReaderBusy = false;
                     }
                 });
             }
@@ -477,6 +482,7 @@ namespace LMSF_Gen5
 
         private void CarrierIn()
         {
+            IsReaderBusy = true;
             try
             {
                 TextOut += gen5Reader.CarrierIn();
@@ -485,6 +491,7 @@ namespace LMSF_Gen5
             {
                 TextOut += $"Error at CarrierIn, {exc}./n";
             }
+            IsReaderBusy = false;
         }
 
         private void CarrierOutButton_Click(object sender, RoutedEventArgs e)
@@ -494,6 +501,7 @@ namespace LMSF_Gen5
 
         private void CarrierOut()
         {
+            IsReaderBusy = true;
             try
             {
                 TextOut += gen5Reader.CarrierOut();
@@ -502,6 +510,7 @@ namespace LMSF_Gen5
             {
                 TextOut += $"Error at CarrierOut, {exc}./n";
             }
+            IsReaderBusy = false;
         }
 
         private void CloseExpButton_Click(object sender, RoutedEventArgs e)
