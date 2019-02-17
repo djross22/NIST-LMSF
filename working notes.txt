@@ -350,15 +350,28 @@ LMSF_Gen5: Set output textbox to autoscroll to end of messages
 
 LMSF_Gen5: Add generic error handling try-catch wrapper to all calls to LMSF_Gen5_Reader.dll
 
+LMSF_Gen5: Add IsExperimentQueuedOrRunning property, and move controls enabled state setting to OnPropertyChanged() method (via call to UpdateControlEnabledStatus())
+
+LMSF_Gen5: Add IsConnected property and button to switch between remote and local control
+
+
+
 
 TODOs-
+
+TCP client/listener
+	send connection requests from Main LMSF (clients)
+		LMSF Scheduler - clients
+		LMSF_Gen5 - server
+		
+	best bet: "TCP Socket Off-the-shelf" from Code Project
+	TCP port numbers: 41798-42507 are Unassigned, but Unauthorized Use Known on port 42000
+	
+		So, use 42222, 42223, 42224..., 42999
 
 Add real-time plotting
 
 Test RunReaderControlCommand()
-
-TCP client/listener
-	send connection requests from Main LMSF
 
 
 
