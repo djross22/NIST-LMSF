@@ -333,6 +333,22 @@ namespace LMSF_Scheduler
             concDictionary = new Dictionary<string, Concentration>();
         }
 
+        private List<string> GetConnectedReadersList()
+        {
+            var connectedList = new List<string>();
+
+            foreach (string s in ReaderList)
+            {
+                SimpleTcpClient client = readerClients[s];
+                if ((client != null) && (client.IsConnected()))
+                {
+                    connectedList.Add(s);
+                }
+            }
+
+            return connectedList;
+        }
+
         protected void OnPropertyChanged(string name)
         {
             if (PropertyChanged != null)
