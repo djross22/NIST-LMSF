@@ -103,12 +103,12 @@ namespace LMSF_Gen5
                 if (isRemoteControlled)
                 {
                     remoteButton.Background = Brushes.LimeGreen;
-                    remoteButton.Content = "Remote";
+                    remoteButton.Content = "Switch to Local";
                 }
                 else
                 {
                     remoteButton.Background = startingButtonBackground;
-                    remoteButton.Content = "Local";
+                    remoteButton.Content = "Switch to Remote";
                 }
             }
         }

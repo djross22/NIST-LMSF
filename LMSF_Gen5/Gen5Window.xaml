@@ -43,7 +43,7 @@
                 <Border x:Name="remoteBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="20,0,0,0" VerticalAlignment="Center" Width="110">
                     <TextBlock x:Name="remoteTextBlock" TextWrapping="Wrap" Text="Not Connected" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
                 </Border>
-                <Button x:Name="remoteButton" Content="Local" Width="75" Margin="20,0,0,0" Click="RemoteButton_Click"/>
+                <Button x:Name="remoteButton" Content="Switch to Remote" Width="120" Margin="20,0,0,0" Click="RemoteButton_Click"/>
             </StackPanel>
 
         </Grid>
