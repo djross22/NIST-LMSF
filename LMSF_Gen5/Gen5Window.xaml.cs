@@ -41,7 +41,6 @@ namespace LMSF_Gen5
         private BackgroundWorker readerMonitorWorker;
 
         private Gen5Reader gen5Reader;
-        //private string readerName;
 
         private Brush startingButtonBackground;
 
@@ -321,7 +320,7 @@ namespace LMSF_Gen5
         {
             try
             {
-                string filePath = gen5Reader.GetExperimentFilePath(ExpFolderPath, ExperimentId);
+                string filePath = Gen5Reader.GetExperimentFilePath(ExpFolderPath, ExperimentId, gen5Reader);
                 if (File.Exists(filePath))
                 {
                     MessageBoxResult res = MessageBox.Show("That Gen5 epxeriment file already exists. Ok to overwrite?", "Overwrite File", MessageBoxButton.YesNo);

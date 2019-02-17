@@ -631,11 +631,24 @@ namespace LMSF_Gen5_Reader
             return evStatusCode;
         }
 
-        public string GetExperimentFilePath(string folder, string id)
+        public static string GetExperimentFilePath(string folder, string id, string readerName, bool forExportFile = false)
         {
-            string expPath = System.IO.Path.Combine(folder, $"{id}_{ReaderName}");
-            expPath += ".xpt";
+            string expPath = System.IO.Path.Combine(folder, $"{id}_{readerName}");
+            if (forExportFile)
+            {
+                expPath += ".txt";
+            }
+            else
+            {
+                expPath += ".xpt";
+            }
+            
             return expPath;
+        }
+
+        public static string GetExperimentFilePath(string folder, string id, Gen5Reader reader, bool forExportFile = false)
+        {
+            return GetExperimentFilePath(folder, id, reader.ReaderName, forExportFile);
         }
 
         //===========================================================================================
@@ -661,7 +674,7 @@ namespace LMSF_Gen5_Reader
             {
                 //ExperimentPath = System.IO.Path.Combine(ExperimentFolderPath,ExperimentID);
                 //ExperimentPath += ".xpt";
-                ExperimentPath = GetExperimentFilePath(ExperimentFolderPath, ExperimentID);
+                ExperimentPath = GetExperimentFilePath(ExperimentFolderPath, ExperimentID, ReaderName);
                 experiment.SaveAs(ExperimentPath);
                 retStr += "SaveAs Successful\n";
             }
@@ -907,8 +920,7 @@ namespace LMSF_Gen5_Reader
 
             try
             {
-                ExportFilePath = System.IO.Path.Combine(ExperimentFolderPath, $"{ExperimentID}_{ReaderName}");
-                ExportFilePath += ".txt";
+                ExportFilePath = GetExperimentFilePath(ExperimentFolderPath, ExperimentID, ReaderName, true);
 
                 plate.FileExport(ExportFilePath);
                 retStr += "FileExport Successful";
