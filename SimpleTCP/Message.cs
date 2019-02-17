@@ -72,6 +72,16 @@ namespace SimpleTCP
         //DJR addition, 2019-02017
         public static bool CheckMessageHash(string wrappedMessage)
         {
+            string[] messageParts = UnwrapTcpMessage(wrappedMessage);
+
+            string msg = messageParts[1];
+            string hash = messageParts[2];
+
+            return $"{msg.GetHashCode()}" == hash;
+        }
+
+        public static string[] UnwrapTcpMessage(string wrappedMessage)
+        {
             string[] messageParts = wrappedMessage.Split(new[] { ',' }, StringSplitOptions.None);
 
             if (messageParts.Length != 3)
@@ -88,10 +98,7 @@ namespace SimpleTCP
                 }
             }
 
-            string msg = messageParts[1];
-            string hash = messageParts[2];
-
-            return $"{msg.GetHashCode()}" == hash;
+            return messageParts;
         }
 
         public static string WrapTcpMessage(string msg)
