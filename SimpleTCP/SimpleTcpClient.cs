@@ -46,6 +46,13 @@ namespace SimpleTCP
 			return this;
 		}
 
+        //DJR addition 201-02-17
+        public bool IsConnected()
+        {
+            return ((_client != null) && (_client.Connected));
+        }
+        //end DJR addition
+
 		private void StartRxThread()
 		{
 			if (_rxThread != null) { return; }
