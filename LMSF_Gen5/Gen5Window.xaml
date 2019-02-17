@@ -37,8 +37,8 @@
             <Button x:Name="selectExpFolderButton" Content="..." HorizontalAlignment="Right" Margin="0,230,35,0" VerticalAlignment="Top" Width="25" Height="25" Click="SelectExpFolderButton_Click" Focusable="False"/>
 
             <StackPanel HorizontalAlignment="Center" Height="25" Margin="50,10,0,0" VerticalAlignment="Top" Width="400" Orientation="Horizontal">
-                <Border x:Name="computerNameBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="0" VerticalAlignment="Center" Width="110">
-                    <TextBlock x:Name="computerNameTextBlock" TextWrapping="Wrap" Text="{Binding ComputerName, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                <Border x:Name="computerNameBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="0" VerticalAlignment="Bottom" Width="110">
+                    <TextBlock x:Name="computerNameTextBlock" TextWrapping="Wrap" Text="{Binding ReaderName, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
                 </Border>
                 <Border x:Name="remoteBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="20,0,0,0" VerticalAlignment="Center" Width="110">
                     <TextBlock x:Name="remoteTextBlock" TextWrapping="Wrap" Text="Not Connected" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>

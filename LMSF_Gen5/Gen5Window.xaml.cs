@@ -47,6 +47,7 @@ namespace LMSF_Gen5
 
         //variables for TCP communication
         //private string computerName;
+        private string readerName;
         private SimpleTcpServer server;
         private int tcpPort;
         private bool isHandlingMessage;
@@ -71,6 +72,7 @@ namespace LMSF_Gen5
                 TextOut = gen5Reader.StartGen5();
                 TextOut += gen5Reader.SetClientWindow(this);
                 TextOut += gen5Reader.ConfigureUSBReader();
+                ReaderName = gen5Reader.ReaderName;
             }
             catch (Exception exc)
             {
@@ -79,15 +81,15 @@ namespace LMSF_Gen5
         }
 
         #region Properties Getters and Setters
-        //public string ComputerName
-        //{
-        //    get { return this.computerName; }
-        //    set
-        //    {
-        //        this.computerName = value;
-        //        OnPropertyChanged("ComputerName");
-        //    }
-        //}
+        public string ReaderName
+        {
+            get { return this.readerName; }
+            private set
+            {
+                this.readerName = value;
+                OnPropertyChanged("ReaderName");
+            }
+        }
 
         public bool IsRemoteControlled
         {
