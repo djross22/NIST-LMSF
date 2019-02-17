@@ -3293,21 +3293,17 @@ namespace LMSF_Scheduler
 
         private void ReaderComboBox_DropDownClosed(object sender, EventArgs e)
         {
-            ConfigureReader(SelectedReaderBlock);
-            //foreach (TextBlock tb in ReaderBlockList)
-            //{
-            //    tb.Background = Brushes.Transparent;
-            //}
-            //SelectedReaderBlock.Background = Brushes.LimeGreen;
-        }
-
-        private void ConfigureReader(TextBlock readerBlock)
-        {
-            string reader = readerBlock.Text;
+            string reader = SelectedReaderBlock.Text;
             string title = $"Remote Connection to {reader}";
             string messageText = $"Do you want to make the remote connection to {reader}?\nSelect 'Yes' to establish or continue a connection, or 'No' to close an existing connection.";
             YesNoDialog.Response userResp = SharedParameters.ShowYesNoDialog(messageText, title);
-            if (userResp == YesNoDialog.Response.Yes)
+
+            ConfigureReader(reader, userResp);
+        }
+
+        private void ConfigureReader(string reader, YesNoDialog.Response connect)
+        {
+            if (connect == YesNoDialog.Response.Yes)
             {
                 SelectedReaderBlock.Background = Brushes.LimeGreen;
                 if (readerClients[reader] == null)
