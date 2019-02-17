@@ -1067,7 +1067,7 @@ namespace LMSF_Scheduler
                 //First two arguments are reader name and reader command
                 string name;
                 string command;
-                List<string> commandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
+                List<string> commandList = LMSF_Gen5.Gen5Window.Gen5CommandList; //new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
                 //arguments 3, 4 and 5 are the protocol path, experiment Id, and save folder path
                 string protocolPath;
                 string expIdStr;

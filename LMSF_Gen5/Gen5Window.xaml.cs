@@ -54,6 +54,7 @@ namespace LMSF_Gen5
         private Queue<Message> messageQueue = new Queue<Message>();
         public enum ReaderStatus { Idle, Busy };
         private ReaderStatus status;
+        public static List<string> Gen5CommandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
 
         public Gen5Window()
         {
