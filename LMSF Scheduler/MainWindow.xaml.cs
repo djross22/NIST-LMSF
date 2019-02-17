@@ -1627,10 +1627,7 @@ namespace LMSF_Scheduler
                     expIdStr = stepArgs[1];
 
                     //expIdStr needs to be usable in filenames, so make sure it only has just letters, numbers, or "-" or "_")
-                    RegexValidationRule valRule = new RegexValidationRule();
-                    valRule.RegexText = "^[a-zA-Z0-9-_]+$";
-                    valRule.ErrorMessage = "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
-                    ValidationResult valRes = valRule.Validate(expIdStr, System.Globalization.CultureInfo.CurrentCulture);
+                    ValidationResult valRes = ValidateExpId(expIdStr);
                     if (!valRes.IsValid)
                     {
                         argsOk = false;
@@ -1908,6 +1905,17 @@ namespace LMSF_Scheduler
                     }
                 }
             }
+        }
+
+        private ValidationResult ValidateExpId(string expIdStr)
+        {
+            //expIdStr needs to be usable in filenames, so make sure it only has just letters, numbers, or "-" or "_")
+            RegexValidationRule valRule = new RegexValidationRule();
+            valRule.RegexText = "^[a-zA-Z0-9-_]+$";
+            valRule.ErrorMessage = "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
+            ValidationResult valRes = valRule.Validate(expIdStr, System.Globalization.CultureInfo.CurrentCulture);
+
+            return valRes;
         }
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
