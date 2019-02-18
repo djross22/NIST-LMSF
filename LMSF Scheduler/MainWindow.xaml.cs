@@ -3120,7 +3120,7 @@ namespace LMSF_Scheduler
 
             while (GetReaderStatus(reader) == $"{LMSF_Gen5.Gen5Window.ReaderStatusStates.Busy}")
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
 
         }
