@@ -542,6 +542,16 @@ namespace LMSF_Scheduler
             inputTextBox.Focus();
         }
 
+        private void AddOutputText(string txt)
+        {
+            OutputText += txt;
+            //Add to log file
+            if (!isValidating)
+            {
+                File.AppendAllText(logFilePath, txt);
+            }
+        }
+
         private void InsertInputText(string newText)
         {
             if (!(newText is null))
@@ -645,12 +655,7 @@ namespace LMSF_Scheduler
         {
             if (AbortCalled)
             {
-                OutputText += "Method Aborted.\n";
-                //Add to log file
-                if (!isValidating)
-                {
-                    File.AppendAllText(logFilePath, "Method Aborted.\n");
-                }
+                AddOutputText("Method Aborted.\n");
                 this.Dispatcher.Invoke(() => { IsRunning = false; });
             }
             else
@@ -670,11 +675,7 @@ namespace LMSF_Scheduler
                 else
                 {
                     string doneText = $"{SharedParameters.GetDateTimeString()}; Done.\n";
-                    OutputText += doneText;
-                    if (!isValidating)
-                    {
-                        File.AppendAllText(logFilePath, doneText);
-                    }
+                    AddOutputText(doneText);
 
                     this.Dispatcher.Invoke(() => { IsRunning = false; });
                 }
@@ -2186,19 +2187,19 @@ namespace LMSF_Scheduler
             //Validation failure is signaled by having one or more entires in the valFailed list 
             if (valFailed.Count > 0)
             {
-                OutputText += "\r\n";
-                OutputText += "Validation failed on the following steps:\r\n";
+                AddOutputText("\r\n");
+                AddOutputText("Validation failed on the following steps:\r\n");
                 foreach (int i in valFailed)
                 {
-                    OutputText += $"{i}, ";
+                    AddOutputText($"{i}, ");
                 }
                 validationTextBlock.Text = "Validation Failed";
                 validationBorder.Background = Brushes.Red;// new SolidColorBrush(Colors.Red);
             }
             else
             {
-                OutputText += "\r\n";
-                OutputText += "Validation sucessful.\r\n";
+                AddOutputText("\r\n");
+                AddOutputText("Validation sucessful.\r\n");
                 validationTextBlock.Text = "Validation Sucessful";
                 validationBorder.Background = Brushes.LimeGreen;// new SolidColorBrush(Colors.LimeGreen);
                 valReturn = true;
@@ -3080,7 +3081,7 @@ namespace LMSF_Scheduler
         {
             WaitingForStepCompletion = true;
 
-            OutputText += "... waiting for Gen5 to finish.";
+            AddOutputText("... waiting for Gen5 to finish.");
 
             BackgroundWorker gen5MonitorWorker = new BackgroundWorker();
             gen5MonitorWorker.WorkerReportsProgress = false;
@@ -3145,7 +3146,7 @@ namespace LMSF_Scheduler
             {
                 if (!ovProcess.HasExited)
                 {
-                    OutputText += "... waiting for last Overlord Process to exit.";
+                    AddOutputText("... waiting for last Overlord Process to exit.");
                     while (!ovProcess.HasExited)
                     {
                         Thread.Sleep(100);
@@ -3245,7 +3246,7 @@ namespace LMSF_Scheduler
             {
                 if (!hamProcess.HasExited)
                 {
-                    OutputText += "... waiting for last Hamilton Process to exit.";
+                    AddOutputText("... waiting for last Hamilton Process to exit.");
                     while (!hamProcess.HasExited)
                     {
                         Thread.Sleep(100);
@@ -3316,7 +3317,7 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
-            OutputText += "... waiting for Overlord to finish and exit.";
+            AddOutputText("... waiting for Overlord to finish and exit.");
 
             BackgroundWorker ovMonitorWorker = new BackgroundWorker();
             ovMonitorWorker.WorkerReportsProgress = false;
@@ -3357,7 +3358,7 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
-            OutputText += "... waiting for Hamilton Runtime Engine to finish and exit.";
+            AddOutputText("... waiting for Hamilton Runtime Engine to finish and exit.");
 
             BackgroundWorker hamMonitorWorker = new BackgroundWorker();
             hamMonitorWorker.WorkerReportsProgress = false;
@@ -3442,7 +3443,7 @@ namespace LMSF_Scheduler
             {
                 if (!stepTimerDialog.IsClosed)
                 {
-                    OutputText += "... waiting for last Timer to finish.";
+                    AddOutputText("... waiting for last Timer to finish.");
                     while (!stepTimerDialog.IsClosed)
                     {
                         Thread.Sleep(100);
@@ -3466,7 +3467,7 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
-            OutputText += "... waiting for Timer to finish.";
+            AddOutputText("... waiting for Timer to finish.");
 
             BackgroundWorker timerMonitorWorker = new BackgroundWorker();
             timerMonitorWorker.WorkerReportsProgress = false;
@@ -3657,13 +3658,13 @@ namespace LMSF_Scheduler
             //wrappedMessage += "1";
             //Note WriteLineAndGetReply() retruns null if server takes longer than timeout to send reply
             Message replyMsg = null;
-            OutputText += "    sending message to reader... ";
+            AddOutputText("    sending message to reader... ");
             //TODO: add maxRetries
             int numTries = 0;
             while (replyMsg == null)
             {
                 numTries++;
-                OutputText += $"{numTries}, ";
+                AddOutputText($"{numTries}, ");
                 replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
                 //try
                 //{
@@ -3704,11 +3705,11 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        OutputText += $"reply received... ";
+                        AddOutputText($"reply received... ");
                     }
                 }
             }
-            OutputText += $"... done.\n";
+            AddOutputText($"... done.\n");
 
             return replyStatus;
         }
