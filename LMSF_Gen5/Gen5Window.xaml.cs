@@ -335,7 +335,7 @@ namespace LMSF_Gen5
 
         private string NewLogFileName()
         {
-            return $"{DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss")}.gen5.trc";
+            return $"{DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss")}-gen5.trc";
         }
 
         private void SelectExpFolderButton_Click(object sender, RoutedEventArgs e)

@@ -3539,7 +3539,7 @@ namespace LMSF_Scheduler
 
         private string NewLogFileName()
         {
-            return $"{DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss")}.trc";
+            return $"{DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss")}-lmsf.trc";
         }
 
         private bool NewLogFile()
