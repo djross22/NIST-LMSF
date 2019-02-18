@@ -56,7 +56,7 @@
                     </Border>
                 </ToolBar>
             </ToolBarTray>
-            <Grid Margin="0" DockPanel.Dock="Bottom" >
+            <Grid Margin="0,0,0,5" DockPanel.Dock="Bottom" Height="40" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="600"/>
                     <ColumnDefinition/>
