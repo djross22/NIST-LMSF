@@ -3065,6 +3065,12 @@ namespace LMSF_Scheduler
             }
 
             string replyStatus = SendTcpMessage(readerName, msg);
+            while (replyStatus == "Idle")
+            {
+                replyStatus = SendTcpMessage(readerName, "StatusCheck");
+                Thread.Sleep(200);
+            }
+            AddOutputText($"... reader status: {replyStatus}");
 
             //Send info to metadata if collecting
             if (command == "RunExp" && isCollectingXml)
