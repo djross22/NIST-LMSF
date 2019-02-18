@@ -3591,7 +3591,21 @@ namespace LMSF_Scheduler
         {
             string reader = SelectedReaderBlock.Text;
             string title = $"Remote Connection to {reader}";
-            string messageText = $"Do you want to make the remote connection to {reader}?\nSelect 'Yes' to establish or continue a connection, or 'No' to close an existing connection.";
+
+            bool readerConnected = GetConnectedReadersList().Contains(reader);
+
+            string messageText = "";
+            if (readerConnected)
+            {
+                messageText = $"{reader} is currently connected. Do you want to retain that remote connection or disconnect?\n";
+                messageText += "Select 'Yes' to retain the connection, or 'No' to disconnect.";
+            }
+            else
+            {
+                messageText = $"Do you want to make a remote connection to {reader}?\n";
+                messageText += "Select 'Yes' to establish a connection, or 'No' to cancel.";
+            }
+
             YesNoDialog.Response userResp = SharedParameters.ShowYesNoDialog(messageText, title);
 
             ConfigureReader(reader, userResp);
@@ -3601,7 +3615,7 @@ namespace LMSF_Scheduler
         {
             if (connect == YesNoDialog.Response.Yes)
             {
-                SelectedReaderBlock.Background = Brushes.LimeGreen;
+                SelectedReaderBlock.Background = Brushes.Transparent;
                 if (readerClients[reader] == null)
                 {
                     SimpleTcpClient client = new SimpleTcpClient();
@@ -3609,6 +3623,8 @@ namespace LMSF_Scheduler
                     try
                     {
                         client.Connect(readerIps[reader], 42222);
+                        SelectedReaderBlock.Background = Brushes.LimeGreen;
+                        readerClients[reader] = client;
                     }
                     catch (System.Net.Sockets.SocketException e)
                     {
@@ -3618,13 +3634,24 @@ namespace LMSF_Scheduler
                     {
                         MessageBox.Show($"Exception: {e}");
                     }
-                    readerClients[reader] = client;
                 }
                 else
                 {
                     SimpleTcpClient client = readerClients[reader];
                     client.Delimiter = 0x13;
-                    client.Connect(readerIps[reader], 42222);
+                    try
+                    {
+                        client.Connect(readerIps[reader], 42222);
+                        SelectedReaderBlock.Background = Brushes.LimeGreen;
+                    }
+                    catch (System.Net.Sockets.SocketException e)
+                    {
+                        MessageBox.Show($"{reader} is not accepting the connection. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer. Then try again.");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Exception: {e}");
+                    }
                 }
             }
             else
