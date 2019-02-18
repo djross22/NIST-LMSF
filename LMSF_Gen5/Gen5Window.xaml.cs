@@ -576,24 +576,32 @@ namespace LMSF_Gen5
             }
 
             string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
+            
+            this.Dispatcher.Invoke(() =>
+            {
+                TextOut += $"message received {messageQueue.Count}: {msg.MessageString}";
+            });
+
+            //Reply
+            string replyStr;
+            string textOutAdd;
             if (goodMsg)
             {
-                this.Dispatcher.Invoke(() =>
-                {
-                    TextOut += $"message received {messageQueue.Count}: {msg.MessageString}";
-                });
                 //send back status if good message
-                string replyStr = $"{msgParts[0]},{status},{msgParts[2]}";
-                msg.ReplyLine(replyStr);
-                TextOut += $"; reply sent, {status}.\n";
+                replyStr = $"{msgParts[0]},{status},{msgParts[2]}";
+                textOutAdd = $"; reply sent, {status}.\n";
             }
             else
             {
                 //send back "fail" if bad message
-                string replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
-                msg.ReplyLine(replyStr);
-                TextOut += $"; reply sent, fail.\n";
+                replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
+                textOutAdd = $"; reply sent, fail.\n";
             }
+            msg.ReplyLine(replyStr);
+            this.Dispatcher.Invoke(() =>
+            {
+                TextOut += textOutAdd;
+            });
         }
 
         private void Server_ClientDisconnected(object sender, System.Net.Sockets.TcpClient client)
@@ -699,7 +707,8 @@ namespace LMSF_Gen5
                     }
                     else
                     {
-                        throw new System.ArgumentException($"Unsupported remote reader command, {command}", "command");
+                        MessageBox.Show($"Unsupported remote reader command, {command}", "Unsupported Command Error");
+                        //throw new System.ArgumentException($"Unsupported remote reader command, {command}", "command");
                     }
                     break;
             }
