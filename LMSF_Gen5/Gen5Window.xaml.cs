@@ -70,14 +70,14 @@ namespace LMSF_Gen5
             {
                 gen5Reader = new Gen5Reader(this);
 
-                TextOut = gen5Reader.StartGen5();
-                TextOut += gen5Reader.SetClientWindow(this);
-                TextOut += gen5Reader.ConfigureUSBReader();
+                OutputText = gen5Reader.StartGen5();
+                OutputText += gen5Reader.SetClientWindow(this);
+                OutputText += gen5Reader.ConfigureUSBReader();
                 ReaderName = gen5Reader.ReaderName;
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at initilization of Gen5, {exc}./n";
+                OutputText += $"Error at initilization of Gen5, {exc}./n";
             }
         }
 
@@ -164,14 +164,14 @@ namespace LMSF_Gen5
             }
         }
 
-        public string TextOut
+        public string OutputText
         {
             get { return this.textOut; }
             set
             {
                 this.textOut = value;
-                OnPropertyChanged("TextOut");
-                tempOutTextBox.ScrollToEnd();
+                OnPropertyChanged("OutputText");
+                outputTextBox.ScrollToEnd();
             }
         }
 
@@ -221,7 +221,7 @@ namespace LMSF_Gen5
             SetEnableAllControl(!IsRemoteControlled);
             //These two controls should always be enabled:
             remoteButton.IsEnabled = true;
-            tempOutTextBox.IsEnabled = true;
+            outputTextBox.IsEnabled = true;
 
             //When in local control mode, set the enabled properties according to whether or not an experiment has beed queued or is running
             if (!IsRemoteControlled)
@@ -290,12 +290,12 @@ namespace LMSF_Gen5
         {
             try
             {
-                TextOut += gen5Reader.SetClientWindow(this);
+                OutputText += gen5Reader.SetClientWindow(this);
                 ExpFolderPath = gen5Reader.BrowseForFolder();
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at SelectExpFolderButton_Click, {exc}./n";
+                OutputText += $"Error at SelectExpFolderButton_Click, {exc}./n";
             }
         }
 
@@ -305,12 +305,12 @@ namespace LMSF_Gen5
             {
                 if (gen5Reader.IsGen5Active())
                 {
-                    TextOut += gen5Reader.TerminateGen5();
+                    OutputText += gen5Reader.TerminateGen5();
                 }
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at termination of Gen5, {exc}./n";
+                OutputText += $"Error at termination of Gen5, {exc}./n";
             }
         }
 
@@ -330,7 +330,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at NewExpButton_Click, {exc}./n";
+                OutputText += $"Error at NewExpButton_Click, {exc}./n";
                 return;
             }
 
@@ -344,17 +344,17 @@ namespace LMSF_Gen5
 
             try
             {
-                TextOut += gen5Reader.NewExperiment(ProtocolPath);
+                OutputText += gen5Reader.NewExperiment(ProtocolPath);
 
                 gen5Reader.ExperimentID = ExperimentId;
                 gen5Reader.ExperimentFolderPath = ExpFolderPath;
-                TextOut += gen5Reader.ExpSaveAs();
+                OutputText += gen5Reader.ExpSaveAs();
 
-                TextOut += gen5Reader.PlatesGetPlate();
+                OutputText += gen5Reader.PlatesGetPlate();
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at NewExp, {exc}./n";
+                OutputText += $"Error at NewExp, {exc}./n";
             }
         }
 
@@ -370,16 +370,16 @@ namespace LMSF_Gen5
             try
             {
                 startText = gen5Reader.PlateStartRead();
-                TextOut += gen5Reader.PlateStartRead();
+                OutputText += gen5Reader.PlateStartRead();
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at RunExp, {exc}./n";
+                OutputText += $"Error at RunExp, {exc}./n";
             }
 
             if (startText.Contains("StartRead Successful"))
             {
-                TextOut += WaitForFinishThenExportAndClose();
+                OutputText += WaitForFinishThenExportAndClose();
             }
             else
             {
@@ -421,7 +421,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at ReaderMonitor_DoWork, {exc}./n";
+                OutputText += $"Error at ReaderMonitor_DoWork, {exc}./n";
             }
 
             while (status == Gen5ReadStatus.eReadInProgress)
@@ -434,7 +434,7 @@ namespace LMSF_Gen5
                 }
                 catch (Exception exc)
                 {
-                    TextOut += $"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n";
+                    OutputText += $"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n";
                 }
 
                 //TODO: Handle live data stream
@@ -465,7 +465,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at ReaderMonitor_RunWorkerCompleted, {exc}./n";
+                OutputText += $"Error at ReaderMonitor_RunWorkerCompleted, {exc}./n";
             }
 
             this.Dispatcher.Invoke(() => {
@@ -473,7 +473,7 @@ namespace LMSF_Gen5
                 IsExperimentQueuedOrRunning = false;
             });
 
-            TextOut += "            ... Done.\n\n";
+            OutputText += "            ... Done.\n\n";
         }
 
         private void CarrierInButton_Click(object sender, RoutedEventArgs e)
@@ -486,11 +486,11 @@ namespace LMSF_Gen5
             IsReaderBusy = true;
             try
             {
-                TextOut += gen5Reader.CarrierIn();
+                OutputText += gen5Reader.CarrierIn();
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at CarrierIn, {exc}./n";
+                OutputText += $"Error at CarrierIn, {exc}./n";
             }
             IsReaderBusy = false;
         }
@@ -505,11 +505,11 @@ namespace LMSF_Gen5
             IsReaderBusy = true;
             try
             {
-                TextOut += gen5Reader.CarrierOut();
+                OutputText += gen5Reader.CarrierOut();
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at CarrierOut, {exc}./n";
+                OutputText += $"Error at CarrierOut, {exc}./n";
             }
             IsReaderBusy = false;
         }
@@ -518,11 +518,11 @@ namespace LMSF_Gen5
         {
             try
             {
-                TextOut += gen5Reader.ExpClose();
+                OutputText += gen5Reader.ExpClose();
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at CloseExpButton_Click, {exc}./n";
+                OutputText += $"Error at CloseExpButton_Click, {exc}./n";
             }
 
             //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
@@ -531,7 +531,7 @@ namespace LMSF_Gen5
 
         private void TemperatureButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.GetCurrentTemperature();
+            OutputText += gen5Reader.GetCurrentTemperature();
         }
 
         private void SetReaderNameAndPort()
@@ -585,7 +585,7 @@ namespace LMSF_Gen5
             }
             this.Dispatcher.Invoke(() =>
             {
-                TextOut += textOutAdd;
+                OutputText += textOutAdd;
             });
 
             string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
@@ -607,7 +607,7 @@ namespace LMSF_Gen5
             msg.ReplyLine(replyStr);
             this.Dispatcher.Invoke(() =>
             {
-                TextOut += textOutAdd;
+                OutputText += textOutAdd;
             });
         }
 
@@ -616,7 +616,7 @@ namespace LMSF_Gen5
             this.Dispatcher.Invoke(() =>
             {
                 IsConnected = false;
-                TextOut += $"Client Disconnected\n";
+                OutputText += $"Client Disconnected\n";
             });
         }
 
@@ -625,7 +625,7 @@ namespace LMSF_Gen5
             this.Dispatcher.Invoke(() =>
             {
                 IsConnected = true;
-                TextOut += $"Client Connected\n";
+                OutputText += $"Client Connected\n";
             });
         }
 
@@ -753,25 +753,25 @@ namespace LMSF_Gen5
         //Button Click event handlers to be deleted after initial testing
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut = gen5Reader.StartGen5();
-            TextOut += gen5Reader.SetClientWindow(this);
-            TextOut += gen5Reader.ConfigureUSBReader();
+            OutputText = gen5Reader.StartGen5();
+            OutputText += gen5Reader.SetClientWindow(this);
+            OutputText += gen5Reader.ConfigureUSBReader();
         }
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.PlateFileExport();
+            OutputText += gen5Reader.PlateFileExport();
         }
 
         private void StatusButton_Click(object sender, RoutedEventArgs e)
         {
             Gen5ReadStatus status = Gen5ReadStatus.eReadNotStarted;
-            TextOut += gen5Reader.PlateReadStatus(ref status);
+            OutputText += gen5Reader.PlateReadStatus(ref status);
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.ExpSave();
+            OutputText += gen5Reader.ExpSave();
         }
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //===============================================================

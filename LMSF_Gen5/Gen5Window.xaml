@@ -68,7 +68,7 @@
                     <RowDefinition Height="113"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <TextBox x:Name="tempOutTextBox" Margin="20,30,115,20" Grid.Row="1" TextWrapping="Wrap" Text="{Binding TextOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
+                <TextBox x:Name="outputTextBox" Margin="20,30,115,20" Grid.Row="1" TextWrapping="Wrap" Text="{Binding TextOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
                 <TextBlock HorizontalAlignment="Left" Margin="396,10,0,0" TextWrapping="Wrap" Text="Test Buttons (to be deleted)" VerticalAlignment="Top" Foreground="White" Width="82" Grid.Row="1"/>
                 <Button x:Name="startButton" Content="Start Gen5" HorizontalAlignment="Right" Margin="0,47,10,0" VerticalAlignment="Top" Width="75" Click="StartButton_Click" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="exportButton" Content="File Export" HorizontalAlignment="Right" Margin="0,74,10,0" VerticalAlignment="Top" Click="ExportButton_Click" MinWidth="75" Grid.Row="1" Focusable="False"/>

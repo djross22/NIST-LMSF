@@ -8,6 +8,6 @@ namespace LMSF_Gen5_Reader
 {
     public interface IReaderTextOut
     {
-        string TextOut { get; set; }
+        string OutputText { get; set; }
     }
 }
