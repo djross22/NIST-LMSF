@@ -50,7 +50,7 @@ namespace LMSF_Gen5
         private SimpleTcpServer server;
         private int tcpPort;
         private readonly object messageHandlingLock = new object();
-        private Queue<Message> messageQueue = new Queue<Message>();
+        private Queue<string> messageQueue = new Queue<string>();
         public enum ReaderStatusStates { Idle, Busy };
         public ReaderStatusStates ReaderStatus { get; private set; }
         public static List<string> Gen5CommandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
@@ -562,37 +562,47 @@ namespace LMSF_Gen5
         private void MessageReceived(object sender, Message msg)
         {
             bool goodMsg = false;
+            bool msgQueued = false;
 
             lock (messageHandlingLock)
             {
                 goodMsg = Message.CheckMessageHash(msg.MessageString);
-                if (goodMsg && !messageQueue.Contains(msg))
+                if (goodMsg && !messageQueue.Contains(msg.MessageString))
                 {
-                    messageQueue.Enqueue(msg);
+                    messageQueue.Enqueue(msg.MessageString);
+                    msgQueued = true;
                 }
             }
 
-            string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
-            
+            string textOutAdd;
+            if (msgQueued)
+            {
+                textOutAdd = $"message received and queued {messageQueue.Count}: {msg.MessageString}; ";
+            }
+            else
+            {
+                textOutAdd = $"message received {messageQueue.Count}: {msg.MessageString}; ";
+            }
             this.Dispatcher.Invoke(() =>
             {
-                TextOut += $"message received {messageQueue.Count}: {msg.MessageString}";
+                TextOut += textOutAdd;
             });
+
+            string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
 
             //Reply
             string replyStr;
-            string textOutAdd;
             if (goodMsg)
             {
                 //send back status if good message
                 replyStr = $"{msgParts[0]},{ReaderStatus},{msgParts[2]}";
-                textOutAdd = $"; reply sent, {ReaderStatus}.\n";
+                textOutAdd = $"reply sent, {ReaderStatus}.\n";
             }
             else
             {
                 //send back "fail" if bad message
                 replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
-                textOutAdd = $"; reply sent, fail.\n";
+                textOutAdd = $"reply sent, fail.\n";
             }
             msg.ReplyLine(replyStr);
             this.Dispatcher.Invoke(() =>
@@ -675,7 +685,7 @@ namespace LMSF_Gen5
                     else
                     {
                         ReaderStatus = ReaderStatusStates.Busy;
-                        Message nextMsg = messageQueue.Dequeue();
+                        string nextMsg = messageQueue.Dequeue();
                         ParseAndRunCommand(nextMsg);
                     }
                 }
@@ -685,9 +695,9 @@ namespace LMSF_Gen5
 
         }
 
-        void ParseAndRunCommand(Message msg)
+        void ParseAndRunCommand(string msg)
         {
-            string[] messageParts = Message.UnwrapTcpMessage(msg.MessageString);
+            string[] messageParts = Message.UnwrapTcpMessage(msg);
             string command = messageParts[1];
 
             //{ "CarrierIn", "CarrierOut", "RunExp" }, "StatusCheck"
