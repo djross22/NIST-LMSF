@@ -3656,7 +3656,7 @@ namespace LMSF_Scheduler
             string wrappedMessage = Message.WrapTcpMessage(msg);
             //For testing:
             //wrappedMessage += "1";
-            //Note WriteLineAndGetReply() retruns null if server takes longer than timeout to send reply
+            //Note WriteLineAndGetReply() returns null if server takes longer than timeout to send reply
             Message replyMsg = null;
             AddOutputText("    sending message to reader... ");
             //TODO: add maxRetries
@@ -3665,26 +3665,17 @@ namespace LMSF_Scheduler
             {
                 numTries++;
                 AddOutputText($"{numTries}, ");
-                replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
-                //try
-                //{
-                //    replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
-                //}
-                //catch (System.IO.IOException)
-                //{
-                //    try
-                //    {
-                //        client.Connect(readerIps[reader], 42222);
-                //    }
-                //    catch (System.Net.Sockets.SocketException e)
-                //    {
-                //        Thread.Sleep(250);
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        MessageBox.Show($"Exception: {e}");
-                //    }
-                //}
+                //replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
+                try
+                {
+                    replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
+                }
+                catch (Exception e)
+                {
+                    AddOutputText($"\n*****************************\nException caught in SendTcpMessage(), client.WriteLineAndGetReply(): {e}\n*****************************\n");
+                    replyMsg = null;
+                    Thread.Sleep(250);
+                }
                 if (replyMsg != null)
                 {
                     string[] messageParts = Message.UnwrapTcpMessage(wrappedMessage);
