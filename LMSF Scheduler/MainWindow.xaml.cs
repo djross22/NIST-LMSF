@@ -1112,6 +1112,7 @@ namespace LMSF_Scheduler
                             if (commandList.Contains(command))
                             {
                                 argsOk = true;
+                                outString += $"{name}/ {command} ";
                             }
                             else
                             {
@@ -1195,6 +1196,10 @@ namespace LMSF_Scheduler
                                     valFailed.Add(num);
                                     argsOk = false;
                                 }
+                            }
+                            if (argsOk)
+                            {
+                                outString += $"{protocolPath}/ {expIdStr}/ {saveFolderPath} ";
                             }
                         }
                     }
