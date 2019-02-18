@@ -422,7 +422,7 @@ namespace LMSF_Gen5
             try
             {
                 startText = gen5Reader.PlateStartRead();
-                AddOutputText(gen5Reader.PlateStartRead());
+                AddOutputText(startText);
             }
             catch (Exception exc)
             {
