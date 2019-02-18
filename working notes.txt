@@ -394,6 +394,8 @@ LMSF Scheduler: Add "Gen5/" and "WaitFor/ <reader>/" commands
 
 LMSF_Gen5: Add validation check to experimentID textbox
 
+LMSF_Gen5: Add code to de-queue and run commands that get recieved
+
 
 TODO:
 
@@ -402,7 +404,7 @@ Set ReaderName property correctly - based on computerName
 
 Set IPs for different readers
 
-LMSF_Gen5: De-queue and run commands that get recieved
+
 
 Test and merge into main branch
 

@@ -616,19 +616,100 @@ namespace LMSF_Gen5
 
         private void RemoteButton_Click(object sender, RoutedEventArgs e)
         {
-            IsRemoteControlled = !IsRemoteControlled;
-
+            MessageBoxResult res = MessageBoxResult.OK;
             if (IsRemoteControlled)
             {
-                StartTcpServer();
+                string okCancelPrompt = $"Are you sure you want to disconnect {ReaderName} from remote?\nClick 'OK' to continue or 'Cancel' to cancel";
+                res = MessageBox.Show(okCancelPrompt, "Disconnect Remote?", MessageBoxButton.OKCancel);
             }
-            else
+
+            if (res == MessageBoxResult.OK)
             {
-                if (server != null)
+                IsRemoteControlled = !IsRemoteControlled;
+
+                if (IsRemoteControlled)
                 {
-                    server.Stop();
+                    messageQueue.Clear();
+                    StartTcpServer();
+                    StartRemoteControl();
+                }
+                else
+                {
+                    if (server != null)
+                    {
+                        server.Stop();
+                    }
                 }
             }
+        }
+
+        private void StartRemoteControl()
+        {
+            BackgroundWorker remoteControlWorker = new BackgroundWorker();
+            remoteControlWorker.WorkerReportsProgress = false;
+            remoteControlWorker.DoWork += RemoteControl_DoWork;
+            remoteControlWorker.RunWorkerCompleted += RemoteControl_RunWorkerCompleted;
+
+            remoteControlWorker.RunWorkerAsync();
+        }
+
+        void RemoteControl_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (IsRemoteControlled)
+            {
+                if ((messageQueue.Count > 0) && !IsExperimentQueuedOrRunning)
+                {
+                    Message nextMsg = messageQueue.Dequeue();
+                    ParseAndRunCommand(nextMsg);
+                }
+                Thread.Sleep(100);
+            }
+
+        }
+
+        void ParseAndRunCommand(Message msg)
+        {
+            string[] messageParts = Message.UnwrapTcpMessage(msg.MessageString);
+            string command = messageParts[1];
+
+            //{ "CarrierIn", "CarrierOut", "RunExp" }, "StatusCheck"
+            switch (command)
+            {
+                case "CarrierIn":
+                    break;
+                case "CarrierOut":
+                    break;
+                case "StatusCheck":
+                    break;
+                default:
+                    if (command.StartsWith("RunExp"))
+                    {
+                        //command = $"RunExp/{protocolPath}/{expIdStr}/{saveFolderPath}";
+                        string[] runExpParts = command.Split('/');
+                        string protocolPath = runExpParts[1];
+                        string expIdStr = runExpParts[2];
+                        string saveFolder = runExpParts[3];
+                        this.Dispatcher.Invoke(() => {
+                            ProtocolPath = protocolPath;
+                            ExperimentId = expIdStr;
+                            ExpFolderPath = saveFolder;
+                            NewExp();
+                            RunExp();
+                        });
+                    }
+                    else
+                    {
+                        throw new System.ArgumentException($"Unsupported remote reader command, {command}", "command");
+                    }
+                    break;
+            }
+        }
+
+        void RemoteControl_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            this.Dispatcher.Invoke(() => {
+                UpdateControlEnabledStatus();
+            });
         }
 
         //===============================================================
