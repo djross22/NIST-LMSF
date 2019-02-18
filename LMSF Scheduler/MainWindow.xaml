@@ -67,8 +67,7 @@
                     <Button x:Name="testWriteButton" Content="Write" Width="75" Margin="10,0,0,10" Click="TestWriteButton_Click"/>
                 </StackPanel>
                 <ComboBox x:Name="readerComboBox" Width="120" Height="25" VerticalAlignment="Center" Margin="20,0,50,0" ItemsSource="{Binding ReaderBlockList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedReaderBlock, Mode=TwoWay}" DropDownClosed="ReaderComboBox_DropDownClosed" Grid.Column="1" HorizontalAlignment="Right"/>
-                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
-                <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="292,0,0,0" TextWrapping="Wrap" Text="Remote Connections:" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,180,0" TextWrapping="Wrap" Text="Remote Connections:" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
             </Grid>
 
 
