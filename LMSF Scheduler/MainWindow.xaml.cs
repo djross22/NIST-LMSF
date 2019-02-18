@@ -3070,7 +3070,7 @@ namespace LMSF_Scheduler
                 replyStatus = SendTcpMessage(readerName, "StatusCheck");
                 Thread.Sleep(200);
             }
-            AddOutputText($"... reader status: {replyStatus}");
+            AddOutputText($"... reader status: {replyStatus}.\n");
 
             //Send info to metadata if collecting
             if (command == "RunExp" && isCollectingXml)
@@ -3746,7 +3746,7 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        AddOutputText($"reply received... ");
+                        AddOutputText($"reply received... {replyStatus} ");
                     }
                 }
             }
