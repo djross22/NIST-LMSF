@@ -26,11 +26,11 @@ namespace LMSF_Gen5_Reader
         public string ExperimentPath { get; set; }
         public string ExportFilePath { get; set; }
         public string ExperimentFolderPath { get; set; }
-        public IReaderTextOut gen5Window { get; set; }
+        public IReaderTextOut ReaderGuiWindow { get; private set; }
 
         public Gen5Reader(IReaderTextOut win)
         {
-            gen5Window = win;
+            ReaderGuiWindow = win;
             SetReaderName();
         }
 
