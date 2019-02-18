@@ -633,7 +633,7 @@ namespace LMSF_Gen5
             }
             else
             {
-                textOutAdd = $"message received {messageQueue.Count}: {msg.MessageString}; ";
+                textOutAdd = $"duplicate message received (but not queued) {messageQueue.Count}: {msg.MessageString}; ";
             }
             this.Dispatcher.Invoke(() =>
             {
