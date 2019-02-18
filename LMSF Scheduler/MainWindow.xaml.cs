@@ -543,13 +543,21 @@ namespace LMSF_Scheduler
             inputTextBox.Focus();
         }
 
-        private void AddOutputText(string txt)
+        private void AddOutputText(string txt, bool newLine = true)
         {
             OutputText += txt;
             //Add to log file
             if (!isValidating)
             {
-                File.AppendAllText(logFilePath, txt);
+                if (newLine)
+                {
+                    string timeStr = DateTime.Now.ToString("yyyy-MM-dd.HH:mm:ss.fff");
+                    File.AppendAllText(logFilePath, $"\n{timeStr}, txt");
+                }
+                else
+                {
+                    File.AppendAllText(logFilePath, txt);
+                }
             }
         }
 
@@ -3665,7 +3673,7 @@ namespace LMSF_Scheduler
             while (replyMsg == null)
             {
                 numTries++;
-                AddOutputText($"{numTries}, ");
+                AddOutputText($"try {numTries}, ");
                 //replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
                 try
                 {
