@@ -36,13 +36,25 @@ namespace LMSF_Gen5_Reader
 
         private void SetReaderName()
         {
-            ReaderName = "Neo";
+            ReaderName = "Test";
 
             string computerName = Environment.MachineName;
             switch (computerName)
             {
-                case ("Main"):
+                case ("DESKTOP-D44787E"):
                     ReaderName = "Neo";
+                    break;
+                case ("DESKTOP-PTVORQ9"):
+                    ReaderName = "Epoch1";
+                    break;
+                case ("DESKTOP-9N430S9"):
+                    ReaderName = "Epoch2";
+                    break;
+                case ("DESKTOP-5N8AH43"):
+                    ReaderName = "Epoch3";
+                    break;
+                case ("DESKTOP-7IA5AOQ"):
+                    ReaderName = "Epoch4";
                     break;
             }
         }
