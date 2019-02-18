@@ -1127,7 +1127,8 @@ namespace LMSF_Scheduler
                         }
                         else
                         {
-                            outString += $"{name} not connected. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {name} computer.";
+                            outString += $"{name} not connected. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {name} computer,\n";
+                            outString += $"then establish the remote connection to {name} using the drop-down \"Remote Connections\" control at the bottom right of this window.";
                             valFailed.Add(num);
                         }
                     }
