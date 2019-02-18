@@ -109,7 +109,7 @@ namespace SimpleTCP
         private static string GetUniqueMsgId()
         {
             DateTime now = DateTime.Now;
-            return $"{now.ToString("yyyyMMddHHmmss")}{now.Millisecond}";
+            return now.ToString("yyyyMMddHHmmssfff");
         }
         //end DJR addition
     }
