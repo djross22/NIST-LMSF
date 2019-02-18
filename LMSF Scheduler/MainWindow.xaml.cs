@@ -368,8 +368,8 @@ namespace LMSF_Scheduler
             //client.Delimiter = 0x13;
             //client.Connect("localhost", 42222);
             //client.WriteLine("test sending line");
-
-            SendTcpMessage("Neo", "test message");
+            string msg = "StatusCheck";
+            SendTcpMessage("Neo", msg);
         }
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
