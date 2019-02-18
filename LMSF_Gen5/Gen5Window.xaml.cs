@@ -299,7 +299,7 @@ namespace LMSF_Gen5
                 if (newLine)
                 {
                     string timeStr = DateTime.Now.ToString("yyyy-MM-dd.HH:mm:ss.fff");
-                    File.AppendAllText(logFilePath, $"\n{timeStr}, txt");
+                    File.AppendAllText(logFilePath, $"\n{timeStr}, {txt}");
                 }
                 else
                 {
