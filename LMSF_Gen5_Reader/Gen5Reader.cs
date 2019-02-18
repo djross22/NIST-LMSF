@@ -166,19 +166,19 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         public string NewExperiment(string protocolPath)
         {
-            string retStr = "Running NewExperiment\n";
+            string retStr = "Running NewExperiment; ";
             ProtocolPath = protocolPath;
 
             if (IsReading)
             {
-                retStr += "Read in progress, abort read or wait until end of read before creating new experiment.\n";
+                retStr += "Read in progress, abort read or wait until end of read before creating new experiment. ";
                 return retStr;
             }
 
             if (Gen5App == null)
             {
 
-                retStr += "Gen5App is null\n";
+                retStr += "Gen5App is null. ";
                 return retStr;
             }
 
@@ -186,15 +186,15 @@ namespace LMSF_Gen5_Reader
             {
                 experiment = (Gen5.Experiment)Gen5App.NewExperiment(ProtocolPath);
                 plates = (Gen5.Plates)experiment.Plates;
-                retStr += "NewExperiment successful, with plates\n";
+                retStr += "NewExperiment successful, with plates; ";
             }
             catch (System.Runtime.InteropServices.COMException exception)
             {
-                retStr += $"NewExperiment Failed, {exception}.\n";
+                retStr += $"NewExperiment Failed, {exception}. ";
             }
             catch (Exception exception)
             {
-                retStr += $"NewExperiment Failed, {exception}.\n";
+                retStr += $"NewExperiment Failed, {exception}. ";
             }
 
             retStr += "\n";
@@ -309,17 +309,17 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         public string CarrierIn()
         {
-            string retStr = "Running CarrierIn\n";
+            string retStr = "Running CarrierIn; ";
 
             if (IsReading)
             {
-                retStr += "Read in progress, abort read or wait until end of read before moving carrier in or out.\n";
+                retStr += "Read in progress, abort read or wait until end of read before moving carrier in or out. ";
                 return retStr;
             }
 
             if (Gen5App == null)
             {
-                retStr += "gen5App is null\n";
+                retStr += "gen5App is null. ";
                 return retStr;
             }
 
@@ -330,12 +330,12 @@ namespace LMSF_Gen5_Reader
                 try
                 {
                     Gen5App.CarrierIn();
-                    retStr += "CarrierIn Successful\n";
+                    retStr += "CarrierIn Successful. ";
                     break;
                 }
                 catch (COMException exception)
                 {
-                    retStr += $"CarrierIn Failed on try number {numTries}, {exception}.\n";
+                    retStr += $"CarrierIn Failed on try number {numTries}, {exception}. ";
                     Thread.Sleep(500);
                 }
             }
@@ -350,28 +350,28 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         public string CarrierOut()
         {
-            string retStr = "Running CarrierOut\n";
+            string retStr = "Running CarrierOut; ";
 
             if (IsReading)
             {
-                retStr += "Read in progress, abort read or wait until end of read before moving carrier in or out.\n";
+                retStr += "Read in progress, abort read or wait until end of read before moving carrier in or out. ";
                 return retStr;
             }
             
             if (Gen5App == null)
             {
-                retStr += "gen5App is null\n";
+                retStr += "gen5App is null. ";
                 return retStr;
             }
 
             try
             {
                 Gen5App.CarrierOut();
-                retStr += "CarrierOut Successful\n";
+                retStr += "CarrierOut Successful. ";
             }
             catch (COMException exception)
             {
-                retStr += $"CarrierOut Failed, {exception}.";
+                retStr += $"CarrierOut Failed, {exception}. ";
             }
 
             retStr += "\n";
@@ -668,17 +668,17 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         public string ExpSaveAs()
         {
-            string retStr = "Running ExpSaveAs\n";
+            string retStr = "Running ExpSaveAs; ";
 
             if (IsReading)
             {
-                retStr += "Read in progress, abort read or wait until end of read before saving.\n";
+                retStr += "Read in progress, abort read or wait until end of read before saving. ";
                 return retStr;
             }
 
             if (experiment == null)
             {
-                retStr += "experiment is null\n";
+                retStr += "experiment is null. ";
                 return retStr;
             }
 
@@ -688,11 +688,11 @@ namespace LMSF_Gen5_Reader
                 //ExperimentPath += ".xpt";
                 ExperimentPath = GetExperimentFilePath(ExperimentFolderPath, ExperimentID, ReaderName);
                 experiment.SaveAs(ExperimentPath);
-                retStr += "SaveAs Successful\n";
+                retStr += "SaveAs Successful. ";
             }
             catch (COMException exception)
             {
-                retStr += $"SaveAs Failed, {exception}\n";
+                retStr += $"SaveAs Failed, {exception}. ";
             }
 
             retStr += "\n";
@@ -781,28 +781,28 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         public string PlatesGetPlate()
         {
-            string retStr = "Running PlatesGetPlate\n";
+            string retStr = "Running PlatesGetPlate; ";
 
             if (IsReading)
             {
-                retStr += "Read in progress, abort read or wait until end of read before running this method.\n";
+                retStr += "Read in progress, abort read or wait until end of read before running this method. ";
                 return retStr;
             }
 
             if (plates == null)
             {
-                retStr += "plates is null\n";
+                retStr += "plates is null. ";
                 return retStr;
             }
 
             try
             {
                 plate = (Gen5.Plate)plates.GetPlate(1);
-                retStr += "GetPlate Successful\n";
+                retStr += "GetPlate Successful. ";
             }
             catch (COMException exception)
             {
-                retStr += $"GetPlate Failed, {exception}\n";
+                retStr += $"GetPlate Failed, {exception}. ";
             }
 
             GC.Collect();
@@ -817,17 +817,17 @@ namespace LMSF_Gen5_Reader
         //===========================================================================================
         public string PlateStartRead()
         {
-            string retStr = "Running PlateStartRead\n";
+            string retStr = "Running PlateStartRead; ";
 
             if (IsReading)
             {
-                retStr += "Read in progress, abort read or wait until end of read before starting a new read.\n";
+                retStr += "Read in progress, abort read or wait until end of read before starting a new read. ";
                 return retStr;
             }
 
             if (plate == null)
             {
-                retStr += "plate is null\n";
+                retStr += "plate is null. ";
                 return retStr;
             }
 
@@ -835,11 +835,11 @@ namespace LMSF_Gen5_Reader
             {
                 plateReadMonitor = (Gen5.PlateReadMonitor)plate.StartReadEx(true);
                 IsReading = true;
-                retStr += "StartRead Successful, reverse plate orientation.\n";
+                retStr += "StartRead Successful, reverse plate orientation. ";
             }
             catch (COMException exception)
             {
-                retStr += $"StartRead Failed, {exception}\n";
+                retStr += $"StartRead Failed, {exception}. ";
             }
 
             retStr += "\n";

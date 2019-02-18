@@ -299,7 +299,7 @@ namespace LMSF_Gen5
                 if (newLine)
                 {
                     string timeStr = DateTime.Now.ToString("yyyy-MM-dd.HH:mm:ss.fff");
-                    File.AppendAllText(logFilePath, $"\n{timeStr}\t, {txt}");
+                    File.AppendAllText(logFilePath, $"\n{timeStr},\t {txt}");
                 }
                 else
                 {
@@ -441,13 +441,13 @@ namespace LMSF_Gen5
 
         public string WaitForFinishThenExportAndClose()
         {
-            string retStr = "Running WaitForFinishThenExportAndClose\n";
+            string retStr = "Running WaitForFinishThenExportAndClose; ";
 
             if (!(readerMonitorWorker is null))
             {
                 if (readerMonitorWorker.IsBusy)
                 {
-                    retStr += "Read in progress, abort read or wait until end of read before starting a new read.\n";
+                    retStr += "Read in progress, abort read or wait until end of read before starting a new read. ";
                     return retStr;
                 }
             }
@@ -459,7 +459,7 @@ namespace LMSF_Gen5
 
             readerMonitorWorker.RunWorkerAsync();
 
-            retStr += "    ... Read in Progress...\n";
+            retStr += "    ... Read in Progress... ";
 
             return retStr;
         }
@@ -525,7 +525,7 @@ namespace LMSF_Gen5
                 IsExperimentQueuedOrRunning = false;
             });
 
-            AddOutputText("            ... Done.\n\n");
+            AddOutputText("... Done.\n\n");
         }
 
         private void CarrierInButton_Click(object sender, RoutedEventArgs e)
