@@ -49,11 +49,10 @@ namespace LMSF_Gen5
         private string readerName;
         private SimpleTcpServer server;
         private int tcpPort;
-        private bool isHandlingMessage;
         private readonly object messageHandlingLock = new object();
         private Queue<Message> messageQueue = new Queue<Message>();
-        public enum ReaderStatus { Idle, Busy };
-        private ReaderStatus status;
+        public enum ReaderStatusStates { Idle, Busy };
+        public ReaderStatusStates ReaderStatus { get; private set; }
         public static List<string> Gen5CommandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
 
         public Gen5Window()
@@ -156,13 +155,11 @@ namespace LMSF_Gen5
                 {
                     statusBorder.Background = Brushes.LimeGreen;
                     statusTextBlock.Text = "Reader Busy";
-                    status = ReaderStatus.Busy;
                 }
                 else
                 {
                     statusBorder.Background = Brushes.Red;
                     statusTextBlock.Text = "Reader Idle";
-                    status = ReaderStatus.Idle;
                 }
             }
         }
@@ -588,8 +585,8 @@ namespace LMSF_Gen5
             if (goodMsg)
             {
                 //send back status if good message
-                replyStr = $"{msgParts[0]},{status},{msgParts[2]}";
-                textOutAdd = $"; reply sent, {status}.\n";
+                replyStr = $"{msgParts[0]},{ReaderStatus},{msgParts[2]}";
+                textOutAdd = $"; reply sent, {ReaderStatus}.\n";
             }
             else
             {
@@ -665,11 +662,24 @@ namespace LMSF_Gen5
         {
             while (IsRemoteControlled)
             {
-                if ((messageQueue.Count > 0) && !IsExperimentQueuedOrRunning)
+                if (IsExperimentQueuedOrRunning || IsReaderBusy)
                 {
-                    Message nextMsg = messageQueue.Dequeue();
-                    ParseAndRunCommand(nextMsg);
+                    ReaderStatus = ReaderStatusStates.Busy;
                 }
+                else
+                {
+                    if (messageQueue.Count == 0)
+                    {
+                        ReaderStatus = ReaderStatusStates.Idle;
+                    }
+                    else
+                    {
+                        ReaderStatus = ReaderStatusStates.Busy;
+                        Message nextMsg = messageQueue.Dequeue();
+                        ParseAndRunCommand(nextMsg);
+                    }
+                }
+                
                 Thread.Sleep(100);
             }
 

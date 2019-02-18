@@ -3118,7 +3118,7 @@ namespace LMSF_Scheduler
             List<object> argsList = e.Argument as List<object>;
             string reader = (string)argsList[0];
 
-            while (GetReaderStatus(reader) == $"{LMSF_Gen5.Gen5Window.ReaderStatus.Busy}")
+            while (GetReaderStatus(reader) == $"{LMSF_Gen5.Gen5Window.ReaderStatusStates.Busy}")
             {
                 Thread.Sleep(100);
             }
