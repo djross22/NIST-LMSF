@@ -684,10 +684,17 @@ namespace LMSF_Gen5
             switch (command)
             {
                 case "CarrierIn":
+                    this.Dispatcher.Invoke(() => {
+                        CarrierIn();
+                    });
                     break;
                 case "CarrierOut":
+                    this.Dispatcher.Invoke(() => {
+                        CarrierOut();
+                    });
                     break;
                 case "StatusCheck":
+                    //Don't need to do anything here because the reader status is automatically sent back
                     break;
                 default:
                     if (command.StartsWith("RunExp"))
