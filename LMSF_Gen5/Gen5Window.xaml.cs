@@ -44,6 +44,9 @@ namespace LMSF_Gen5
 
         private Brush startingButtonBackground;
 
+        //log file
+        private string logFilePath;
+
         //variables for TCP communication
         //private string computerName;
         private string readerName;
@@ -71,14 +74,15 @@ namespace LMSF_Gen5
                 gen5Reader = new Gen5Reader(this);
 
                 OutputText = gen5Reader.StartGen5();
-                OutputText += gen5Reader.SetClientWindow(this);
-                OutputText += gen5Reader.ConfigureUSBReader();
+                AddOutputText(gen5Reader.SetClientWindow(this));
+                AddOutputText(gen5Reader.ConfigureUSBReader());
                 ReaderName = gen5Reader.ReaderName;
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at initilization of Gen5, {exc}./n";
+                AddOutputText($"Error at initilization of Gen5, {exc}./n");
             }
+            NewLogFile();
         }
 
         #region Properties Getters and Setters
@@ -286,16 +290,64 @@ namespace LMSF_Gen5
             }
         }
 
+        private void AddOutputText(string txt, bool newLine = true)
+        {
+            OutputText += txt;
+            //Add to log file
+            if (IsRemoteControlled && (logFilePath != null))
+            {
+                if (newLine)
+                {
+                    string timeStr = DateTime.Now.ToString("yyyy-MM-dd.HH:mm:ss.fff");
+                    File.AppendAllText(logFilePath, $"\n{timeStr}, txt");
+                }
+                else
+                {
+                    File.AppendAllText(logFilePath, txt);
+                }
+            }
+        }
+
+        private bool NewLogFile()
+        {
+            bool okToGo = true;
+            logFilePath = SharedParameters.LogFileFolderPath + NewLogFileName();
+            if (!Directory.Exists(SharedParameters.LogFileFolderPath))
+            {
+                try
+                {
+                    Directory.CreateDirectory(SharedParameters.LogFileFolderPath);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    string dialogText = @"Failed to create log file directory. Try manually creating the directory: 'C:\Shared Files\LMSF Scheduler\LogFiles\', then press 'OK' to continue, or 'Cancel' to abort the run.";
+                    MessageBoxResult result = MessageBox.Show(dialogText, "Log File Directory Error", MessageBoxButton.OKCancel);
+                    if (result == MessageBoxResult.Cancel)
+                    {
+                        okToGo = false;
+                    }
+
+                }
+            }
+
+            return okToGo;
+        }
+
+        private string NewLogFileName()
+        {
+            return $"{DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss")}.gen5.trc";
+        }
+
         private void SelectExpFolderButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                OutputText += gen5Reader.SetClientWindow(this);
+                AddOutputText(gen5Reader.SetClientWindow(this));
                 ExpFolderPath = gen5Reader.BrowseForFolder();
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at SelectExpFolderButton_Click, {exc}./n";
+                AddOutputText($"Error at SelectExpFolderButton_Click, {exc}./n");
             }
         }
 
@@ -305,12 +357,12 @@ namespace LMSF_Gen5
             {
                 if (gen5Reader.IsGen5Active())
                 {
-                    OutputText += gen5Reader.TerminateGen5();
+                    AddOutputText(gen5Reader.TerminateGen5());
                 }
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at termination of Gen5, {exc}./n";
+                AddOutputText($"Error at termination of Gen5, {exc}./n");
             }
         }
 
@@ -330,7 +382,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at NewExpButton_Click, {exc}./n";
+                AddOutputText($"Error at NewExpButton_Click, {exc}./n");
                 return;
             }
 
@@ -344,17 +396,17 @@ namespace LMSF_Gen5
 
             try
             {
-                OutputText += gen5Reader.NewExperiment(ProtocolPath);
+                AddOutputText(gen5Reader.NewExperiment(ProtocolPath));
 
                 gen5Reader.ExperimentID = ExperimentId;
                 gen5Reader.ExperimentFolderPath = ExpFolderPath;
-                OutputText += gen5Reader.ExpSaveAs();
+                AddOutputText(gen5Reader.ExpSaveAs());
 
-                OutputText += gen5Reader.PlatesGetPlate();
+                AddOutputText(gen5Reader.PlatesGetPlate());
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at NewExp, {exc}./n";
+                AddOutputText($"Error at NewExp, {exc}./n");
             }
         }
 
@@ -370,16 +422,16 @@ namespace LMSF_Gen5
             try
             {
                 startText = gen5Reader.PlateStartRead();
-                OutputText += gen5Reader.PlateStartRead();
+                AddOutputText(gen5Reader.PlateStartRead());
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at RunExp, {exc}./n";
+                AddOutputText($"Error at RunExp, {exc}./n");
             }
 
             if (startText.Contains("StartRead Successful"))
             {
-                OutputText += WaitForFinishThenExportAndClose();
+                AddOutputText(WaitForFinishThenExportAndClose());
             }
             else
             {
@@ -421,7 +473,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at ReaderMonitor_DoWork, {exc}./n";
+                AddOutputText($"Error at ReaderMonitor_DoWork, {exc}./n");
             }
 
             while (status == Gen5ReadStatus.eReadInProgress)
@@ -434,7 +486,7 @@ namespace LMSF_Gen5
                 }
                 catch (Exception exc)
                 {
-                    OutputText += $"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n";
+                    AddOutputText($"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n");
                 }
 
                 //TODO: Handle live data stream
@@ -465,7 +517,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at ReaderMonitor_RunWorkerCompleted, {exc}./n";
+                AddOutputText($"Error at ReaderMonitor_RunWorkerCompleted, {exc}./n");
             }
 
             this.Dispatcher.Invoke(() => {
@@ -473,7 +525,7 @@ namespace LMSF_Gen5
                 IsExperimentQueuedOrRunning = false;
             });
 
-            OutputText += "            ... Done.\n\n";
+            AddOutputText("            ... Done.\n\n");
         }
 
         private void CarrierInButton_Click(object sender, RoutedEventArgs e)
@@ -486,11 +538,11 @@ namespace LMSF_Gen5
             IsReaderBusy = true;
             try
             {
-                OutputText += gen5Reader.CarrierIn();
+                AddOutputText(gen5Reader.CarrierIn());
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at CarrierIn, {exc}./n";
+                AddOutputText($"Error at CarrierIn, {exc}./n");
             }
             IsReaderBusy = false;
         }
@@ -505,11 +557,11 @@ namespace LMSF_Gen5
             IsReaderBusy = true;
             try
             {
-                OutputText += gen5Reader.CarrierOut();
+                AddOutputText(gen5Reader.CarrierOut());
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at CarrierOut, {exc}./n";
+                AddOutputText($"Error at CarrierOut, {exc}./n");
             }
             IsReaderBusy = false;
         }
@@ -518,11 +570,11 @@ namespace LMSF_Gen5
         {
             try
             {
-                OutputText += gen5Reader.ExpClose();
+                AddOutputText(gen5Reader.ExpClose());
             }
             catch (Exception exc)
             {
-                OutputText += $"Error at CloseExpButton_Click, {exc}./n";
+                AddOutputText($"Error at CloseExpButton_Click, {exc}./n");
             }
 
             //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
@@ -531,7 +583,7 @@ namespace LMSF_Gen5
 
         private void TemperatureButton_Click(object sender, RoutedEventArgs e)
         {
-            OutputText += gen5Reader.GetCurrentTemperature();
+            AddOutputText(gen5Reader.GetCurrentTemperature());
         }
 
         private void SetReaderNameAndPort()
@@ -585,7 +637,7 @@ namespace LMSF_Gen5
             }
             this.Dispatcher.Invoke(() =>
             {
-                OutputText += textOutAdd;
+                AddOutputText(textOutAdd);
             });
 
             string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
@@ -607,7 +659,7 @@ namespace LMSF_Gen5
             msg.ReplyLine(replyStr);
             this.Dispatcher.Invoke(() =>
             {
-                OutputText += textOutAdd;
+                AddOutputText(textOutAdd);
             });
         }
 
@@ -616,7 +668,7 @@ namespace LMSF_Gen5
             this.Dispatcher.Invoke(() =>
             {
                 IsConnected = false;
-                OutputText += $"Client Disconnected\n";
+                AddOutputText($"Client Disconnected\n");
             });
         }
 
@@ -625,7 +677,7 @@ namespace LMSF_Gen5
             this.Dispatcher.Invoke(() =>
             {
                 IsConnected = true;
-                OutputText += $"Client Connected\n";
+                AddOutputText($"Client Connected\n");
             });
         }
 
@@ -754,24 +806,24 @@ namespace LMSF_Gen5
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
             OutputText = gen5Reader.StartGen5();
-            OutputText += gen5Reader.SetClientWindow(this);
-            OutputText += gen5Reader.ConfigureUSBReader();
+            AddOutputText(gen5Reader.SetClientWindow(this));
+            AddOutputText(gen5Reader.ConfigureUSBReader());
         }
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            OutputText += gen5Reader.PlateFileExport();
+            AddOutputText(gen5Reader.PlateFileExport());
         }
 
         private void StatusButton_Click(object sender, RoutedEventArgs e)
         {
             Gen5ReadStatus status = Gen5ReadStatus.eReadNotStarted;
-            OutputText += gen5Reader.PlateReadStatus(ref status);
+            AddOutputText(gen5Reader.PlateReadStatus(ref status));
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OutputText += gen5Reader.ExpSave();
+            AddOutputText(gen5Reader.ExpSave());
         }
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //===============================================================
