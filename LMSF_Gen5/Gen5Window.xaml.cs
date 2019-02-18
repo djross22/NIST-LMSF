@@ -781,6 +781,7 @@ namespace LMSF_Gen5
                             ExperimentId = expIdStr;
                             ExpFolderPath = saveFolder;
                             NewExp();
+                            CarrierIn();
                             RunExp();
                         });
                     }
