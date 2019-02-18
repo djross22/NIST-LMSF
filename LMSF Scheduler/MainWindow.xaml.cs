@@ -545,9 +545,11 @@ namespace LMSF_Scheduler
 
         private void AddOutputText(string txt, bool newLine = true)
         {
+
             OutputText += txt;
+
             //Add to log file
-            if (!isValidating)
+            if (!isValidating && (logFilePath != null))
             {
                 if (newLine)
                 {
