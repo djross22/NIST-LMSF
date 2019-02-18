@@ -327,6 +327,10 @@ namespace LMSF_Scheduler
                 readerClients[s] = null;
             }
             readerIps["Neo"] = "localhost";
+            readerIps["Epoch1"] = "129.6.167.36";
+            readerIps["Epoch2"] = "129.6.167.37";
+            readerIps["Epoch3"] = "129.6.167.38";
+            readerIps["Epoch4"] = "129.6.167.39";
             //Set IPs for Epoch readers
 
             metaDictionary = new Dictionary<string, string>();
