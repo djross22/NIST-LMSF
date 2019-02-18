@@ -253,7 +253,7 @@ namespace LMSF_Scheduler
             {
                 this.outputText = value;
                 OnPropertyChanged("OutputText");
-                outputTextBox.ScrollToEnd();
+                this.Dispatcher.Invoke(() => { outputTextBox.ScrollToEnd(); });
             }
         }
         #endregion
