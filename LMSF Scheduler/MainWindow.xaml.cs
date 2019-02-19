@@ -3736,14 +3736,34 @@ namespace LMSF_Scheduler
                 }
                 if (replyMsg != null)
                 {
-                    string[] messageParts = Message.UnwrapTcpMessage(wrappedMessage);
-                    string[] replyParts = Message.UnwrapTcpMessage(replyMsg.MessageString);
+                    string[] messageParts = new string[] { "msg", "msg", "msg" };
+                    string[] replyParts = new string[] { "rpl", "fail", "rpl" };
+                    try
+                    {
+                        messageParts = Message.UnwrapTcpMessage(wrappedMessage);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        AddOutputText($"\n*****************************\nException caught in SendTcpMessage(), UnwrapTcpMessage(wrappedMessage): {e}\n*****************************\n");
+                        Thread.Sleep(250);
+                    }
+                    try
+                    {
+                        replyParts = Message.UnwrapTcpMessage(replyMsg.MessageString);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        AddOutputText($"\n*****************************\nException caught in SendTcpMessage(), UnwrapTcpMessage(replyMsg.MessageString): {e}\n*****************************\n");
+                        Thread.Sleep(250);
+                    }
+                    
                     replyStatus = replyParts[1];
                     bool msgRecieved = false;
                     if (replyStatus != "fail")
                     {
-                        msgRecieved = (messageParts[0] == replyParts[0]) && (messageParts[0] == replyParts[0]);
+                        msgRecieved = (messageParts[0] == replyParts[0]) && (messageParts[2] == replyParts[2]);
                     }
+
                     if (!msgRecieved)
                     {
                         //if the message did not get received properly, set replyMSg = null to try again.
