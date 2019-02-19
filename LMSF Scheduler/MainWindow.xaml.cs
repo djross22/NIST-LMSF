@@ -2190,6 +2190,14 @@ namespace LMSF_Scheduler
 
         private bool Validate()
         {
+            //clear GUI
+            validationBorder.Background = Brushes.Transparent;
+            OutputText = "";
+            for (int i=0; i<10; i++)
+            {
+                Thread.Sleep(10);
+            }
+
             IsPaused = false;
             AbortCalled = false;
             IsRunning = true;
