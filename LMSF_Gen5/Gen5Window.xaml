@@ -55,7 +55,8 @@
             </Grid.RowDefinitions>
             <Button x:Name="newExpButton" Content="New Exp" HorizontalAlignment="Left" Margin="31,35,0,0" VerticalAlignment="Top" Width="75" Click="NewExpButton_Click" Focusable="False"/>
             <Button x:Name="runExpButton" Content="Run Exp" HorizontalAlignment="Left" Margin="31,70,0,0" VerticalAlignment="Top" Width="75" Click="RunExpButton_Click" Focusable="False"/>
-            <Button x:Name="closeExpButton" Content="Close Exp" HorizontalAlignment="Left" Margin="124,70,0,0" VerticalAlignment="Top" Width="75" Click="CloseExpButton_Click"/>
+            <Button x:Name="closeExpButton" Content="Close Exp" HorizontalAlignment="Left" Margin="127,35,0,0" VerticalAlignment="Top" Width="75" Click="CloseExpButton_Click"/>
+            <Button x:Name="abortReadButton" Content="Abort Read" HorizontalAlignment="Left" Margin="127,70,0,0" VerticalAlignment="Top" Width="75" Click="AbortReadButton_Click"/>
             <TextBlock HorizontalAlignment="Left" Margin="31,10,0,0" TextWrapping="Wrap" Text="Control Buttons:" VerticalAlignment="Top" Foreground="White"/>
             <Button x:Name="carrierOutButton" Content="Carrier Out" HorizontalAlignment="Left" Margin="222,35,0,0" VerticalAlignment="Top" Width="75" Click="CarrierOutButton_Click" Focusable="False"/>
             <Button x:Name="carrierInButton" Content="Carrier In" HorizontalAlignment="Left" Margin="222,70,0,0" VerticalAlignment="Top" Width="75" Click="CarrierInButton_Click" Focusable="False"/>
@@ -74,13 +75,8 @@
                 <Button x:Name="exportButton" Content="File Export" HorizontalAlignment="Right" Margin="0,74,10,0" VerticalAlignment="Top" Click="ExportButton_Click" MinWidth="75" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="statusButton" Content="Plate Status" HorizontalAlignment="Right" Margin="0,101,10,0" VerticalAlignment="Top" Width="75" Click="StatusButton_Click" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Right" Margin="0,128,10,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" Grid.Row="1" Focusable="False"/>
-
                 <TextBlock HorizontalAlignment="Left" Margin="20,10,0,0" TextWrapping="Wrap" Text="Status Monitor:" VerticalAlignment="Top" Foreground="White" Grid.Row="1"/>
-
-
-
             </Grid>
         </Grid>
-
     </Grid>
 </Window>

@@ -581,6 +581,27 @@ namespace LMSF_Gen5
             IsExperimentQueuedOrRunning = false;
         }
 
+        private void AbortReadButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsReaderBusy)
+            {
+                var messageBoxResult =  MessageBox.Show("Are you sure you want to abort the current read?\nClick 'Yes' to abort or 'No' to continue the current read.", "Abort Read?", MessageBoxButton.YesNo);
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        AddOutputText(gen5Reader.PlateAbortRead());
+                    }
+                    catch (Exception exc)
+                    {
+                        AddOutputText($"Error at AbortReadButton_Click, {exc}./n");
+                    }
+                    //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
+                    IsExperimentQueuedOrRunning = false;
+                }
+            }
+        }
+
         private void TemperatureButton_Click(object sender, RoutedEventArgs e)
         {
             AddOutputText(gen5Reader.GetCurrentTemperature());
