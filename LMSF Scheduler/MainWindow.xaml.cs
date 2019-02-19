@@ -3716,7 +3716,7 @@ namespace LMSF_Scheduler
             //wrappedMessage += "1";
             //Note WriteLineAndGetReply() returns null if server takes longer than timeout to send reply
             Message replyMsg = null;
-            AddOutputText($"sending message to reader, {wrappedMessage} ... ");
+            AddOutputText($"sending message to {reader}, {wrappedMessage} ... ");
             //TODO: add maxRetries
             int numTries = 0;
             while (replyMsg == null)
