@@ -447,6 +447,8 @@ LMSF_Gen5: Add CarrierIn() step before RunExp() in ParseAndRunCommand() for RunE
 
 LMSF_Gen5: Add AbortRead button and command
 
+SimpleTCP: Replace DataReceived with DelimiterDataReceived() in WriteLineAndGetReply() so that both message and reply are handled as lines (delimieted by Delimiter = 0x13)
+
 
 TODO:
 
@@ -468,7 +470,7 @@ Automatically write something to dictionary when running Gen5/?
 
 
 
-SimpleTCP: test //DJR TODO: replace with DelimiterDataReceived in WriteLineAndGetReply()
+
 
 Reader initialization.
 
