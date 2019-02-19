@@ -396,17 +396,76 @@ LMSF_Gen5: Add validation check to experimentID textbox
 
 LMSF_Gen5: Add code to de-queue and run commands that get recieved
 
+LMSF Scheduler: Set ReaderName property correctly - based on computer hostname
+
+LMSF Scheduler: Set IPs for different readers
+
+LMSF_Gen5: Add code run CarrierOut and CarrierIn commands in ParseAndRunCommand()
+
+LMSF_Gen5.Gen5Window: Change readerStatus to property (ReaderStatus) and stop setting it in the IsReaderBusy property setter;
+    But do set the IsReaderBusy property in the RemoteControl_DoWork() method so that it will appropriately signal to the Scheduler "WaitFor/ <reader>" command.
+	Also, rename the enum ReaderStatus -> ReaderStatusStates
+
+LMSF Scheduler: Inrease Sleep time in WaitForGen5()
+
+LMSF Scheduler: Add AddOutputText(string txt) method and use it in place of "OutputText +=" - so that everything gets captured to log file
+
+LMSF_Gen5: Change messageQueue type to string so that messageQueue.Contains() works as expected to avoid duplicate commands getting queued
+
+LMSF Scheduler: Add Exception handling in SendTcpMessage(), client.WriteLineAndGetReply() - with excpetion written to log file; any excpetion results in a re-try.
+
+LMSF Scheduler: Add autoscroll to bottom
+
+LMSF Scheduler: Add datetime stamps to each line sent to log file
+
+LMSF Scheduler: Add wrapped message to output text after, "sending message to reader..."
+
+LMSF Scheduler: Add output text after "Running Gen5 Command:"
+
+LMSF Scheduler Gen5/: In validation, when not connected add text about turning on connection on the Scheduler end. Also add label for the relevant control on the GUI
+
+LMSF Scheduler: Change message on connection comboBox - depending on whether or not the reader is currently connected
+    also, don't change indicator to green if connection isn't made
+
+LMSF_Gen5.Gen5Window: Change property name TextOut -> OutputText, and tempOutTextBox -> outputTextBox, for consistency with Scheduler
+
+LMSF_Gen5.Gen5Window: Add output to log file (and add AddOutputText() method similar to LMSF Scheduler)
+
+add tab to log file lines after timestamp
+
+change log file name endings to "-gen5.trc" and "-lmsf.trc"
+
+Change output message for non-queued/duplicate messages, to make it more clear
+
+Change message hash timestamp format to "fff"
+
+LMSF Scheduler Gen5/<reader>/ RunExp: Add status check to make sure reader actually starts the read before moving on - to avoid having WaitFor/ <reader> return with "Idle" because read had not yet started.
+
+LMSF Scheduler : Make bottom task button area a bit bigger
+
+LMSF_Gen5: Add CarrierIn() step before RunExp() in ParseAndRunCommand() for RunExp command - becasue the Gen5Reader.CarrierIn() has the code to re-try 3 times if there is a bump error
+
+LMSF_Gen5: Add AbortRead button and command
+
 
 TODO:
 
 
-Set ReaderName property correctly - based on computerName
 
-Set IPs for different readers
+Add sleep time as optional parameter to WaitFor/
 
+
+
+lock (messageHandlingLock)
 
 
 Test and merge into main branch
+
+test for graceful closing and/or exit of Scheduler and Gen5Window - with respect to TCP connections
+
+Automatically write something to dictionary when running Gen5/?
+
+
 
 
 SimpleTCP: test //DJR TODO: replace with DelimiterDataReceived in WriteLineAndGetReply()
@@ -415,6 +474,7 @@ Reader initialization.
 
 
 Add quick connection test in SimpleTCP.IsConnected()
+LMSF Scheduler: on sending command, check if connected first, then reconnect if necessary
 	
 Set up maxRetries in Scheduler.SendTcpMessage()
 
