@@ -3741,6 +3741,7 @@ namespace LMSF_Scheduler
                     try
                     {
                         messageParts = Message.UnwrapTcpMessage(wrappedMessage);
+                        AddOutputText($"messageParts: {messageParts[0]},{messageParts[1]},{messageParts[2]}, ", false);
                     }
                     catch (ArgumentException e)
                     {
@@ -3750,6 +3751,7 @@ namespace LMSF_Scheduler
                     try
                     {
                         replyParts = Message.UnwrapTcpMessage(replyMsg.MessageString);
+                        AddOutputText($"replyParts: {replyParts[0]},{replyParts[1]},{replyParts[2]}, ", false);
                     }
                     catch (ArgumentException e)
                     {
