@@ -449,6 +449,8 @@ LMSF_Gen5: Add AbortRead button and command
 
 SimpleTCP: Replace DataReceived with DelimiterDataReceived() in WriteLineAndGetReply() so that both message and reply are handled as lines (delimieted by Delimiter = 0x13)
 
+LMSF_Gen5: Add oldMessageQueue - to take messages that have been run - to avoid running duplicates that arrive slowly (after the original has run and been dequeued)
+
 
 TODO:
 

@@ -54,6 +54,7 @@ namespace LMSF_Gen5
         private int tcpPort;
         private readonly object messageHandlingLock = new object();
         private Queue<string> messageQueue = new Queue<string>();
+        private Queue<string> oldMessageQueue = new Queue<string>();
         public enum ReaderStatusStates { Idle, Busy };
         public ReaderStatusStates ReaderStatus { get; private set; }
         public static List<string> Gen5CommandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
@@ -640,7 +641,7 @@ namespace LMSF_Gen5
             lock (messageHandlingLock)
             {
                 goodMsg = Message.CheckMessageHash(msg.MessageString);
-                if (goodMsg && !messageQueue.Contains(msg.MessageString))
+                if (goodMsg && !messageQueue.Contains(msg.MessageString) && !oldMessageQueue.Contains(msg.MessageString))
                 {
                     messageQueue.Enqueue(msg.MessageString);
                     msgQueued = true;
@@ -718,6 +719,7 @@ namespace LMSF_Gen5
                 if (IsRemoteControlled)
                 {
                     messageQueue.Clear();
+                    oldMessageQueue.Clear();
                     StartTcpServer();
                     StartRemoteControl();
                 }
@@ -759,6 +761,7 @@ namespace LMSF_Gen5
                     {
                         ReaderStatus = ReaderStatusStates.Busy;
                         string nextMsg = messageQueue.Dequeue();
+                        oldMessageQueue.Enqueue(nextMsg);
                         ParseAndRunCommand(nextMsg);
                     }
                 }
