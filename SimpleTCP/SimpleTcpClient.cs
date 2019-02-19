@@ -181,8 +181,9 @@ namespace SimpleTCP
 		{
 			Message mReply = null;
             //DJR TODO: replace with DelimiterDataReceived?
-            this.DataReceived += (s, e) => { mReply = e; };
-			WriteLine(data);
+            //this.DataReceived += (s, e) => { mReply = e; };
+            this.DelimiterDataReceived += (s, e) => { mReply = e; };
+            WriteLine(data);
 
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
