@@ -316,7 +316,7 @@ namespace LMSF_Scheduler
             string[] args = App.commandLineArgs;
             if (args.Length > 0)
             {
-                // open script file if it is passed as first argument
+                //Open a script file if it is passed as first argument
                 //The OpenFile() method handles checking for ".lmsf" ending
                 //    and has try... catch in case the filename has other problems
                 // it also sets the ExperimentFileName property
@@ -348,6 +348,22 @@ namespace LMSF_Scheduler
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
+        }
+
+        public void SecondCommandRun(IList<string> args)
+        {
+            if (!IsRunning)
+            {
+                //The agument list here includes "LMSF Scheduler.exe" as args[0]
+                if (args.Count > 1)
+                {
+                    //Open a script file if it is passed as first argument
+                    //The OpenFile() method handles checking for ".lmsf" ending
+                    //    and has try... catch in case the filename has other problems
+                    // it also sets the ExperimentFileName property
+                    OpenFile(args[1]);
+                }
+            }
         }
 
         private List<string> GetConnectedReadersList()

@@ -37,6 +37,8 @@ namespace LMSF_Scheduler
         {
             // handle command line arguments of second instance
             // ...
+            MainWindow win = (MainWindow)this.MainWindow;
+            win.SecondCommandRun(args);
             return true;
         }
     }
