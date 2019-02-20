@@ -364,6 +364,12 @@ namespace LMSF_Scheduler
                     OpenFile(args[1]);
                 }
             }
+            this.Show();
+            this.WindowState = WindowState.Normal;
+            this.Activate();
+            this.Topmost = true;
+            this.Topmost = false;
+            this.Focus();
         }
 
         private List<string> GetConnectedReadersList()

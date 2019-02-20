@@ -16,13 +16,13 @@
         "Entry"
         {
         "MsmKey" = "8:_2DCA251C2227574A4586AF081B7CA3F9"
-        "OwnerKey" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
+        "OwnerKey" = "8:_E411F22A7CDF4870B0E7BF848E92A747"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_2DCA251C2227574A4586AF081B7CA3F9"
-        "OwnerKey" = "8:_E411F22A7CDF4870B0E7BF848E92A747"
+        "OwnerKey" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -34,12 +34,6 @@
         "Entry"
         {
         "MsmKey" = "8:_CF695ED28088F0ABBC71B1AB9A85059A"
-        "OwnerKey" = "8:_D1FD5C1031AAB8AC5906F91F52B91872"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_CF695ED28088F0ABBC71B1AB9A85059A"
         "OwnerKey" = "8:_E411F22A7CDF4870B0E7BF848E92A747"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -47,6 +41,12 @@
         {
         "MsmKey" = "8:_CF695ED28088F0ABBC71B1AB9A85059A"
         "OwnerKey" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CF695ED28088F0ABBC71B1AB9A85059A"
+        "OwnerKey" = "8:_D1FD5C1031AAB8AC5906F91F52B91872"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -64,12 +64,6 @@
         "Entry"
         {
         "MsmKey" = "8:_E6A3A71A5180F2B07F5D1D9D638165A7"
-        "OwnerKey" = "8:_D1FD5C1031AAB8AC5906F91F52B91872"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E6A3A71A5180F2B07F5D1D9D638165A7"
         "OwnerKey" = "8:_E411F22A7CDF4870B0E7BF848E92A747"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -81,7 +75,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_ED0B0118571EDA9BB619FE6BADB8E327"
+        "MsmKey" = "8:_E6A3A71A5180F2B07F5D1D9D638165A7"
         "OwnerKey" = "8:_D1FD5C1031AAB8AC5906F91F52B91872"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -95,6 +89,12 @@
         {
         "MsmKey" = "8:_ED0B0118571EDA9BB619FE6BADB8E327"
         "OwnerKey" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ED0B0118571EDA9BB619FE6BADB8E327"
+        "OwnerKey" = "8:_D1FD5C1031AAB8AC5906F91F52B91872"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -106,18 +106,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2DCA251C2227574A4586AF081B7CA3F9"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E411F22A7CDF4870B0E7BF848E92A747"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -125,6 +113,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_D1FD5C1031AAB8AC5906F91F52B91872"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_E411F22A7CDF4870B0E7BF848E92A747"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -145,6 +139,12 @@
         "OwnerKey" = "8:_E6A3A71A5180F2B07F5D1D9D638165A7"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_2DCA251C2227574A4586AF081B7CA3F9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -163,6 +163,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -179,6 +187,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -386,6 +402,29 @@
         }
         "FileType"
         {
+            "{5EB83D71-FA18-4901-BE56-DE22E13CC478}:_CB9E1BC0B0C840B396CB36187D2A77C3"
+            {
+            "Name" = "8:LMSF Protocol"
+            "Description" = "8:Protocol script files for the LMSF automation controls"
+            "Extensions" = "8:lmsf"
+            "MIME" = "8:"
+            "Icon" = "8:"
+            "IconIndex" = "3:0"
+                "Command"
+                {
+                "Command" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
+                }
+                "Verbs"
+                {
+                    "{95C0C507-CBF0-42B8-B119-07219E384A4A}:_8EAE725D805E45FEA2897DBFC3066A7C"
+                    {
+                    "Command" = "8:&Open"
+                    "Verb" = "8:open"
+                    "Arguments" = "8:\"%1\""
+                    "Order" = "3:0"
+                    }
+                }
+            }
         }
         "Folder"
         {
