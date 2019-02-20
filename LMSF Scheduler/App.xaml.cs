@@ -14,13 +14,17 @@ namespace LMSF_Scheduler
     /// </summary>
     public partial class App : Application, ISingleInstanceApp
     {
+        public static string[] commandLineArgs;
+
         //Code from: https://www.codeproject.com/Articles/84270/WPF-Single-Instance-Application
         private const string Unique = "LMSF_Scheduler_Unique_Hold_String";
         [STAThread]
-        public static void Main()
+        public static void Main(string[] args)
         {
             if (SingleInstance<App>.InitializeAsFirstInstance(Unique))
             {
+                commandLineArgs = args;
+
                 var application = new App();
                 application.InitializeComponent();
                 application.Run();

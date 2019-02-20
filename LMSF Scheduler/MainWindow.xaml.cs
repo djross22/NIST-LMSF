@@ -311,7 +311,19 @@ namespace LMSF_Scheduler
         public MainWindow()
         {
             InitializeComponent();
-            runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
+
+            //Variables for parsing input arguments
+            string[] args = App.commandLineArgs;
+            if (args.Length > 0)
+            {
+                // open script file if it is passed as first argument
+                //The OpenFile() method handles checking for ".lmsf" ending
+                //    and has try... catch in case the filename has other problems
+                // it also sets the ExperimentFileName property
+                OpenFile(args[0]);
+            }
+
+                runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
 
             DataContext = this;
 
@@ -452,6 +464,36 @@ namespace LMSF_Scheduler
                 Open();
             }
             inputTextBox.Focus();
+        }
+
+        private void OpenFile(string file)
+        {
+            if (!InputChanged || SaveFirstQuery())
+            {
+                Open(file);
+            }
+            inputTextBox.Focus();
+        }
+
+        private void Open(string file)
+        {
+            if (file.EndsWith(".lmsf", StringComparison.CurrentCultureIgnoreCase))
+            {
+                try
+                {
+                    ExperimentFileName = file;
+                    InputText = File.ReadAllText(ExperimentFileName);
+                    InputChanged = false;
+                }
+                catch
+                {
+                    MessageBox.Show($"Failed to open file, {file}");
+                }
+            }
+            else
+            {
+                MessageBox.Show($"{file} is not an LMSF script file (*.lmsf)");
+            }
         }
 
         private void Open()
