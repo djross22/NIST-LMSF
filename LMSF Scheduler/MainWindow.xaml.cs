@@ -311,7 +311,19 @@ namespace LMSF_Scheduler
         public MainWindow()
         {
             InitializeComponent();
-            runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
+
+            //Variables for parsing input arguments
+            string[] args = App.commandLineArgs;
+            if (args.Length > 0)
+            {
+                //Open a script file if it is passed as first argument
+                //The OpenFile() method handles checking for ".lmsf" ending
+                //    and has try... catch in case the filename has other problems
+                // it also sets the ExperimentFileName property
+                OpenFile(args[0]);
+            }
+
+                runStepsThread = new Thread(new ThreadStart(StepsThreadProc));
 
             DataContext = this;
 
@@ -336,6 +348,22 @@ namespace LMSF_Scheduler
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
+        }
+
+        public void SecondCommandRun(IList<string> args)
+        {
+            if (!IsRunning)
+            {
+                //The agument list here includes "LMSF Scheduler.exe" as args[0]
+                if (args.Count > 1)
+                {
+                    //Open a script file if it is passed as first argument
+                    //The OpenFile() method handles checking for ".lmsf" ending
+                    //    and has try... catch in case the filename has other problems
+                    // it also sets the ExperimentFileName property
+                    OpenFile(args[1]);
+                }
+            }
         }
 
         private List<string> GetConnectedReadersList()
@@ -452,6 +480,36 @@ namespace LMSF_Scheduler
                 Open();
             }
             inputTextBox.Focus();
+        }
+
+        private void OpenFile(string file)
+        {
+            if (!InputChanged || SaveFirstQuery())
+            {
+                Open(file);
+            }
+            inputTextBox.Focus();
+        }
+
+        private void Open(string file)
+        {
+            if (file.EndsWith(".lmsf", StringComparison.CurrentCultureIgnoreCase))
+            {
+                try
+                {
+                    ExperimentFileName = file;
+                    InputText = File.ReadAllText(ExperimentFileName);
+                    InputChanged = false;
+                }
+                catch
+                {
+                    MessageBox.Show($"Failed to open file, {file}");
+                }
+            }
+            else
+            {
+                MessageBox.Show($"{file} is not an LMSF script file (*.lmsf)");
+            }
         }
 
         private void Open()
