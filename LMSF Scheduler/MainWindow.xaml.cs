@@ -1636,10 +1636,41 @@ namespace LMSF_Scheduler
                     valFailed.Add(num);
                     argsOk = false;
                 }
-                //All arguments can be any string, so no additional validation checks
+                //need to check that parentNodeStr and newNodeStr are acceptable XML element names
                 else
                 {
-                    argsOk = true;
+                    parentNodeStr = stepArgs[1];
+                    newNodeStr = stepArgs[2];
+                    //If the parentNodeStr and newNodeStr exist, make sure they are acceptable XML element names
+                    //    with just letters, numbers, or "-" or "_")
+                    //    and must start with a letter or underscore
+                    //    and not starting with "xml"
+                    RegexValidationRule valRule = new RegexValidationRule();
+                    valRule.RegexText = @"^[a-zA-Z_][a-zA-Z0-9-_]+$";
+                    valRule.ErrorMessage = "XML element names can only contain letters, numbers, or \"-\" or \"_\"; they also must start with a letter or underscore.";
+                    ValidationResult valRes1 = valRule.Validate(parentNodeStr, System.Globalization.CultureInfo.CurrentCulture);
+                    ValidationResult valRes2 = valRule.Validate(newNodeStr, System.Globalization.CultureInfo.CurrentCulture);
+                    if (valRes1.IsValid && valRes2.IsValid)
+                    {
+                        if (parentNodeStr.StartsWith("xml", StringComparison.CurrentCultureIgnoreCase) || newNodeStr.StartsWith("xml", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            argsOk = false;
+                            //Message for bad XML element name
+                            outString += "XML element names cannot start with \"xml\"";
+                            valFailed.Add(num);
+                        }
+                        else
+                        {
+                            argsOk = true;
+                        }
+                    }
+                    else
+                    {
+                        argsOk = false;
+                        //Message for bad XML element name
+                        outString += "XML element names can only contain letters, numbers, or \"-\" or \"_\"; they also must start with a letter or underscore";
+                        valFailed.Add(num);
+                    }
                 }
 
                 if (argsOk)
@@ -3644,7 +3675,7 @@ namespace LMSF_Scheduler
                     }
                     catch (System.Net.Sockets.SocketException e)
                     {
-                        MessageBox.Show($"{reader} is not accepting the connection. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer. Then try again.");
+                        MessageBox.Show($"Exception: {e}. {reader} is not accepting the connection. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer. Then try again.");
                     }
                     catch (Exception e)
                     {
