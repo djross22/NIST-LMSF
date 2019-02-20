@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LMSF_Gen5"
+        xmlns:LMSF_Utilities="clr-namespace:LMSF_Utilities;assembly=LMSF_Utilities"
         mc:Ignorable="d"
         Title="LMSF-Gen5" Height="750" Width="1250" Background="{DynamicResource PurpleBackgroundBrush}" MinWidth="1250" MinHeight="750" Closing="Window_Closing">
     <Grid>
@@ -20,7 +21,7 @@
                 <TextBox.Text>
                     <Binding Path="ExperimentId" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
-
+                            <LMSF_Utilities:RegexValidationRule RegexText = "^[-a-zA-Z0-9_]+$" ErrorMessage="Experiment identifiers can only contain letters, numbers, spaces, '_', or '-'." ValidationOptions="None"/>
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
@@ -35,9 +36,16 @@
             <TextBlock x:Name="promptTextBlock_Copy1" HorizontalAlignment="Left" Margin="50,200,0,0" TextWrapping="Wrap" Text="Experiment Data Folder:" VerticalAlignment="Top" Foreground="White" FontSize="16"/>
             <TextBox x:Name="expFolderTextBox" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Margin="80,230,80,0" IsReadOnly="True" Background="#FFCBCBCB" Text="{Binding ExpFolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button x:Name="selectExpFolderButton" Content="..." HorizontalAlignment="Right" Margin="0,230,35,0" VerticalAlignment="Top" Width="25" Height="25" Click="SelectExpFolderButton_Click" Focusable="False"/>
-            <Border x:Name="remoteBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="0,10,0,0" VerticalAlignment="Top" Width="110">
-                <TextBlock x:Name="remoteTextBlock" TextWrapping="Wrap" Text="Local" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
-            </Border>
+
+            <StackPanel HorizontalAlignment="Center" Height="25" Margin="50,10,0,0" VerticalAlignment="Top" Width="400" Orientation="Horizontal">
+                <Border x:Name="computerNameBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="0" VerticalAlignment="Bottom" Width="110">
+                    <TextBlock x:Name="computerNameTextBlock" TextWrapping="Wrap" Text="{Binding ReaderName, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                </Border>
+                <Border x:Name="remoteBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="25" Margin="20,0,0,0" VerticalAlignment="Center" Width="110">
+                    <TextBlock x:Name="remoteTextBlock" TextWrapping="Wrap" Text="Not Connected" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
+                </Border>
+                <Button x:Name="remoteButton" Content="Switch to Remote" Width="120" Margin="20,0,0,0" Click="RemoteButton_Click"/>
+            </StackPanel>
 
         </Grid>
         <Grid Grid.Column="1" Margin="0">
@@ -47,7 +55,8 @@
             </Grid.RowDefinitions>
             <Button x:Name="newExpButton" Content="New Exp" HorizontalAlignment="Left" Margin="31,35,0,0" VerticalAlignment="Top" Width="75" Click="NewExpButton_Click" Focusable="False"/>
             <Button x:Name="runExpButton" Content="Run Exp" HorizontalAlignment="Left" Margin="31,70,0,0" VerticalAlignment="Top" Width="75" Click="RunExpButton_Click" Focusable="False"/>
-            <Button x:Name="closeExpButton" Content="Close Exp" HorizontalAlignment="Left" Margin="124,70,0,0" VerticalAlignment="Top" Width="75" Click="CloseExpButton_Click"/>
+            <Button x:Name="closeExpButton" Content="Close Exp" HorizontalAlignment="Left" Margin="127,35,0,0" VerticalAlignment="Top" Width="75" Click="CloseExpButton_Click"/>
+            <Button x:Name="abortReadButton" Content="Abort Read" HorizontalAlignment="Left" Margin="127,70,0,0" VerticalAlignment="Top" Width="75" Click="AbortReadButton_Click"/>
             <TextBlock HorizontalAlignment="Left" Margin="31,10,0,0" TextWrapping="Wrap" Text="Control Buttons:" VerticalAlignment="Top" Foreground="White"/>
             <Button x:Name="carrierOutButton" Content="Carrier Out" HorizontalAlignment="Left" Margin="222,35,0,0" VerticalAlignment="Top" Width="75" Click="CarrierOutButton_Click" Focusable="False"/>
             <Button x:Name="carrierInButton" Content="Carrier In" HorizontalAlignment="Left" Margin="222,70,0,0" VerticalAlignment="Top" Width="75" Click="CarrierInButton_Click" Focusable="False"/>
@@ -55,24 +64,19 @@
             <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="0,10,50,0" VerticalAlignment="Top" Width="110" Background="Red">
                 <TextBlock x:Name="statusTextBlock" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Reader Idle" VerticalAlignment="Center" FontWeight="Bold"/>
             </Border>
-            <Grid Margin="0">
+            <Grid x:Name="topRightGrid" Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="113"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <TextBox x:Name="tempOutTextBox" Margin="20,30,115,20" Grid.Row="1" TextWrapping="Wrap" Text="{Binding TextOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
+                <TextBox x:Name="outputTextBox" Margin="20,30,115,20" Grid.Row="1" TextWrapping="Wrap" Text="{Binding OutputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" VerticalScrollBarVisibility="Auto"/>
                 <TextBlock HorizontalAlignment="Left" Margin="396,10,0,0" TextWrapping="Wrap" Text="Test Buttons (to be deleted)" VerticalAlignment="Top" Foreground="White" Width="82" Grid.Row="1"/>
                 <Button x:Name="startButton" Content="Start Gen5" HorizontalAlignment="Right" Margin="0,47,10,0" VerticalAlignment="Top" Width="75" Click="StartButton_Click" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="exportButton" Content="File Export" HorizontalAlignment="Right" Margin="0,74,10,0" VerticalAlignment="Top" Click="ExportButton_Click" MinWidth="75" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="statusButton" Content="Plate Status" HorizontalAlignment="Right" Margin="0,101,10,0" VerticalAlignment="Top" Width="75" Click="StatusButton_Click" Grid.Row="1" Focusable="False"/>
                 <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Right" Margin="0,128,10,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" Grid.Row="1" Focusable="False"/>
-
                 <TextBlock HorizontalAlignment="Left" Margin="20,10,0,0" TextWrapping="Wrap" Text="Status Monitor:" VerticalAlignment="Top" Foreground="White" Grid.Row="1"/>
-
-
-
             </Grid>
         </Grid>
-
     </Grid>
 </Window>

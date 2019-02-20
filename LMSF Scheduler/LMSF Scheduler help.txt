@@ -50,6 +50,34 @@ Commands:
 		Examples:
 			Hamilton/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl
 			
+			
+	Gen5
+		Controls an instance of the LMSF_Gen5 program (with communication via TCP - so either for local reader or reader on another computer with network connection).
+		The first argument is the name of the reader.
+			The valid reader names are "Neo", "Epoch1", "Epoch2", "Epoch3", and "Epoch4".
+		The second argument is the command to send to the reader.
+			The valid commands that can be sent are "CarrierIn", "CarrierOut", and "RunExp".
+		If the second argument is CarrierOut or CarrierIn, the reader does what you would expect in response.
+			Note that if the carrier is out when a RunExp command is sent, the carrier will automatically close before starting the run.
+		If the second argument is RunExp, the LMSF_Gen5 program will create and run a new experiment.
+			For the RunExp command, three additional arguments are required:
+				The path to the protocol file to be run.
+					The path is read from the point of view of the computer controlling the reader.
+					So, to use a protocol from the master Protocols directroy on the main computer, the protocol path will have to start with the IP adddress: "127.6.167.34\\..."
+				The experiment ID. This is used to automatically generate file names for the Gen5 experiment file (.xpt) and the data export file (.txt).
+					The LMSF_Gen5 program automatically appends the reader name to the experiment ID to create the .xpt and export file names.
+						Note that if more than one read needs to be run with the same experiment ID, then use "{experimentId}-read 1", "{experimentId}-read 2", etc. for the <experiment ID> argument.
+				The path to the folder where the Gen5 experiment and exported data will be saved.
+					The save folder path is also read from the point of view of the computer controlling the reader.
+		
+		Syntax:
+			Gen5/ <reader>/ <gen5 command>{/ <protocol path>/ <experiment ID>/ <save folder path>}
+			
+		Examples:
+			Gen5/ Epoch1/ CarrierOut
+			Gen5/ Epoch2/ CarrierIn
+			Gen5/ Epoch1/ RunExp/ C:\Users\Public\Documents\Protocols\Growth Plate w Membrane 4h.37C.1C.prt/ {experimentId}/ C:\Shared Files\Data\GSF-IMS-coli\2019-02-04-0740_IPTG_gradient
+			
 		
 	Timer
 		Starts a timer that runs for a specified amount of time, or until a specified time or date-time.
@@ -70,12 +98,14 @@ Commands:
 			
 	WaitFor
 		Pauses execution and waits for a previous step to finish
+		The <process to wait for> argument can be either "Overlord", "Hamilton", "Timer", or the name of a plate reader that is connected (see the Gen5/ command description).
 		
 		Syntax:
-			WaitFor/ <step to wait for>
+			WaitFor/ <process to wait for>
 			
 		Examples:
 			WaitFor/ Overlord
+			WaitFor/ Epoch1
 			WaitFor/ Timer
 			
 			

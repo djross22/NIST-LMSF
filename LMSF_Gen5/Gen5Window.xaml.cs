@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using LMSF_Utilities;
 using LMSF_Gen5_Reader;
 using Gen5;
+using SimpleTCP;
 
 namespace LMSF_Gen5
 {
@@ -33,33 +34,69 @@ namespace LMSF_Gen5
         private string expFolderPath;
         private string protocolPath;
         private string textOut;
-        private bool isReadRunning;
+        private bool isReaderBusy;
         private bool isExperimentQueuedOrRunning;
         private bool isRemoteControlled;
+        private bool isConnected;
         private BackgroundWorker readerMonitorWorker;
 
         private Gen5Reader gen5Reader;
+
+        private Brush startingButtonBackground;
+
+        //log file
+        private string logFilePath;
+
+        //variables for TCP communication
+        //private string computerName;
+        private string readerName;
+        private SimpleTcpServer server;
+        private int tcpPort;
+        private readonly object messageHandlingLock = new object();
+        private Queue<string> messageQueue = new Queue<string>();
+        private Queue<string> oldMessageQueue = new Queue<string>();
+        public enum ReaderStatusStates { Idle, Busy };
+        public ReaderStatusStates ReaderStatus { get; private set; }
+        public static List<string> Gen5CommandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
 
         public Gen5Window()
         {
             InitializeComponent();
             DataContext = this;
 
+            //Get the starting/default button background brush so I can re-set it later
+            startingButtonBackground = remoteButton.Background;
+
+            //ComputerName = Environment.MachineName;
+            SetReaderNameAndPort();
+
             try
             {
                 gen5Reader = new Gen5Reader(this);
 
-                TextOut = gen5Reader.StartGen5();
-                TextOut += gen5Reader.SetClientWindow(this);
-                TextOut += gen5Reader.ConfigureUSBReader();
+                OutputText = gen5Reader.StartGen5();
+                AddOutputText(gen5Reader.SetClientWindow(this));
+                AddOutputText(gen5Reader.ConfigureUSBReader());
+                ReaderName = gen5Reader.ReaderName;
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at initilization of Gen5, {exc}./n";
+                AddOutputText($"Error at initilization of Gen5, {exc}./n");
             }
+            NewLogFile();
         }
 
         #region Properties Getters and Setters
+        public string ReaderName
+        {
+            get { return this.readerName; }
+            private set
+            {
+                this.readerName = value;
+                OnPropertyChanged("ReaderName");
+            }
+        }
+
         public bool IsRemoteControlled
         {
             get { return this.isRemoteControlled; }
@@ -69,14 +106,34 @@ namespace LMSF_Gen5
                 OnPropertyChanged("IsRemoteControlled");
                 if (isRemoteControlled)
                 {
+                    remoteButton.Background = Brushes.LimeGreen;
+                    remoteButton.Content = "Switch to Local";
+                }
+                else
+                {
+                    remoteButton.Background = startingButtonBackground;
+                    remoteButton.Content = "Switch to Remote";
+                }
+            }
+        }
+
+        public bool IsConnected
+        {
+            get { return this.isConnected; }
+            private set
+            {
+                this.isConnected = value;
+                OnPropertyChanged("IsConnected");
+                if (isConnected)
+                {
                     remoteBorder.Background = Brushes.LimeGreen;
-                    remoteTextBlock.Text = "Remote";
+                    remoteTextBlock.Text = "Connected";
                     remoteTextBlock.Foreground = Brushes.Black;
                 }
                 else
                 {
                     remoteBorder.Background = Brushes.Transparent;
-                    remoteTextBlock.Text = "Local";
+                    remoteTextBlock.Text = "Not Connected";
                     remoteTextBlock.Foreground = Brushes.White;
                 }
             }
@@ -92,17 +149,17 @@ namespace LMSF_Gen5
             }
         }
 
-        public bool IsReadRunning
+        public bool IsReaderBusy
         {
-            get { return this.isReadRunning; }
+            get { return this.isReaderBusy; }
             private set
             {
-                this.isReadRunning = value;
-                OnPropertyChanged("IsReadRunning");
-                if (isReadRunning)
+                this.isReaderBusy = value;
+                OnPropertyChanged("IsReaderBusy");
+                if (isReaderBusy)
                 {
                     statusBorder.Background = Brushes.LimeGreen;
-                    statusTextBlock.Text = "Read In Progress";
+                    statusTextBlock.Text = "Reader Busy";
                 }
                 else
                 {
@@ -112,14 +169,14 @@ namespace LMSF_Gen5
             }
         }
 
-        public string TextOut
+        public string OutputText
         {
             get { return this.textOut; }
             set
             {
                 this.textOut = value;
-                OnPropertyChanged("TextOut");
-                tempOutTextBox.ScrollToEnd();
+                OnPropertyChanged("OutputText");
+                outputTextBox.ScrollToEnd();
             }
         }
 
@@ -165,8 +222,11 @@ namespace LMSF_Gen5
 
         private void UpdateControlEnabledStatus()
         {
-            //This sets the IsEnabled property for the entire window
-            IsEnabled = !IsRemoteControlled;
+            //This sets the IsEnabled property for all the controls in the window
+            SetEnableAllControl(!IsRemoteControlled);
+            //These two controls should always be enabled:
+            remoteButton.IsEnabled = true;
+            outputTextBox.IsEnabled = true;
 
             //When in local control mode, set the enabled properties according to whether or not an experiment has beed queued or is running
             if (!IsRemoteControlled)
@@ -175,6 +235,39 @@ namespace LMSF_Gen5
                 experimentIdTextBox.IsEnabled = !IsExperimentQueuedOrRunning;
                 selectExpFolderButton.IsEnabled = !IsExperimentQueuedOrRunning;
                 selectProtocolButton.IsEnabled = !IsExperimentQueuedOrRunning;
+            }
+        }
+
+        private void SetEnableAllControl(bool isEnabled)
+        {
+            foreach (Button b in FindVisualChildren<Button>(this))
+            {
+                b.IsEnabled = isEnabled;
+            }
+
+            foreach (TextBox b in FindVisualChildren<TextBox>(this))
+            {
+                b.IsEnabled = isEnabled;
+            }
+        }
+
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
             }
         }
 
@@ -198,16 +291,64 @@ namespace LMSF_Gen5
             }
         }
 
+        private void AddOutputText(string txt, bool newLine = true)
+        {
+            OutputText += txt;
+            //Add to log file
+            if (IsRemoteControlled && (logFilePath != null))
+            {
+                if (newLine)
+                {
+                    string timeStr = DateTime.Now.ToString("yyyy-MM-dd.HH:mm:ss.fff");
+                    File.AppendAllText(logFilePath, $"\n{timeStr},\t {txt}");
+                }
+                else
+                {
+                    File.AppendAllText(logFilePath, txt);
+                }
+            }
+        }
+
+        private bool NewLogFile()
+        {
+            bool okToGo = true;
+            logFilePath = SharedParameters.LogFileFolderPath + NewLogFileName();
+            if (!Directory.Exists(SharedParameters.LogFileFolderPath))
+            {
+                try
+                {
+                    Directory.CreateDirectory(SharedParameters.LogFileFolderPath);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    string dialogText = @"Failed to create log file directory. Try manually creating the directory: 'C:\Shared Files\LMSF Scheduler\LogFiles\', then press 'OK' to continue, or 'Cancel' to abort the run.";
+                    MessageBoxResult result = MessageBox.Show(dialogText, "Log File Directory Error", MessageBoxButton.OKCancel);
+                    if (result == MessageBoxResult.Cancel)
+                    {
+                        okToGo = false;
+                    }
+
+                }
+            }
+
+            return okToGo;
+        }
+
+        private string NewLogFileName()
+        {
+            return $"{DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss")}-gen5.trc";
+        }
+
         private void SelectExpFolderButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                TextOut += gen5Reader.SetClientWindow(this);
+                AddOutputText(gen5Reader.SetClientWindow(this));
                 ExpFolderPath = gen5Reader.BrowseForFolder();
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at SelectExpFolderButton_Click, {exc}./n";
+                AddOutputText($"Error at SelectExpFolderButton_Click, {exc}./n");
             }
         }
 
@@ -217,12 +358,12 @@ namespace LMSF_Gen5
             {
                 if (gen5Reader.IsGen5Active())
                 {
-                    TextOut += gen5Reader.TerminateGen5();
+                    AddOutputText(gen5Reader.TerminateGen5());
                 }
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at termination of Gen5, {exc}./n";
+                AddOutputText($"Error at termination of Gen5, {exc}./n");
             }
         }
 
@@ -230,7 +371,7 @@ namespace LMSF_Gen5
         {
             try
             {
-                string filePath = gen5Reader.GetExperimentFilePath(ExpFolderPath, ExperimentId);
+                string filePath = Gen5Reader.GetExperimentFilePath(ExpFolderPath, ExperimentId, gen5Reader);
                 if (File.Exists(filePath))
                 {
                     MessageBoxResult res = MessageBox.Show("That Gen5 epxeriment file already exists. Ok to overwrite?", "Overwrite File", MessageBoxButton.YesNo);
@@ -242,7 +383,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at NewExpButton_Click, {exc}./n";
+                AddOutputText($"Error at NewExpButton_Click, {exc}./n");
                 return;
             }
 
@@ -256,17 +397,17 @@ namespace LMSF_Gen5
 
             try
             {
-                TextOut += gen5Reader.NewExperiment(ProtocolPath);
+                AddOutputText(gen5Reader.NewExperiment(ProtocolPath));
 
                 gen5Reader.ExperimentID = ExperimentId;
                 gen5Reader.ExperimentFolderPath = ExpFolderPath;
-                TextOut += gen5Reader.ExpSaveAs();
+                AddOutputText(gen5Reader.ExpSaveAs());
 
-                TextOut += gen5Reader.PlatesGetPlate();
+                AddOutputText(gen5Reader.PlatesGetPlate());
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at NewExp, {exc}./n";
+                AddOutputText($"Error at NewExp, {exc}./n");
             }
         }
 
@@ -277,32 +418,37 @@ namespace LMSF_Gen5
 
         private void RunExp()
         {
+            IsReaderBusy = true;
             string startText = "";
             try
             {
                 startText = gen5Reader.PlateStartRead();
-                TextOut += gen5Reader.PlateStartRead();
+                AddOutputText(startText);
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at RunExp, {exc}./n";
+                AddOutputText($"Error at RunExp, {exc}./n");
             }
 
             if (startText.Contains("StartRead Successful"))
             {
-                TextOut += WaitForFinishThenExportAndClose();
+                AddOutputText(WaitForFinishThenExportAndClose());
+            }
+            else
+            {
+                IsReaderBusy = false;
             }
         }
 
         public string WaitForFinishThenExportAndClose()
         {
-            string retStr = "Running WaitForFinishThenExportAndClose\n";
+            string retStr = "Running WaitForFinishThenExportAndClose; ";
 
             if (!(readerMonitorWorker is null))
             {
                 if (readerMonitorWorker.IsBusy)
                 {
-                    retStr += "Read in progress, abort read or wait until end of read before starting a new read.\n";
+                    retStr += "Read in progress, abort read or wait until end of read before starting a new read. ";
                     return retStr;
                 }
             }
@@ -314,7 +460,7 @@ namespace LMSF_Gen5
 
             readerMonitorWorker.RunWorkerAsync();
 
-            retStr += "    ... Read in Progress...\n";
+            retStr += "    ... Read in Progress... ";
 
             return retStr;
         }
@@ -328,7 +474,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at ReaderMonitor_DoWork, {exc}./n";
+                AddOutputText($"Error at ReaderMonitor_DoWork, {exc}./n");
             }
 
             while (status == Gen5ReadStatus.eReadInProgress)
@@ -341,7 +487,7 @@ namespace LMSF_Gen5
                 }
                 catch (Exception exc)
                 {
-                    TextOut += $"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n";
+                    AddOutputText($"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n");
                 }
 
                 //TODO: Handle live data stream
@@ -349,11 +495,11 @@ namespace LMSF_Gen5
                 this.Dispatcher.Invoke(() => {
                     if (status == Gen5ReadStatus.eReadInProgress)
                     {
-                        IsReadRunning = true;
+                        IsReaderBusy = true;
                     }
                     else
                     {
-                        IsReadRunning = false;
+                        IsReaderBusy = false;
                     }
                 });
             }
@@ -372,7 +518,7 @@ namespace LMSF_Gen5
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at ReaderMonitor_RunWorkerCompleted, {exc}./n";
+                AddOutputText($"Error at ReaderMonitor_RunWorkerCompleted, {exc}./n");
             }
 
             this.Dispatcher.Invoke(() => {
@@ -380,7 +526,7 @@ namespace LMSF_Gen5
                 IsExperimentQueuedOrRunning = false;
             });
 
-            TextOut += "            ... Done.\n\n";
+            AddOutputText("... Done.\n\n");
         }
 
         private void CarrierInButton_Click(object sender, RoutedEventArgs e)
@@ -390,14 +536,16 @@ namespace LMSF_Gen5
 
         private void CarrierIn()
         {
+            IsReaderBusy = true;
             try
             {
-                TextOut += gen5Reader.CarrierIn();
+                AddOutputText(gen5Reader.CarrierIn());
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at CarrierIn, {exc}./n";
+                AddOutputText($"Error at CarrierIn, {exc}./n");
             }
+            IsReaderBusy = false;
         }
 
         private void CarrierOutButton_Click(object sender, RoutedEventArgs e)
@@ -407,34 +555,274 @@ namespace LMSF_Gen5
 
         private void CarrierOut()
         {
+            IsReaderBusy = true;
             try
             {
-                TextOut += gen5Reader.CarrierOut();
+                AddOutputText(gen5Reader.CarrierOut());
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at CarrierOut, {exc}./n";
+                AddOutputText($"Error at CarrierOut, {exc}./n");
             }
+            IsReaderBusy = false;
         }
 
         private void CloseExpButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                TextOut += gen5Reader.ExpClose();
+                AddOutputText(gen5Reader.ExpClose());
             }
             catch (Exception exc)
             {
-                TextOut += $"Error at CloseExpButton_Click, {exc}./n";
+                AddOutputText($"Error at CloseExpButton_Click, {exc}./n");
             }
 
             //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
             IsExperimentQueuedOrRunning = false;
         }
 
+        private void AbortReadButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsReaderBusy)
+            {
+                var messageBoxResult =  MessageBox.Show("Are you sure you want to abort the current read?\nClick 'Yes' to abort or 'No' to continue the current read.", "Abort Read?", MessageBoxButton.YesNo);
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        AddOutputText(gen5Reader.PlateAbortRead());
+                    }
+                    catch (Exception exc)
+                    {
+                        AddOutputText($"Error at AbortReadButton_Click, {exc}./n");
+                    }
+                    //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
+                    IsExperimentQueuedOrRunning = false;
+                }
+            }
+        }
+
         private void TemperatureButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.GetCurrentTemperature();
+            AddOutputText(gen5Reader.GetCurrentTemperature());
+        }
+
+        private void SetReaderNameAndPort()
+        {
+            tcpPort = 42222;
+            //readerName = "Neo";
+
+            //switch (ComputerName)
+            //{
+            //    case ("Main"):
+            //        readerName = "Neo";
+            //        break;
+            //}
+        }
+
+        private void StartTcpServer()
+        {
+            //Turn on TCP server
+            server = new SimpleTcpServer().Start(tcpPort);
+            server.Delimiter = 0x13;
+            server.ClientConnected += Server_ClientConnected;
+            server.ClientDisconnected += Server_ClientDisconnected;
+            server.DelimiterDataReceived += MessageReceived;
+
+            //Create and start message handling thread
+        }
+
+        private void MessageReceived(object sender, Message msg)
+        {
+            bool goodMsg = false;
+            bool msgQueued = false;
+
+            lock (messageHandlingLock)
+            {
+                goodMsg = Message.CheckMessageHash(msg.MessageString);
+                if (goodMsg && !messageQueue.Contains(msg.MessageString) && !oldMessageQueue.Contains(msg.MessageString))
+                {
+                    messageQueue.Enqueue(msg.MessageString);
+                    msgQueued = true;
+                }
+            }
+
+            string textOutAdd;
+            if (msgQueued)
+            {
+                textOutAdd = $"message received and queued {messageQueue.Count}: {msg.MessageString}; ";
+            }
+            else
+            {
+                textOutAdd = $"duplicate message received (but not queued) {messageQueue.Count}: {msg.MessageString}; ";
+            }
+            this.Dispatcher.Invoke(() =>
+            {
+                AddOutputText(textOutAdd);
+            });
+
+            string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
+
+            //Reply
+            string replyStr;
+            if (goodMsg)
+            {
+                //send back status if good message
+                replyStr = $"{msgParts[0]},{ReaderStatus},{msgParts[2]}";
+                textOutAdd = $"reply sent, {ReaderStatus}.\n";
+            }
+            else
+            {
+                //send back "fail" if bad message
+                replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
+                textOutAdd = $"reply sent, fail.\n";
+            }
+            msg.ReplyLine(replyStr);
+            this.Dispatcher.Invoke(() =>
+            {
+                AddOutputText(textOutAdd);
+            });
+        }
+
+        private void Server_ClientDisconnected(object sender, System.Net.Sockets.TcpClient client)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                IsConnected = false;
+                AddOutputText($"Client Disconnected\n");
+            });
+        }
+
+        private void Server_ClientConnected(object sender, System.Net.Sockets.TcpClient client)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                IsConnected = true;
+                AddOutputText($"Client Connected\n");
+            });
+        }
+
+        private void RemoteButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult res = MessageBoxResult.OK;
+            if (IsRemoteControlled)
+            {
+                string okCancelPrompt = $"Are you sure you want to disconnect {ReaderName} from remote?\nClick 'OK' to continue or 'Cancel' to cancel";
+                res = MessageBox.Show(okCancelPrompt, "Disconnect Remote?", MessageBoxButton.OKCancel);
+            }
+
+            if (res == MessageBoxResult.OK)
+            {
+                IsRemoteControlled = !IsRemoteControlled;
+
+                if (IsRemoteControlled)
+                {
+                    messageQueue.Clear();
+                    oldMessageQueue.Clear();
+                    StartTcpServer();
+                    StartRemoteControl();
+                }
+                else
+                {
+                    if (server != null)
+                    {
+                        server.Stop();
+                    }
+                }
+            }
+        }
+
+        private void StartRemoteControl()
+        {
+            BackgroundWorker remoteControlWorker = new BackgroundWorker();
+            remoteControlWorker.WorkerReportsProgress = false;
+            remoteControlWorker.DoWork += RemoteControl_DoWork;
+            remoteControlWorker.RunWorkerCompleted += RemoteControl_RunWorkerCompleted;
+
+            remoteControlWorker.RunWorkerAsync();
+        }
+
+        void RemoteControl_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (IsRemoteControlled)
+            {
+                if (IsExperimentQueuedOrRunning || IsReaderBusy)
+                {
+                    ReaderStatus = ReaderStatusStates.Busy;
+                }
+                else
+                {
+                    if (messageQueue.Count == 0)
+                    {
+                        ReaderStatus = ReaderStatusStates.Idle;
+                    }
+                    else
+                    {
+                        ReaderStatus = ReaderStatusStates.Busy;
+                        string nextMsg = messageQueue.Dequeue();
+                        oldMessageQueue.Enqueue(nextMsg);
+                        ParseAndRunCommand(nextMsg);
+                    }
+                }
+                
+                Thread.Sleep(100);
+            }
+
+        }
+
+        void ParseAndRunCommand(string msg)
+        {
+            string[] messageParts = Message.UnwrapTcpMessage(msg);
+            string command = messageParts[1];
+
+            //{ "CarrierIn", "CarrierOut", "RunExp" }, "StatusCheck"
+            switch (command)
+            {
+                case "CarrierIn":
+                    this.Dispatcher.Invoke(() => {
+                        CarrierIn();
+                    });
+                    break;
+                case "CarrierOut":
+                    this.Dispatcher.Invoke(() => {
+                        CarrierOut();
+                    });
+                    break;
+                case "StatusCheck":
+                    //Don't need to do anything here because the reader status is automatically sent back
+                    break;
+                default:
+                    if (command.StartsWith("RunExp"))
+                    {
+                        //command = $"RunExp/{protocolPath}/{expIdStr}/{saveFolderPath}";
+                        string[] runExpParts = command.Split('/');
+                        string protocolPath = runExpParts[1];
+                        string expIdStr = runExpParts[2];
+                        string saveFolder = runExpParts[3];
+                        this.Dispatcher.Invoke(() => {
+                            ProtocolPath = protocolPath;
+                            ExperimentId = expIdStr;
+                            ExpFolderPath = saveFolder;
+                            NewExp();
+                            CarrierIn();
+                            RunExp();
+                        });
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Unsupported remote reader command, {command}", "Unsupported Command Error");
+                        //throw new System.ArgumentException($"Unsupported remote reader command, {command}", "command");
+                    }
+                    break;
+            }
+        }
+
+        void RemoteControl_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            this.Dispatcher.Invoke(() => {
+                UpdateControlEnabledStatus();
+            });
         }
 
         //===============================================================
@@ -442,25 +830,27 @@ namespace LMSF_Gen5
         //Button Click event handlers to be deleted after initial testing
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut = gen5Reader.StartGen5();
-            TextOut += gen5Reader.SetClientWindow(this);
-            TextOut += gen5Reader.ConfigureUSBReader();
+            OutputText = gen5Reader.StartGen5();
+            AddOutputText(gen5Reader.SetClientWindow(this));
+            AddOutputText(gen5Reader.ConfigureUSBReader());
         }
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.PlateFileExport();
+            AddOutputText(gen5Reader.PlateFileExport());
         }
 
         private void StatusButton_Click(object sender, RoutedEventArgs e)
         {
             Gen5ReadStatus status = Gen5ReadStatus.eReadNotStarted;
-            TextOut += gen5Reader.PlateReadStatus(ref status);
+            AddOutputText(gen5Reader.PlateReadStatus(ref status));
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            TextOut += gen5Reader.ExpSave();
+            AddOutputText(gen5Reader.ExpSave());
         }
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        //===============================================================
     }
 }

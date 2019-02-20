@@ -21,6 +21,7 @@ using Microsoft.Win32;
 using LMSF_Utilities;
 using System.Xml;
 using System.Text.RegularExpressions;
+using SimpleTCP;
 
 namespace LMSF_Scheduler
 {
@@ -94,6 +95,13 @@ namespace LMSF_Scheduler
         private Dictionary<string, string> metaDictionary;
         private Dictionary<string, Concentration> concDictionary;
 
+        //variables for TCP communication
+        public List<string> ReaderList { get; set; }
+        public ObservableCollection<TextBlock> ReaderBlockList { get; set; }
+        private TextBlock selectedReaderBlock;
+        Dictionary<string, string> readerIps = new Dictionary<string, string>();
+        Dictionary<string, SimpleTcpClient> readerClients = new Dictionary<string, SimpleTcpClient>();
+
         #region Properties Getters and Setters
         public bool IsValUserInput
         {
@@ -102,6 +110,16 @@ namespace LMSF_Scheduler
             {
                 this.isValUserInput = value;
                 OnPropertyChanged("IsValUserInput");
+            }
+        }
+
+        public TextBlock SelectedReaderBlock
+        {
+            get { return this.selectedReaderBlock; }
+            set
+            {
+                this.selectedReaderBlock = value;
+                OnPropertyChanged("SelectedReaderBlock");
             }
         }
 
@@ -235,6 +253,7 @@ namespace LMSF_Scheduler
             {
                 this.outputText = value;
                 OnPropertyChanged("OutputText");
+                this.Dispatcher.Invoke(() => { outputTextBox.ScrollToEnd(); });
             }
         }
         #endregion
@@ -296,10 +315,43 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
+
+            ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4" };
+            ReaderBlockList = new ObservableCollection<TextBlock>();
+            foreach (string s in ReaderList)
+            {
+                TextBlock tb = new TextBlock();
+                tb.Text = s;
+                ReaderBlockList.Add(tb);
+
+                readerClients[s] = null;
+            }
+            readerIps["Neo"] = "localhost";
+            readerIps["Epoch1"] = "129.6.167.36";
+            readerIps["Epoch2"] = "129.6.167.37";
+            readerIps["Epoch3"] = "129.6.167.38";
+            readerIps["Epoch4"] = "129.6.167.39";
+            //Set IPs for Epoch readers
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
+        }
+
+        private List<string> GetConnectedReadersList()
+        {
+            var connectedList = new List<string>();
+
+            foreach (string s in ReaderList)
+            {
+                SimpleTcpClient client = readerClients[s];
+                if ((client != null) && (client.IsConnected()))
+                {
+                    connectedList.Add(s);
+                }
+            }
+
+            return connectedList;
         }
 
         protected void OnPropertyChanged(string name)
@@ -313,10 +365,12 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            string test = SharedParameters.GetNumber("enter a number:");
-
-            OutputText += test;
-            OutputText += "\n";
+            //var client = new SimpleTcpClient();
+            //client.Delimiter = 0x13;
+            //client.Connect("localhost", 42222);
+            //client.WriteLine("test sending line");
+            string msg = "StatusCheck";
+            SendTcpMessage("Neo", msg);
         }
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
@@ -489,6 +543,26 @@ namespace LMSF_Scheduler
             inputTextBox.Focus();
         }
 
+        private void AddOutputText(string txt, bool newLine = true)
+        {
+
+            OutputText += txt;
+
+            //Add to log file
+            if (!isValidating && (logFilePath != null))
+            {
+                if (newLine)
+                {
+                    string timeStr = DateTime.Now.ToString("yyyy-MM-dd.HH:mm:ss.fff");
+                    File.AppendAllText(logFilePath, $"\n{timeStr},\t {txt}");
+                }
+                else
+                {
+                    File.AppendAllText(logFilePath, txt);
+                }
+            }
+        }
+
         private void InsertInputText(string newText)
         {
             if (!(newText is null))
@@ -592,12 +666,7 @@ namespace LMSF_Scheduler
         {
             if (AbortCalled)
             {
-                OutputText += "Method Aborted.\n";
-                //Add to log file
-                if (!isValidating)
-                {
-                    File.AppendAllText(logFilePath, "Method Aborted.\n");
-                }
+                AddOutputText("Method Aborted.\n");
                 this.Dispatcher.Invoke(() => { IsRunning = false; });
             }
             else
@@ -617,11 +686,7 @@ namespace LMSF_Scheduler
                 else
                 {
                     string doneText = $"{SharedParameters.GetDateTimeString()}; Done.\n";
-                    OutputText += doneText;
-                    if (!isValidating)
-                    {
-                        File.AppendAllText(logFilePath, doneText);
-                    }
+                    AddOutputText(doneText);
 
                     this.Dispatcher.Invoke(() => { IsRunning = false; });
                 }
@@ -806,6 +871,9 @@ namespace LMSF_Scheduler
                         break;
                     case "Hamilton":
                         ParseHamiltonStep();
+                        break;
+                    case "Gen5":
+                        ParseGen5Step();
                         break;
                     case "WaitFor":
                         ParseWaitForStep();
@@ -1009,6 +1077,152 @@ namespace LMSF_Scheduler
                 }
             }
 
+            void ParseGen5Step()
+            {
+                //Gen5 takes 2 or 5 arguments
+                //First two arguments are reader name and reader command
+                string name;
+                string command;
+                List<string> commandList = LMSF_Gen5.Gen5Window.Gen5CommandList; //new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
+                //arguments 3, 4 and 5 are the protocol path, experiment Id, and save folder path
+                string protocolPath;
+                string expIdStr;
+                string saveFolderPath;
+
+                outString += "Running Gen5 Command: ";
+
+                //Booleans to track validity of arguments
+                bool argsOk = false;
+
+                //Requires at least two arguments (plus Gen5 command itself)
+                if (numArgs < 3)
+                {
+                    outString += "Not enough arguments; Gen5 command requires at least 2 arguments: reader name, and reader command. ";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    name = stepArgs[1];
+                    command = stepArgs[2];
+                    // Check if 1st argument is valid reader name 
+                    if (ReaderList.Contains(name))
+                    {
+                        //Check if reader is connected
+                        if (GetConnectedReadersList().Contains(name))
+                        {
+                            //Check if 2nd argument is valid reader command
+                            if (commandList.Contains(command))
+                            {
+                                argsOk = true;
+                                outString += $"{name}/ {command} ";
+                            }
+                            else
+                            {
+                                outString += "Not a valid reader command: ";
+                                outString += $"{command}. Valid reader commands are: ";
+                                foreach (string s in commandList)
+                                {
+                                    outString += $"{s}, ";
+                                }
+                                valFailed.Add(num);
+                            }
+                        }
+                        else
+                        {
+                            outString += $"{name} not connected. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {name} computer,\n";
+                            outString += $"then establish the remote connection to {name} using the drop-down \"Remote Connections\" control at the bottom right of this window.";
+                            valFailed.Add(num);
+                        }
+                    }
+                    else
+                    {
+                        outString += "Not a valid reader name: ";
+                        outString += $"{name}. Valid reader names are: ";
+                        foreach (string r in ReaderList)
+                        {
+                            outString += $"{r}, ";
+                        }
+                        valFailed.Add(num);
+                    }
+
+                    //If arguments are ok so far, check additional arguments of RunExp command
+                    if (argsOk && command == "RunExp")
+                    {
+                        //With RunExp command, there need to be at least arguments (plus Gen5 command itself)
+                        if (numArgs < 6)
+                        {
+                            outString += "Not enough arguments; Gen5/ <reader name>/ RunExp/ command requires three additional: protocol path, experiment Id, and save folder path. ";
+                            valFailed.Add(num);
+                        }
+                        else
+                        {
+                            protocolPath = stepArgs[3];
+                            expIdStr = stepArgs[4];
+                            saveFolderPath = stepArgs[5];
+                            
+                            //Check if protocol path is valid file with .prt extension
+                            if (!protocolPath.EndsWith(".prt"))
+                            {
+                                outString += $"Protocol path needs to end with .prt, you enetered: {protocolPath} ";
+                                valFailed.Add(num);
+                                argsOk = false;
+                            }
+                            if (!File.Exists(protocolPath))
+                            {
+                                outString += $"Protocol file/path does not exist: {protocolPath} ";
+                                valFailed.Add(num);
+                                argsOk = false;
+                            }
+                            //check validity of expId
+                            //expIdStr needs to be usable in filenames, so make sure it only has just letters, numbers, or "-" or "_")
+                            ValidationResult valRes = ValidateExpId(expIdStr);
+                            if (!valRes.IsValid)
+                            {
+                                argsOk = false;
+                                //Message for bad Experiment ID argument
+                                outString += "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
+                                valFailed.Add(num);
+                            }
+                            //check if save file directory exists
+                            if (!Directory.Exists(saveFolderPath))
+                            {
+                                outString += $"Save folder path does not exist: {saveFolderPath} ";
+                                valFailed.Add(num);
+                                argsOk = false;
+                            }
+                            else
+                            {
+                                //Make sure user has write permission
+                                if (!SharedParameters.IsDirectoryWritable(saveFolderPath))
+                                {
+                                    outString += $"Write permission denied for save folder path: {saveFolderPath} ";
+                                    valFailed.Add(num);
+                                    argsOk = false;
+                                }
+                            }
+                            if (argsOk)
+                            {
+                                outString += $"{protocolPath}/ {expIdStr}/ {saveFolderPath} ";
+                            }
+                        }
+                    }
+                }
+
+                //If arguments are all ok, then run the step
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        //Run the step
+                        RunGen5(num, stepArgs);
+                    }
+                    else
+                    {
+                        //For anything that gets saved by the Run method to the dictionary, put placeholder values into dictionary
+                    }
+                }
+            }
+
             void ParseTimerStep()
             {
                 outString += "Running Timer: ";
@@ -1069,12 +1283,13 @@ namespace LMSF_Scheduler
                 outString += "WaitFor: ";
                 if (numArgs < 2)
                 {
-                    outString += "Must specify the process to WaitFor (Overlord or Timer)";
+                    outString += "Must specify the process to WaitFor (Overlord, Hamilton, Reader, or Timer)";
                     valFailed.Add(num);
                 }
                 else
                 {
-                    switch (stepArgs[1])
+                    string processWaitingFor = stepArgs[1];
+                    switch (processWaitingFor)
                     {
                         case "Overlord":
                             outString += "Overlord, Done.";
@@ -1098,9 +1313,20 @@ namespace LMSF_Scheduler
                             }
                             break;
                         default:
-                            outString += "WaitFor process not recognized: ";
-                            outString += stepArgs[1];
-                            valFailed.Add(num);
+                            if (GetConnectedReadersList().Contains(processWaitingFor))
+                            {
+                                outString += $"{processWaitingFor}, Done.";
+                                if (!isValidating)
+                                {
+                                    WaitForGen5(processWaitingFor);
+                                }
+                            }
+                            else
+                            {
+                                outString += "WaitFor process not recognized: ";
+                                outString += stepArgs[1];
+                                valFailed.Add(num);
+                            }
                             break;
                     }
                 }
@@ -1578,10 +1804,7 @@ namespace LMSF_Scheduler
                     expIdStr = stepArgs[1];
 
                     //expIdStr needs to be usable in filenames, so make sure it only has just letters, numbers, or "-" or "_")
-                    RegexValidationRule valRule = new RegexValidationRule();
-                    valRule.RegexText = "^[a-zA-Z0-9-_]+$";
-                    valRule.ErrorMessage = "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
-                    ValidationResult valRes = valRule.Validate(expIdStr, System.Globalization.CultureInfo.CurrentCulture);
+                    ValidationResult valRes = ValidateExpId(expIdStr);
                     if (!valRes.IsValid)
                     {
                         argsOk = false;
@@ -1861,6 +2084,17 @@ namespace LMSF_Scheduler
             }
         }
 
+        private ValidationResult ValidateExpId(string expIdStr)
+        {
+            //expIdStr needs to be usable in filenames, so make sure it only has just letters, numbers, or "-" or "_")
+            RegexValidationRule valRule = new RegexValidationRule();
+            valRule.RegexText = "^[a-zA-Z0-9-_]+$";
+            valRule.ErrorMessage = "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
+            ValidationResult valRes = valRule.Validate(expIdStr, System.Globalization.CultureInfo.CurrentCulture);
+
+            return valRes;
+        }
+
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
             //Make sure that any edits in the inputTextBox are updated to the InputTest property
@@ -1956,6 +2190,14 @@ namespace LMSF_Scheduler
 
         private bool Validate()
         {
+            //clear GUI
+            validationBorder.Background = Brushes.Transparent;
+            OutputText = "";
+            for (int i=0; i<10; i++)
+            {
+                Thread.Sleep(10);
+            }
+
             IsPaused = false;
             AbortCalled = false;
             IsRunning = true;
@@ -1970,19 +2212,19 @@ namespace LMSF_Scheduler
             //Validation failure is signaled by having one or more entires in the valFailed list 
             if (valFailed.Count > 0)
             {
-                OutputText += "\r\n";
-                OutputText += "Validation failed on the following steps:\r\n";
+                AddOutputText("\r\n");
+                AddOutputText("Validation failed on the following steps:\r\n");
                 foreach (int i in valFailed)
                 {
-                    OutputText += $"{i}, ";
+                    AddOutputText($"{i}, ");
                 }
                 validationTextBlock.Text = "Validation Failed";
                 validationBorder.Background = Brushes.Red;// new SolidColorBrush(Colors.Red);
             }
             else
             {
-                OutputText += "\r\n";
-                OutputText += "Validation sucessful.\r\n";
+                AddOutputText("\r\n");
+                AddOutputText("Validation sucessful.\r\n");
                 validationTextBlock.Text = "Validation Sucessful";
                 validationBorder.Background = Brushes.LimeGreen;// new SolidColorBrush(Colors.LimeGreen);
                 valReturn = true;
@@ -2808,6 +3050,118 @@ namespace LMSF_Scheduler
             metaDictionary[keyStr] = valueStr;
         }
 
+        private void RunGen5(int num, string[] args)
+        {
+            //First two arguments are reader name and reader command
+            string readerName = args[1];
+            string command = args[2];
+            //arguments 3, 4 and 5 are the protocol path, experiment Id, and save folder path
+            string protocolPath="";
+            string expIdStr="";
+            string saveFolderPath="";
+            string msg;
+            if (command != "RunExp")
+            {
+                msg = command;
+            }
+            else
+            {
+                protocolPath = args[3];
+                expIdStr = args[4];
+                saveFolderPath = args[5];
+                msg = $"{command}/{protocolPath}/{expIdStr}/{saveFolderPath}";
+            }
+
+            string replyStatus = SendTcpMessage(readerName, msg);
+            while (replyStatus == "Idle")
+            {
+                replyStatus = SendTcpMessage(readerName, "StatusCheck");
+                Thread.Sleep(200);
+            }
+            AddOutputText($"... reader status: {replyStatus}.\n");
+
+            //Send info to metadata if collecting
+            if (command == "RunExp" && isCollectingXml)
+            {
+                //Add <Gen5Experiment> node to metadata
+                XmlNode gen5Node = xmlDoc.CreateElement("Gen5Experiment");
+                //add the Gen5Experiment node to the step node
+                protocolNode.AppendChild(gen5Node);
+
+                //Protocol file
+                XmlNode protocolFileNode = xmlDoc.CreateElement("protocolFile");
+                protocolFileNode.InnerText = protocolPath;
+                gen5Node.AppendChild(protocolFileNode);
+
+                //Data file
+                XmlNode dataFileNode = xmlDoc.CreateElement("dataFile");
+                dataFileNode.InnerText = LMSF_Gen5_Reader.Gen5Reader.GetExperimentFilePath(saveFolderPath, expIdStr, readerName);
+                gen5Node.AppendChild(dataFileNode);
+
+                //Export file
+                XmlNode exportFileNode = xmlDoc.CreateElement("exportFile");
+                exportFileNode.InnerText = LMSF_Gen5_Reader.Gen5Reader.GetExperimentFilePath(saveFolderPath, expIdStr, readerName, true);
+                gen5Node.AppendChild(exportFileNode);
+
+                //Date and time
+                AddDateTimeNodes(DateTime.Now, gen5Node, "experiment started");
+            }
+        }
+
+        private void WaitForGen5(string reader)
+        {
+            WaitingForStepCompletion = true;
+
+            AddOutputText("... waiting for Gen5 to finish.");
+
+            BackgroundWorker gen5MonitorWorker = new BackgroundWorker();
+            gen5MonitorWorker.WorkerReportsProgress = false;
+            gen5MonitorWorker.DoWork += Gen5Monitor_DoWork;
+            gen5MonitorWorker.RunWorkerCompleted += Gen5Monitor_RunWorkerCompleted;
+
+            List<object> arguments = new List<object>();
+            arguments.Add(reader);
+            gen5MonitorWorker.RunWorkerAsync(arguments);
+
+            while (WaitingForStepCompletion)
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+
+            //Send info to metadata if collecting
+            if (isCollectingXml)
+            {
+                DateTime dt = DateTime.Now;
+
+                XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::Gen5Experiment/dateTime");
+                XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
+                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                statusFiniAtt.Value = "experiment finished";
+                timeFiniNode.Attributes.Append(statusFiniAtt);
+                dateNode.AppendChild(timeFiniNode);
+            }
+
+        }
+
+        void Gen5Monitor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            List<object> argsList = e.Argument as List<object>;
+            string reader = (string)argsList[0];
+
+            while (GetReaderStatus(reader) == $"{LMSF_Gen5.Gen5Window.ReaderStatusStates.Busy}")
+            {
+                Thread.Sleep(1000);
+            }
+
+        }
+
+        void Gen5Monitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            WaitingForStepCompletion = false;
+        }
+
         private void RunOverlord(int num, string[] args)
         {
             //args[0] is "Overlord"
@@ -2823,7 +3177,7 @@ namespace LMSF_Scheduler
             {
                 if (!ovProcess.HasExited)
                 {
-                    OutputText += "... waiting for last Overlord Process to exit.";
+                    AddOutputText("... waiting for last Overlord Process to exit.");
                     while (!ovProcess.HasExited)
                     {
                         Thread.Sleep(100);
@@ -2923,7 +3277,7 @@ namespace LMSF_Scheduler
             {
                 if (!hamProcess.HasExited)
                 {
-                    OutputText += "... waiting for last Hamilton Process to exit.";
+                    AddOutputText("... waiting for last Hamilton Process to exit.");
                     while (!hamProcess.HasExited)
                     {
                         Thread.Sleep(100);
@@ -2994,7 +3348,7 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
-            OutputText += "... waiting for Overlord to finish and exit.";
+            AddOutputText("... waiting for Overlord to finish and exit.");
 
             BackgroundWorker ovMonitorWorker = new BackgroundWorker();
             ovMonitorWorker.WorkerReportsProgress = false;
@@ -3035,7 +3389,7 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
-            OutputText += "... waiting for Hamilton Runtime Engine to finish and exit.";
+            AddOutputText("... waiting for Hamilton Runtime Engine to finish and exit.");
 
             BackgroundWorker hamMonitorWorker = new BackgroundWorker();
             hamMonitorWorker.WorkerReportsProgress = false;
@@ -3120,7 +3474,7 @@ namespace LMSF_Scheduler
             {
                 if (!stepTimerDialog.IsClosed)
                 {
-                    OutputText += "... waiting for last Timer to finish.";
+                    AddOutputText("... waiting for last Timer to finish.");
                     while (!stepTimerDialog.IsClosed)
                     {
                         Thread.Sleep(100);
@@ -3144,7 +3498,7 @@ namespace LMSF_Scheduler
             WaitingForStepCompletion = true;
             stepsRunning[num] = true;
 
-            OutputText += "... waiting for Timer to finish.";
+            AddOutputText("... waiting for Timer to finish.");
 
             BackgroundWorker timerMonitorWorker = new BackgroundWorker();
             timerMonitorWorker.WorkerReportsProgress = false;
@@ -3199,7 +3553,7 @@ namespace LMSF_Scheduler
 
         private string NewLogFileName()
         {
-            return $"{DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss")}.trc";
+            return $"{DateTime.Now.ToString("yyyy-MM-dd HH.mm.ss")}-lmsf.trc";
         }
 
         private bool NewLogFile()
@@ -3249,6 +3603,187 @@ namespace LMSF_Scheduler
 
         }
 
+        private void ReaderComboBox_DropDownClosed(object sender, EventArgs e)
+        {
+            string reader = SelectedReaderBlock.Text;
+            string title = $"Remote Connection to {reader}";
+
+            bool readerConnected = GetConnectedReadersList().Contains(reader);
+
+            string messageText = "";
+            if (readerConnected)
+            {
+                messageText = $"{reader} is currently connected. Do you want to retain that remote connection or disconnect?\n";
+                messageText += "Select 'Yes' to retain the connection, or 'No' to disconnect.";
+            }
+            else
+            {
+                messageText = $"Do you want to make a remote connection to {reader}?\n";
+                messageText += "Select 'Yes' to establish a connection, or 'No' to cancel.";
+            }
+
+            YesNoDialog.Response userResp = SharedParameters.ShowYesNoDialog(messageText, title);
+
+            ConfigureReader(reader, userResp);
+        }
+
+        private void ConfigureReader(string reader, YesNoDialog.Response connect)
+        {
+            if (connect == YesNoDialog.Response.Yes)
+            {
+                SelectedReaderBlock.Background = Brushes.Transparent;
+                if (readerClients[reader] == null)
+                {
+                    SimpleTcpClient client = new SimpleTcpClient();
+                    client.Delimiter = 0x13;
+                    try
+                    {
+                        client.Connect(readerIps[reader], 42222);
+                        SelectedReaderBlock.Background = Brushes.LimeGreen;
+                        readerClients[reader] = client;
+                    }
+                    catch (System.Net.Sockets.SocketException e)
+                    {
+                        MessageBox.Show($"{reader} is not accepting the connection. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer. Then try again.");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Exception: {e}");
+                    }
+                }
+                else
+                {
+                    SimpleTcpClient client = readerClients[reader];
+                    client.Delimiter = 0x13;
+                    try
+                    {
+                        client.Connect(readerIps[reader], 42222);
+                        SelectedReaderBlock.Background = Brushes.LimeGreen;
+                    }
+                    catch (System.Net.Sockets.SocketException e)
+                    {
+                        MessageBox.Show($"{reader} is not accepting the connection. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer. Then try again.");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Exception: {e}");
+                    }
+                }
+            }
+            else
+            {
+                SelectedReaderBlock.Background = Brushes.Transparent;
+                if (readerClients[reader] == null)
+                {
+                    //do nothing
+                }
+                else
+                {
+                    SimpleTcpClient client = readerClients[reader];
+                    client.Disconnect(); // this sets client equal to null after closing the underlying TcpClient
+                }
+            }
+        }
+
+        private string GetReaderStatus(string reader)
+        {
+            return SendTcpMessage(reader, "StatusCheck");
+        }
+
+        //This method sends message and handles wrapping the message with identifier and hash, and re-sending if message is not received
+        private string SendTcpMessage(string reader, string msg)
+        {
+            string replyStatus = "";
+
+            SimpleTcpClient client = readerClients[reader];
+            while (!client.IsConnected())
+            {
+                string warningText = $"{reader} is not connected. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer.";
+                warningText += $"\nThen click 'OK' to try again, or 'Cancel' to abort.";
+
+                MessageBoxResult result = MessageBox.Show(warningText, $"{reader} Not Connected", MessageBoxButton.OKCancel);
+                if (result == MessageBoxResult.Cancel)
+                {
+                    AbortCalled = true;
+                    return replyStatus;
+                }
+            }
+
+            //MessageBox.Show($"client connected: {client.IsConnected()}");
+
+            string wrappedMessage = Message.WrapTcpMessage(msg);
+            //For testing:
+            //wrappedMessage += "1";
+            //Note WriteLineAndGetReply() returns null if server takes longer than timeout to send reply
+            Message replyMsg = null;
+            AddOutputText($"sending message to {reader}, {wrappedMessage} ... ");
+            //TODO: add maxRetries
+            int numTries = 0;
+            while (replyMsg == null)
+            {
+                numTries++;
+                AddOutputText($"try {numTries}, ");
+                //replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
+                try
+                {
+                    replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
+                }
+                catch (Exception e)
+                {
+                    AddOutputText($"\n*****************************\nException caught in SendTcpMessage(), client.WriteLineAndGetReply(): {e}\n*****************************\n");
+                    replyMsg = null;
+                    Thread.Sleep(250);
+                }
+                if (replyMsg != null)
+                {
+                    string[] messageParts = new string[] { "msg", "msg", "msg" };
+                    string[] replyParts = new string[] { "rpl", "fail", "rpl" };
+                    try
+                    {
+                        messageParts = Message.UnwrapTcpMessage(wrappedMessage);
+                        AddOutputText($"messageParts: {messageParts[0]},{messageParts[1]},{messageParts[2]}, ", false);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        AddOutputText($"\n*****************************\nException caught in SendTcpMessage(), UnwrapTcpMessage(wrappedMessage): {e}\n*****************************\n");
+                        Thread.Sleep(250);
+                    }
+                    try
+                    {
+                        replyParts = Message.UnwrapTcpMessage(replyMsg.MessageString);
+                        AddOutputText($"replyParts: {replyParts[0]},{replyParts[1]},{replyParts[2]}, ", false);
+                    }
+                    catch (ArgumentException e)
+                    {
+                        AddOutputText($"\n*****************************\nException caught in SendTcpMessage(), UnwrapTcpMessage(replyMsg.MessageString): {e}\n*****************************\n");
+                        Thread.Sleep(250);
+                    }
+                    
+                    replyStatus = replyParts[1];
+                    bool msgRecieved = false;
+                    if (replyStatus != "fail")
+                    {
+                        msgRecieved = (messageParts[0] == replyParts[0]) && (messageParts[2] == replyParts[2]);
+                    }
+
+                    if (!msgRecieved)
+                    {
+                        //if the message did not get received properly, set replyMSg = null to try again.
+                        replyMsg = null;
+
+                        SharedParameters.SleepWithUiUpdates(1000);
+                        //MessageBox.Show("message not received properly, going to send again-");
+                    }
+                    else
+                    {
+                        AddOutputText($"reply received... {replyStatus} ");
+                    }
+                }
+            }
+            AddOutputText($"... done.\n");
+
+            return replyStatus;
+        }
     }
 
 }
