@@ -3700,26 +3700,29 @@ namespace LMSF_Scheduler
 
         private void ReaderComboBox_DropDownClosed(object sender, EventArgs e)
         {
-            string reader = SelectedReaderBlock.Text;
-            string title = $"Remote Connection to {reader}";
-
-            bool readerConnected = GetConnectedReadersList().Contains(reader);
-
-            string messageText = "";
-            if (readerConnected)
+            if (SelectedReaderBlock != null)
             {
-                messageText = $"{reader} is currently connected. Do you want to retain that remote connection or disconnect?\n";
-                messageText += "Select 'Yes' to retain the connection, or 'No' to disconnect.";
-            }
-            else
-            {
-                messageText = $"Do you want to make a remote connection to {reader}?\n";
-                messageText += "Select 'Yes' to establish a connection, or 'No' to cancel.";
-            }
+                string reader = SelectedReaderBlock.Text;
+                string title = $"Remote Connection to {reader}";
 
-            YesNoDialog.Response userResp = SharedParameters.ShowYesNoDialog(messageText, title);
+                bool readerConnected = GetConnectedReadersList().Contains(reader);
 
-            ConfigureReader(reader, userResp);
+                string messageText = "";
+                if (readerConnected)
+                {
+                    messageText = $"{reader} is currently connected. Do you want to retain that remote connection or disconnect?\n";
+                    messageText += "Select 'Yes' to retain the connection, or 'No' to disconnect.";
+                }
+                else
+                {
+                    messageText = $"Do you want to make a remote connection to {reader}?\n";
+                    messageText += "Select 'Yes' to establish a connection, or 'No' to cancel.";
+                }
+
+                YesNoDialog.Response userResp = SharedParameters.ShowYesNoDialog(messageText, title);
+
+                ConfigureReader(reader, userResp);
+            }
         }
 
         private void ConfigureReader(string reader, YesNoDialog.Response connect)
