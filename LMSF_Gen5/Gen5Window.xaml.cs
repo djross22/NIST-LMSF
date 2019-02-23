@@ -824,6 +824,11 @@ namespace LMSF_Gen5
                 UpdateControlEnabledStatus();
             });
         }
+        
+        private void InstrCntrlButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddOutputText(gen5Reader.RunReaderControlCommand());
+        }
 
         //===============================================================
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
