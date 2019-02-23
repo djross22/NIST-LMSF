@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleTCP", "SimpleTCP\Simp
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LMSF Controls", "LMSF Controls\LMSF Controls.vdproj", "{45CBB66C-9992-4FF0-8F66-79446EE93127}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hamilton Remote", "Hamilton Remote\Hamilton Remote.csproj", "{5BBF49CC-59A5-4D06-AAD3-B02C30A35C68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{45CBB66C-9992-4FF0-8F66-79446EE93127}.Debug|Any CPU.ActiveCfg = Debug
 		{45CBB66C-9992-4FF0-8F66-79446EE93127}.Release|Any CPU.ActiveCfg = Release
 		{45CBB66C-9992-4FF0-8F66-79446EE93127}.Release|Any CPU.Build.0 = Release
+		{5BBF49CC-59A5-4D06-AAD3-B02C30A35C68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BBF49CC-59A5-4D06-AAD3-B02C30A35C68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BBF49CC-59A5-4D06-AAD3-B02C30A35C68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BBF49CC-59A5-4D06-AAD3-B02C30A35C68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
