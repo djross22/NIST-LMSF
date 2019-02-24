@@ -1228,12 +1228,12 @@ namespace LMSF_Scheduler
                         //Need to check the existence of the method file from this computer, via the IP address of the Hamilton computer.
                         //    Method folder as seen from STAR computer: @"C:\Program Files (x86)\HAMILTON\Methods"
                         //    Method folder as seen from this computer: @"\\129.6.167.35\Methods"
-                        string localMethods = @"C:\Program Files (x86)\HAMILTON\Methods";
+                        string localMethods = @"C:\Program Files (x86)\Hamilton\Methods";
                         string remoteMethods = @"\\" + readerIps[name] + @"\Methods";
                         string pathFromHere = methodPath.Replace(localMethods, remoteMethods);
                         if (!File.Exists(pathFromHere))
                         {
-                            outString += $"Method file/path does not exist: {methodPath} ";
+                            outString += $"Method file/path does not exist: {methodPath}, {pathFromHere} ";
                             valFailed.Add(num);
                             argsOk = false;
                         }
