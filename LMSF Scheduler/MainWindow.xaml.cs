@@ -270,6 +270,10 @@ namespace LMSF_Scheduler
                 rewindButton.IsEnabled = isPaused;
                 abortButton.IsEnabled = true;
 
+                selectComboBox.IsEnabled = false;
+                readerComboBox.IsEnabled = false;
+                testButton.IsEnabled = false;
+
                 if (isPaused)
                 {
                     statusBorder.Background = Brushes.Yellow; //new SolidColorBrush(Colors.Yellow);
@@ -305,6 +309,10 @@ namespace LMSF_Scheduler
                 inputTextBox.IsEnabled = true;
                 insertFileButton.IsEnabled = true;
                 mainMenu.IsEnabled = true;
+
+                selectComboBox.IsEnabled = true;
+                readerComboBox.IsEnabled = true;
+                testButton.IsEnabled = true;
             }
         }
 
