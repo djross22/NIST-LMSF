@@ -34,8 +34,13 @@ namespace LMSF_Gen5
         private string expFolderPath;
         private string protocolPath;
         private string textOut;
+
+        private readonly object readerBusyLock = new object();
         private bool isReaderBusy;
+
+        private readonly object experimentQueuedLock = new object();
         private bool isExperimentQueuedOrRunning;
+
         private bool isRemoteControlled;
         private bool isConnected;
         private BackgroundWorker readerMonitorWorker;
@@ -141,20 +146,38 @@ namespace LMSF_Gen5
 
         public bool IsExperimentQueuedOrRunning
         {
-            get { return this.isExperimentQueuedOrRunning; }
+            get
+            {
+                lock (experimentQueuedLock)
+                {
+                    return this.isExperimentQueuedOrRunning;
+                }
+            }
             private set
             {
-                this.isExperimentQueuedOrRunning = value;
+                lock (experimentQueuedLock)
+                {
+                    this.isExperimentQueuedOrRunning = value;
+                }
                 OnPropertyChanged("IsExperimentQueuedOrRunning");
             }
         }
 
         public bool IsReaderBusy
         {
-            get { return this.isReaderBusy; }
+            get
+            {
+                lock (readerBusyLock)
+                {
+                    return this.isReaderBusy;
+                }
+            }
             private set
             {
-                this.isReaderBusy = value;
+                lock (readerBusyLock)
+                {
+                    this.isReaderBusy = value;
+                }
                 OnPropertyChanged("IsReaderBusy");
                 if (isReaderBusy)
                 {
