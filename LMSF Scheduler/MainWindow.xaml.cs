@@ -1382,7 +1382,7 @@ namespace LMSF_Scheduler
                                 outString += $"{processWaitingFor}, Done.";
                                 if (!isValidating)
                                 {
-                                    WaitForGen5(processWaitingFor);
+                                    WaitForRemoteProcess(processWaitingFor);
                                 }
                             }
                             else
@@ -3203,20 +3203,38 @@ namespace LMSF_Scheduler
             }
         }
 
-        private void WaitForGen5(string reader)
+        private void WaitForRemoteProcess(string remoteName)
         {
             WaitingForStepCompletion = true;
 
-            AddOutputText("... waiting for Gen5 to finish.");
+            bool isReader = (remoteName.Contains("Epoch") || remoteName.Contains("Neo"));
+            bool isStar = remoteName.Contains("STAR");
+            string outText;
 
-            BackgroundWorker gen5MonitorWorker = new BackgroundWorker();
-            gen5MonitorWorker.WorkerReportsProgress = false;
-            gen5MonitorWorker.DoWork += Gen5Monitor_DoWork;
-            gen5MonitorWorker.RunWorkerCompleted += Gen5Monitor_RunWorkerCompleted;
+            if (isReader)
+            {
+                outText = "... waiting for Gen5 to finish.";
+            }
+            else {
+                if (isStar)
+                {
+                    outText = "... waiting for remote Hamilton to finish.";
+                }
+                else
+                {
+                    outText = "... waiting for unknown remote proecess.";
+                }
+            }
+            AddOutputText(outText);
+
+            BackgroundWorker remoteMonitorWorker = new BackgroundWorker();
+            remoteMonitorWorker.WorkerReportsProgress = false;
+            remoteMonitorWorker.DoWork += RemoteProcessMonitor_DoWork;
+            remoteMonitorWorker.RunWorkerCompleted += RemoteProcessMonitor_RunWorkerCompleted;
 
             List<object> arguments = new List<object>();
-            arguments.Add(reader);
-            gen5MonitorWorker.RunWorkerAsync(arguments);
+            arguments.Add(remoteName);
+            remoteMonitorWorker.RunWorkerAsync(arguments);
 
             while (WaitingForStepCompletion)
             {
@@ -3228,31 +3246,45 @@ namespace LMSF_Scheduler
             {
                 DateTime dt = DateTime.Now;
 
-                XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::Gen5Experiment/dateTime");
-                XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
-                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
-                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
-                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
-                statusFiniAtt.Value = "experiment finished";
-                timeFiniNode.Attributes.Append(statusFiniAtt);
-                dateNode.AppendChild(timeFiniNode);
+                if (isReader)
+                {
+                    XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::Gen5Experiment/dateTime");
+                    XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
+                    XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                    timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                    XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                    statusFiniAtt.Value = "experiment finished";
+                    timeFiniNode.Attributes.Append(statusFiniAtt);
+                    dateNode.AppendChild(timeFiniNode);
+                }
+                if (isStar)
+                {
+                    XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::hamiltonMethod/dateTime");
+                    XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
+                    XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                    timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                    XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                    statusFiniAtt.Value = "method finished";
+                    timeFiniNode.Attributes.Append(statusFiniAtt);
+                    dateNode.AppendChild(timeFiniNode);
+                }
             }
 
         }
 
-        void Gen5Monitor_DoWork(object sender, DoWorkEventArgs e)
+        void RemoteProcessMonitor_DoWork(object sender, DoWorkEventArgs e)
         {
             List<object> argsList = e.Argument as List<object>;
-            string reader = (string)argsList[0];
+            string remoteServer = (string)argsList[0];
 
-            while (GetReaderStatus(reader) == $"{LMSF_Gen5.Gen5Window.ReaderStatusStates.Busy}")
+            while (GetRemoteServerStatus(remoteServer) == $"{SharedParameters.ServerStatusStates.Busy}")
             {
                 Thread.Sleep(1000);
             }
 
         }
 
-        void Gen5Monitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        void RemoteProcessMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             WaitingForStepCompletion = false;
         }
@@ -3698,7 +3730,7 @@ namespace LMSF_Scheduler
 
         }
 
-        private void ReaderComboBox_DropDownClosed(object sender, EventArgs e)
+        private void RemoteComboBox_DropDownClosed(object sender, EventArgs e)
         {
             if (SelectedReaderBlock != null)
             {
@@ -3721,12 +3753,25 @@ namespace LMSF_Scheduler
 
                 YesNoDialog.Response userResp = SharedParameters.ShowYesNoDialog(messageText, title);
 
-                ConfigureReader(reader, userResp);
+                ConfigureRemoteServer(reader, userResp);
             }
         }
 
-        private void ConfigureReader(string reader, YesNoDialog.Response connect)
+        private void ConfigureRemoteServer(string reader, YesNoDialog.Response connect)
         {
+            string remoteExe = "Remote Program";
+            if (reader.Contains("Epoch") || reader.Contains("Neo"))
+            {
+                remoteExe = "LMSF_Gen5";
+            }
+            else
+            {
+                if (reader.Contains("STAR"))
+                {
+                    remoteExe = "Hamilton Remote";
+                }
+            }
+
             if (connect == YesNoDialog.Response.Yes)
             {
                 SelectedReaderBlock.Background = Brushes.Transparent;
@@ -3742,7 +3787,7 @@ namespace LMSF_Scheduler
                     }
                     catch (System.Net.Sockets.SocketException e)
                     {
-                        MessageBox.Show($"Exception: {e}. {reader} is not accepting the connection. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer. Then try again.");
+                        MessageBox.Show($"Exception: {e}. {reader} is not accepting the connection. Make sure {remoteExe} is running and in \"Remote\" mode on the {reader} computer. Then try again.");
                     }
                     catch (Exception e)
                     {
@@ -3760,7 +3805,7 @@ namespace LMSF_Scheduler
                     }
                     catch (System.Net.Sockets.SocketException e)
                     {
-                        MessageBox.Show($"{reader} is not accepting the connection. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer. Then try again.");
+                        MessageBox.Show($"{reader} is not accepting the connection. Make sure {remoteExe} is running and in \"Remote\" mode on the {reader} computer. Then try again.");
                     }
                     catch (Exception e)
                     {
@@ -3783,20 +3828,33 @@ namespace LMSF_Scheduler
             }
         }
 
-        private string GetReaderStatus(string reader)
+        private string GetRemoteServerStatus(string server)
         {
-            return SendTcpMessage(reader, "StatusCheck");
+            return SendTcpMessage(server, "StatusCheck");
         }
 
         //This method sends message and handles wrapping the message with identifier and hash, and re-sending if message is not received
         private string SendTcpMessage(string reader, string msg)
         {
+            string remoteExe = "Remote Program";
+            if (reader.Contains("Epoch") || reader.Contains("Neo"))
+            {
+                remoteExe = "LMSF_Gen5";
+            }
+            else
+            {
+                if (reader.Contains("STAR"))
+                {
+                    remoteExe = "Hamilton Remote";
+                }
+            }
+
             string replyStatus = "";
 
             SimpleTcpClient client = readerClients[reader];
             while (!client.IsConnected())
             {
-                string warningText = $"{reader} is not connected. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {reader} computer.";
+                string warningText = $"{reader} is not connected. Make sure {remoteExe} is running and in \"Remote\" mode on the {reader} computer.";
                 warningText += $"\nThen click 'OK' to try again, or 'Cancel' to abort.";
 
                 MessageBoxResult result = MessageBox.Show(warningText, $"{reader} Not Connected", MessageBoxButton.OKCancel);
