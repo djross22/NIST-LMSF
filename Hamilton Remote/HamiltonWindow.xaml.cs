@@ -325,7 +325,7 @@ namespace Hamilton_Remote
             {
                 if (!hamProcess.HasExited)
                 {
-                    AddOutputText("... waiting for last Hamilton Method to finish and exit.");
+                    AddOutputText("... waiting for last Hamilton Method to finish and exit. ");
                     while (!hamProcess.HasExited)
                     {
                         Thread.Sleep(100);
@@ -350,7 +350,7 @@ namespace Hamilton_Remote
 
         private void WaitForHamilton()
         {
-            AddOutputText("    ... waiting for Hamilton Runtime Engine to finish and exit.");
+            AddOutputText("    ... waiting for Hamilton Runtime Engine to finish and exit. ");
 
             BackgroundWorker hamMonitorWorker = new BackgroundWorker();
             hamMonitorWorker.WorkerReportsProgress = false;
