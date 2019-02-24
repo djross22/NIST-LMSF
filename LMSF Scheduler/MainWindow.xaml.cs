@@ -1237,7 +1237,17 @@ namespace LMSF_Scheduler
                             valFailed.Add(num);
                             argsOk = false;
                         }
-                        
+
+                        //Remote Hamilton method requiers write permission to the Hamilton/LMSF_FrontEnd dirctory on the remote cmoputer
+                        string remoteFrontEndpath = @"\\" + readerIps[name] + @"\\LMSF_FrontEnd\\";
+                        if (!SharedParameters.IsDirectoryWritable(remoteFrontEndpath))
+                        {
+                            outString += $"Write permission to the Hamilton/LMSF_FrontEnd directory is required for the RemoteHam command. This permission was denied for the folder path: {remoteFrontEndpath}.\n";
+                            outString += $"Manually check the remote connection to that directory and try again. ";
+                            valFailed.Add(num);
+                            argsOk = false;
+                        }
+
                         if (argsOk)
                         {
                             outString += $"{methodPath} ";
@@ -3538,7 +3548,28 @@ namespace LMSF_Scheduler
 
             //Export the metaDicitonary to the Hamilton/LMSF_FrontEnd dirctory on the remote cmoputer
             string remoteFrontEndpath = @"\\" + readerIps[name] + @"\\LMSF_FrontEnd\\";
-            ExportDictionary(remoteFrontEndpath, "parameters.csv");
+            int numTries = 0;
+            bool exportSucess = false;
+            while (!exportSucess && numTries<10)
+            {
+                numTries++;
+                try
+                {
+                    ExportDictionary(remoteFrontEndpath, "parameters.csv");
+                    exportSucess = true;
+                }
+                catch
+                {
+                    Thread.Sleep(3000);
+                }
+            }
+
+            if (!exportSucess)
+            {
+                AddOutputText($"Attempt to write dictionary to Hamilton/LMSF_FrontEnd dirctory failed 10 times. Aborting automation protocol.\n");
+                AbortCalled = true;
+            }
+            
             
             //Send info to metadata if collecting
             if (isCollectingXml)
@@ -3555,7 +3586,6 @@ namespace LMSF_Scheduler
 
                 //Date and time
                 AddDateTimeNodes(DateTime.Now, hamNode, "method started");
-
             }
         }
 
