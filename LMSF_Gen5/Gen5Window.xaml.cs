@@ -25,7 +25,7 @@ namespace LMSF_Gen5
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class Gen5Window : Window, INotifyPropertyChanged, IReaderTextOut
+    public partial class Gen5Window : Window, INotifyPropertyChanged, IReaderTextOut, IReportsRemoteStatus
     {
         //Property change notification event required for INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -55,8 +55,8 @@ namespace LMSF_Gen5
         private readonly object messageHandlingLock = new object();
         private Queue<string> messageQueue = new Queue<string>();
         private Queue<string> oldMessageQueue = new Queue<string>();
-        public enum ReaderStatusStates { Idle, Busy };
-        public ReaderStatusStates ReaderStatus { get; private set; }
+        //public enum ReaderStatusStates { Idle, Busy };
+        public SharedParameters.ServerStatusStates ServerStatus { get; private set; }
         public static List<string> Gen5CommandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
 
         public Gen5Window()
@@ -669,8 +669,8 @@ namespace LMSF_Gen5
             if (goodMsg)
             {
                 //send back status if good message
-                replyStr = $"{msgParts[0]},{ReaderStatus},{msgParts[2]}";
-                textOutAdd = $"reply sent, {ReaderStatus}.\n";
+                replyStr = $"{msgParts[0]},{ServerStatus},{msgParts[2]}";
+                textOutAdd = $"reply sent, {ServerStatus}.\n";
             }
             else
             {
@@ -749,17 +749,17 @@ namespace LMSF_Gen5
             {
                 if (IsExperimentQueuedOrRunning || IsReaderBusy)
                 {
-                    ReaderStatus = ReaderStatusStates.Busy;
+                    ServerStatus = SharedParameters.ServerStatusStates.Busy;
                 }
                 else
                 {
                     if (messageQueue.Count == 0)
                     {
-                        ReaderStatus = ReaderStatusStates.Idle;
+                        ServerStatus = SharedParameters.ServerStatusStates.Idle;
                     }
                     else
                     {
-                        ReaderStatus = ReaderStatusStates.Busy;
+                        ServerStatus = SharedParameters.ServerStatusStates.Busy;
                         string nextMsg = messageQueue.Dequeue();
                         oldMessageQueue.Enqueue(nextMsg);
                         ParseAndRunCommand(nextMsg);
