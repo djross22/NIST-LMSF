@@ -49,11 +49,17 @@ namespace LMSF_Scheduler
 
         private int stepNum;
         private int totalSteps;
+
+        private readonly object runControlLock = new object();
         private bool isRunning = false;
-        private bool abortCalled = false;
         private bool isPaused = true;
+        private bool abortCalled = false;
+
         private bool isOneStep = false;
+
+        private readonly object validatingLock = new object();
         private bool isValidating = false;
+
         private bool isValUserInput;
         private List<int> valFailed;
         //Validation failure is signaled by adding/having one or more entires in the valFailed list
@@ -139,22 +145,29 @@ namespace LMSF_Scheduler
 
         public bool AbortCalled
         {
-            get { return this.abortCalled; }
+            get
+            {
+                lock (runControlLock)
+                {
+                    return this.abortCalled;
+                }
+            }
             set
             {
-                this.abortCalled = value;
-                UpdateEnabledState();
-                if (this.abortCalled)
+                lock (runControlLock)
                 {
-                    abortButton.Background = Brushes.Red; //new SolidColorBrush(Colors.Red);
-                    playButton.Background = Brushes.Transparent;
-                    stepButton.Background = Brushes.Transparent;
+                    this.abortCalled = value;
+                    if (this.abortCalled)
+                    {
+                        abortButton.Background = Brushes.Red; //new SolidColorBrush(Colors.Red);
+                        playButton.Background = Brushes.Transparent;
+                        stepButton.Background = Brushes.Transparent;
+                    }
+                    else
+                    {
+                        abortButton.Background = Brushes.White; //new SolidColorBrush(Colors.White);
+                    }
                 }
-                else
-                {
-                    abortButton.Background = Brushes.White; //new SolidColorBrush(Colors.White);
-                }
-                //OnPropertyChanged("AbortCalled");
             }
         }
 
@@ -189,22 +202,41 @@ namespace LMSF_Scheduler
 
         public bool IsPaused
         {
-            get { return this.isPaused; }
+            get
+            {
+                lock (runControlLock)
+                {
+                    return this.isPaused;
+                }
+            }
             set
             {
-                this.isPaused = value;
-                UpdateEnabledState();
+                lock (runControlLock)
+                {
+                    this.isPaused = value;
+                    UpdateEnabledState();
+                }
                 OnPropertyChanged("IsPaused");
             }
         }
 
         public bool IsRunning
         {
-            get { return this.isRunning; }
+            get
+            {
+                lock (runControlLock)
+                {
+                    return this.isRunning;
+                }
+            }
             set
             {
-                this.isRunning = value;
-                UpdateEnabledState();
+                lock (runControlLock)
+                {
+                    this.isRunning = value;
+                    UpdateEnabledState();
+                }
+                
                 OnPropertyChanged("IsRunning");
             }
         }
