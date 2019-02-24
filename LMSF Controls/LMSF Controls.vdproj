@@ -536,7 +536,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:LMSF Controls"
         "ProductCode" = "8:{E894366B-4778-4A38-9F7C-127A61BD4164}"
-        "PackageCode" = "8:{17CAC509-B601-4C0D-9EF4-AD0BC12B7C93}"
+        "PackageCode" = "8:{73A700BB-E326-486F-9DE8-71570E5A11B4}"
         "UpgradeCode" = "8:{CD578552-36AD-412E-B75E-2FE10ABD17EB}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -695,7 +695,7 @@
             "Target" = "8:_3D66B5C1AC3440C7A7C3C52B28131B11"
             "Folder" = "8:_B5A0630B1E524A5DABB87C3311ECE3CE"
             "WorkingFolder" = "8:_9B6836642D994DAEA1D8B3AE5D12C5FC"
-            "Icon" = "8:"
+            "Icon" = "8:_B286AFBB2DAC46D7B9889032B1BBC5E2"
             "Feature" = "8:"
             }
         }
