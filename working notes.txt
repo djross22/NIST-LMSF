@@ -451,8 +451,14 @@ SimpleTCP: Replace DataReceived with DelimiterDataReceived() in WriteLineAndGetR
 
 LMSF_Gen5: Add oldMessageQueue - to take messages that have been run - to avoid running duplicates that arrive slowly (after the original has run and been dequeued)
 
+Test and merge into main branch
+
 
 TODO:
+
+Message from server (reader/STAR) when finished instead of repeated inquiry from Scheduler
+
+TestReaderCommunication
 
 
 
@@ -463,11 +469,10 @@ Add sleep time as optional parameter to WaitFor/
 lock (messageHandlingLock)
 
 
-Test and merge into main branch
+
 
 test for graceful closing and/or exit of Scheduler and Gen5Window - with respect to TCP connections
 
-Automatically write something to dictionary when running Gen5/?
 
 
 

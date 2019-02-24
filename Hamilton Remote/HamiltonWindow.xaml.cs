@@ -345,7 +345,6 @@ namespace Hamilton_Remote
 
             WaitForHamilton();
 
-
             AddOutputText("Hamilton Method finished.");
         }
 
@@ -551,42 +550,27 @@ namespace Hamilton_Remote
             string[] messageParts = Message.UnwrapTcpMessage(msg);
             string command = messageParts[1];
 
-            //{ "CarrierIn", "CarrierOut", "RunExp" }, "StatusCheck"
+            // "RunMethod", "StatusCheck"
             switch (command)
             {
-                case "CarrierIn":
-                    this.Dispatcher.Invoke(() => {
-                        CarrierIn();
-                    });
-                    break;
-                case "CarrierOut":
-                    this.Dispatcher.Invoke(() => {
-                        CarrierOut();
-                    });
-                    break;
                 case "StatusCheck":
-                    //Don't need to do anything here because the reader status is automatically sent back
+                    //Don't need to do anything here because the server status is automatically sent back
                     break;
                 default:
-                    if (command.StartsWith("RunExp"))
+                    if (command.StartsWith("RunMethod"))
                     {
-                        //command = $"RunExp/{protocolPath}/{expIdStr}/{saveFolderPath}";
+                        //command = $"RunMethod/{methodPath};
+                        //From LMSF_Scheduler: msg = $"{command}/{methodPath}";
                         string[] runExpParts = command.Split('/');
-                        string protocolPath = runExpParts[1];
-                        string expIdStr = runExpParts[2];
-                        string saveFolder = runExpParts[3];
+                        string methodFilePath = runExpParts[1];
                         this.Dispatcher.Invoke(() => {
-                            ProtocolPath = protocolPath;
-                            ExperimentId = expIdStr;
-                            ExpFolderPath = saveFolder;
-                            NewExp();
-                            CarrierIn();
-                            RunExp();
+                            MethodPath = methodFilePath;
+                            RunHamilton();
                         });
                     }
                     else
                     {
-                        MessageBox.Show($"Unsupported remote reader command, {command}", "Unsupported Command Error");
+                        MessageBox.Show($"Unsupported remote server command, {command}", "Unsupported Command Error");
                         //throw new System.ArgumentException($"Unsupported remote reader command, {command}", "command");
                     }
                     break;

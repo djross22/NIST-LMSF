@@ -329,7 +329,7 @@ namespace LMSF_Scheduler
 
             CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
 
-            ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4" };
+            ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
             foreach (string s in ReaderList)
             {
@@ -339,12 +339,13 @@ namespace LMSF_Scheduler
 
                 readerClients[s] = null;
             }
+            //Set IPs for each remote server
             readerIps["Neo"] = "localhost";
             readerIps["Epoch1"] = "129.6.167.36";
             readerIps["Epoch2"] = "129.6.167.37";
             readerIps["Epoch3"] = "129.6.167.38";
             readerIps["Epoch4"] = "129.6.167.39";
-            //Set IPs for Epoch readers
+            readerIps["S-Cell-STAR"] = "129.6.167.35";
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
@@ -936,6 +937,9 @@ namespace LMSF_Scheduler
                     case "Hamilton":
                         ParseHamiltonStep();
                         break;
+                    case "RemoteHam":
+                        ParseRemoteHamiltonStep();
+                        break;
                     case "Gen5":
                         ParseGen5Step();
                         break;
@@ -1137,6 +1141,121 @@ namespace LMSF_Scheduler
                         outString += "Method file not found: ";
                         outString += stepArgs[1];
                         valFailed.Add(num);
+                    }
+                }
+            }
+
+            void ParseRemoteHamiltonStep()
+            {
+                //Gen5 takes 3 arguments
+                //First two arguments are Hamilton name and command
+                string name;
+                string command;
+                List<string> commandList = new List<string> { "RunMethod" };
+                //3rd argument is the method path
+                string methodPath;
+
+                outString += "Running RemoteHam Command: ";
+
+                //Booleans to track validity of arguments
+                bool argsOk = false;
+
+                //Requires at least three arguments (plus RemoteHam command itself)
+                if (numArgs < 4)
+                {
+                    outString += "Not enough arguments; RemoteHam command requires at least 3 arguments: Hamilton name, command, and method path. ";
+                    valFailed.Add(num);
+                }
+                else
+                {
+                    name = stepArgs[1];
+                    command = stepArgs[2];
+                    methodPath = stepArgs[3];
+                    // Check if 1st argument is valid Hamilton name 
+                    if (name.Contains("STAR") && ReaderList.Contains(name))
+                    {
+                        //Check if reader is connected
+                        if (GetConnectedReadersList().Contains(name))
+                        {
+                            //Check if 2nd argument is valid Hamilton command
+                            if (commandList.Contains(command))
+                            {
+                                argsOk = true;
+                                outString += $"{name}/ {command} ";
+                            }
+                            else
+                            {
+                                outString += "Not a valid Hamilton command: ";
+                                outString += $"{command}. Valid Hamilton commands are: ";
+                                foreach (string s in commandList)
+                                {
+                                    outString += $"{s}, ";
+                                }
+                                valFailed.Add(num);
+                            }
+                        }
+                        else
+                        {
+                            outString += $"{name} not connected. Make sure Hamilton Remote is running and in \"Remote\" mode on the {name} computer,\n";
+                            outString += $"then establish the remote connection to {name} using the drop-down \"Remote Connections\" control at the bottom right of this window.";
+                            valFailed.Add(num);
+                        }
+                    }
+                    else
+                    {
+                        outString += "Not a valid Hamilton instrument name: ";
+                        outString += $"{name}. Valid Hamilton instrument names are: ";
+                        foreach (string r in ReaderList)
+                        {
+                            if (r.Contains("STAR"))
+                            {
+                                outString += $"{r}, ";
+                            }
+                        }
+                        valFailed.Add(num);
+                    }
+
+                    //If arguments are ok so far, check additional arguments of RunMethod command
+                    if (argsOk && command == "RunMethod")
+                    {
+                        //Check if method path is valid file with .prt extension
+                        if (!methodPath.EndsWith(".hsl"))
+                        {
+                            outString += $"Method path needs to end with .hsl, you enetered: {methodPath} ";
+                            valFailed.Add(num);
+                            argsOk = false;
+                        }
+                        //Need to check the existence of the method file from this computer, via the IP address of the Hamilton computer.
+                        //    Method folder as seen from STAR computer: @"C:\Program Files (x86)\HAMILTON\Methods"
+                        //    Method folder as seen from this computer: @"\\129.6.167.35\Methods"
+                        string localMethods = @"C:\Program Files (x86)\HAMILTON\Methods";
+                        string remoteMethods = @"\\" + readerIps[name] + @"\Methods";
+                        string pathFromHere = methodPath.Replace(localMethods, remoteMethods);
+                        if (!File.Exists(pathFromHere))
+                        {
+                            outString += $"Method file/path does not exist: {methodPath} ";
+                            valFailed.Add(num);
+                            argsOk = false;
+                        }
+                        
+                        if (argsOk)
+                        {
+                            outString += $"{methodPath} ";
+                        }
+                    }
+                }
+
+                //If arguments are all ok, then run the step
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        //Run the step
+                        RunRemoteHamilton(num, stepArgs);
+                    }
+                    else
+                    {
+                        //For anything that gets saved by the Run method to the dictionary, put placeholder values into dictionary
                     }
                 }
             }
@@ -3171,7 +3290,7 @@ namespace LMSF_Scheduler
             while (replyStatus == "Idle")
             {
                 replyStatus = SendTcpMessage(readerName, "StatusCheck");
-                Thread.Sleep(200);
+                Thread.Sleep(100);
             }
             AddOutputText($"... reader status: {replyStatus}.\n");
 
@@ -3387,7 +3506,57 @@ namespace LMSF_Scheduler
                 //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
                 this.Dispatcher.Invoke(() => { AbortCalled = true; });
             }
+
+        }
+
+        private void RunRemoteHamilton(int num, string[] args)
+        {
+            //First two arguments are Hamilton name and command
+            string name = args[1];
+            string command = args[2];
+            //3rd argument is the method path
+            string methodPath = args[3];
+
+            string msg;
+            if (command != "RunMethod")
+            {
+                msg = command;
+            }
+            else
+            {
+                //methodPath = args[3];
+                msg = $"{command}/{methodPath}";
+            }
+
+            string replyStatus = SendTcpMessage(name, msg);
+            while (replyStatus == "Idle")
+            {
+                replyStatus = SendTcpMessage(name, "StatusCheck");
+                Thread.Sleep(200);
+            }
+            AddOutputText($"... reader status: {replyStatus}.\n");
+
+            //Export the metaDicitonary to the Hamilton/LMSF_FrontEnd dirctory on the remote cmoputer
+            string remoteFrontEndpath = @"\\" + readerIps[name] + @"\\LMSF_FrontEnd\\";
+            ExportDictionary(remoteFrontEndpath, "parameters.csv");
             
+            //Send info to metadata if collecting
+            if (isCollectingXml)
+            {
+                //Add <hamiltonMethod> node to metadata
+                XmlNode hamNode = xmlDoc.CreateElement("hamiltonMethod");
+                //add the hamiltonMethod node to the protocol node
+                protocolNode.AppendChild(hamNode);
+
+                //Method file
+                XmlNode hamFileNode = xmlDoc.CreateElement("methodFile");
+                hamFileNode.InnerText = methodPath;
+                hamNode.AppendChild(hamFileNode);
+
+                //Date and time
+                AddDateTimeNodes(DateTime.Now, hamNode, "method started");
+
+            }
         }
 
         private void RunHamilton(int num, string[] args)

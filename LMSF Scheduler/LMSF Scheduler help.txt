@@ -41,7 +41,7 @@ Commands:
 			
 			
 	Hamilton
-		Runs a Hamilton method (on a computer with Hamilton Venus installed).
+		Runs a Hamilton method (on the local computer with Hamilton Venus installed).
 		Also saves the Metadata Dictionary (metaDictionary) to a parameters file that can be read by a Hamilton Venus program (C:\Program Files (x86)\HAMILTON\LMSF_FrontEnd\parameters.csv).
 		
 		Syntax:
@@ -49,6 +49,28 @@ Commands:
 			
 		Examples:
 			Hamilton/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl
+			
+			
+	RemoteHam
+		Runs a remote Hamilton method (on a different computer with Hamilton Venus installed).
+		Also saves the Metadata Dictionary (metaDictionary) to a parameters file that can be read by the Hamilton Venus program on the remote computer (\\<remote IP address>\LMSF_FrontEnd\parameters.csv).
+		The first argument is the name of the Hamilton.
+			The valid Hamilton names are "S-Cell-STAR".
+		The second argument is the command to send to the Hamilton.
+			The valid commands that can be sent are "RunMethod".
+		If the second argument is RunMethod, the Remote Hamilton program on the remote computer will run the specified method.
+			For the RunMethod command, one additional argument is required:
+				The path to the method file to be run.
+					The path is read from the point of view of the computer controlling the Hamilton.
+					So, the method path will usually start with the Methods folder on that computer: "C:\Program Files (x86)\HAMILTON\Methods\..."
+					
+		Note: after calling a RemoteHam/ command, the appropriate WaitFor/ command to use is WaitFor/ <Hamilton name>
+		
+		Syntax:
+			RemoteHam/ <Hamilton name>/ <Hamilton command>/<file path>
+			
+		Examples:
+			RemoteHam/ S-Cell-STAR/ RunMethod/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl
 			
 			
 	Gen5
@@ -63,7 +85,7 @@ Commands:
 			For the RunExp command, three additional arguments are required:
 				The path to the protocol file to be run.
 					The path is read from the point of view of the computer controlling the reader.
-					So, to use a protocol from the master Protocols directroy on the main computer, the protocol path will have to start with the IP adddress: "127.6.167.34\\..."
+					So, to use a protocol from the master Protocols directroy on the main computer, the protocol path will have to start with the IP adddress: "\\127.6.167.34\..."
 				The experiment ID. This is used to automatically generate file names for the Gen5 experiment file (.xpt) and the data export file (.txt).
 					The LMSF_Gen5 program automatically appends the reader name to the experiment ID to create the .xpt and export file names.
 						Note that if more than one read needs to be run with the same experiment ID, then use "{experimentId}-read 1", "{experimentId}-read 2", etc. for the <experiment ID> argument.
@@ -71,7 +93,7 @@ Commands:
 					The save folder path is also read from the point of view of the computer controlling the reader.
 		
 		Syntax:
-			Gen5/ <reader>/ <gen5 command>{/ <protocol path>/ <experiment ID>/ <save folder path>}
+			Gen5/ <reader name>/ <gen5 command>{/ <protocol path>/ <experiment ID>/ <save folder path>}
 			
 		Examples:
 			Gen5/ Epoch1/ CarrierOut
@@ -98,14 +120,16 @@ Commands:
 			
 	WaitFor
 		Pauses execution and waits for a previous step to finish
-		The <process to wait for> argument can be either "Overlord", "Hamilton", "Timer", or the name of a plate reader that is connected (see the Gen5/ command description).
+		The <process to wait for> argument can be either "Overlord", "Hamilton", "Timer", or the name of a remote instrument that is connected (see the Gen5/ and RemoteHam/ command descriptions).
 		
 		Syntax:
 			WaitFor/ <process to wait for>
 			
 		Examples:
 			WaitFor/ Overlord
+			WaitFor/ Hamilton
 			WaitFor/ Epoch1
+			WaitFor/ S-Cell-STAR
 			WaitFor/ Timer
 			
 			
