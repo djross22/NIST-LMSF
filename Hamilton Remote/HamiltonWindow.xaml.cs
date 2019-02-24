@@ -33,7 +33,6 @@ namespace Hamilton_Remote
         private string textOut;
         private bool isRemoteControlled;
         private bool isConnected;
-        private bool isMethodQueuedOrRunning;
         private bool isVenusBusy;
 
         private Brush startingButtonBackground;
@@ -122,16 +121,6 @@ namespace Hamilton_Remote
             }
         }
 
-        public bool IsMethodQueuedOrRunning
-        {
-            get { return this.isMethodQueuedOrRunning; }
-            private set
-            {
-                this.isMethodQueuedOrRunning = value;
-                OnPropertyChanged("IsMethodQueuedOrRunning");
-            }
-        }
-
         public bool IsVenusBusy
         {
             get { return this.isVenusBusy; }
@@ -194,7 +183,8 @@ namespace Hamilton_Remote
             //When in local control mode, set the enabled properties according to whether or not an experiment has beed queued or is running
             if (!IsRemoteControlled)
             {
-                selectMethodButton.IsEnabled = !IsMethodQueuedOrRunning;
+                selectMethodButton.IsEnabled = !IsVenusBusy;
+                runMethodButton.IsEnabled = !IsVenusBusy;
             }
         }
 
@@ -253,6 +243,10 @@ namespace Hamilton_Remote
 
         private void AddOutputText(string txt, bool newLine = true)
         {
+            if (newLine)
+            {
+                OutputText += "\n";
+            }
             OutputText += txt;
             //Add to log file
             if (IsRemoteControlled && (logFilePath != null))
@@ -306,46 +300,50 @@ namespace Hamilton_Remote
 
         private void RunHamilton()
         {
-            IsVenusBusy = true;
             string file = MethodPath;
-            if (!file.EndsWith(".hsl"))
-            {
-                AddOutputText("Method File Path does not end with \".hsl\"\n");
-                IsVenusBusy = false;
-                return;
-            }
-            if (!File.Exists(file))
-            {
-                AddOutputText($"Method File, {file}, not found.\n");
-                IsVenusBusy = false;
-                return;
-            }
 
-            if (!(hamProcess is null))
+            if (file != null)
             {
-                if (!hamProcess.HasExited)
+                IsVenusBusy = true;
+
+                if (!file.EndsWith(".hsl"))
                 {
-                    AddOutputText("... waiting for last Hamilton Method to finish and exit. ");
-                    while (!hamProcess.HasExited)
+                    AddOutputText("Method File Path does not end with \".hsl\"\n");
+                    IsVenusBusy = false;
+                    return;
+                }
+
+                if (!File.Exists(file))
+                {
+                    AddOutputText($"Method File, {file}, not found.\n");
+                    IsVenusBusy = false;
+                    return;
+                }
+
+                if (!(hamProcess is null))
+                {
+                    if (!hamProcess.HasExited)
                     {
-                        Thread.Sleep(100);
+                        AddOutputText("... waiting for last Hamilton Method to finish and exit. ");
+                        while (!hamProcess.HasExited)
+                        {
+                            Thread.Sleep(100);
+                        }
                     }
                 }
+
+                //This part starts the Hamiltin HxRun.exe process
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.FileName = @"C:\Program Files (x86)\HAMILTON\Bin\HxRun.exe";
+
+                //the -t modifier causes HxRun.exe to run the method and then terminate itself after
+                startInfo.Arguments = "\"" + file + "\"" + " -t";
+
+                hamProcess = Process.Start(startInfo);
+                AddOutputText("Hamilton Method started...");
+
+                WaitForHamilton();
             }
-
-            //This part starts the Hamiltin HxRun.exe process
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = @"C:\Program Files (x86)\HAMILTON\Bin\HxRun.exe";
-
-            //the -t modifier causes HxRun.exe to run the method and then terminate itself after
-            startInfo.Arguments = "\"" + file + "\"" + " -t";
-
-            hamProcess = Process.Start(startInfo);
-            AddOutputText("Hamilton Method started...");
-
-            WaitForHamilton();
-
-            AddOutputText("Hamilton Method finished.");
         }
 
         private void WaitForHamilton()
@@ -362,11 +360,6 @@ namespace Hamilton_Remote
             arguments.Add(num);
             arguments.Add(hamProcess);
             hamMonitorWorker.RunWorkerAsync(arguments);
-
-            while (IsMethodQueuedOrRunning)
-            {
-                Thread.Sleep(100);
-            }
         }
 
         void OutsideProcessMonitor_DoWork(object sender, DoWorkEventArgs e)
@@ -386,8 +379,10 @@ namespace Hamilton_Remote
         {
             this.Dispatcher.Invoke(() => {
                 //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
-                IsMethodQueuedOrRunning = false;
+                IsVenusBusy = false;
             });
+
+            AddOutputText("Hamilton Method finished.");
         }
 
         private void SetTcpPort()
@@ -521,7 +516,7 @@ namespace Hamilton_Remote
         {
             while (IsRemoteControlled)
             {
-                if (IsMethodQueuedOrRunning || IsVenusBusy)
+                if (IsVenusBusy)
                 {
                     ServerStatus = SharedParameters.ServerStatusStates.Busy;
                 }
