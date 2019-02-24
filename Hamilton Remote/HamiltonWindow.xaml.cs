@@ -33,6 +33,8 @@ namespace Hamilton_Remote
         private string textOut;
         private bool isRemoteControlled;
         private bool isConnected;
+
+        private readonly object venusBusyLock = new object();
         private bool isVenusBusy;
 
         private Brush startingButtonBackground;
@@ -125,10 +127,20 @@ namespace Hamilton_Remote
 
         public bool IsVenusBusy
         {
-            get { return this.isVenusBusy; }
+            get
+            {
+                lock (venusBusyLock)
+                {
+                    return this.isVenusBusy;
+                }
+            }
             private set
             {
-                this.isVenusBusy = value;
+                lock (venusBusyLock)
+                {
+                    this.isVenusBusy = value;
+                }
+                
                 OnPropertyChanged("IsVenusBusy");
                 if (isVenusBusy)
                 {
