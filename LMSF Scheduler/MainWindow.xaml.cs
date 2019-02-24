@@ -42,7 +42,11 @@ namespace LMSF_Scheduler
         //For parsing and running steps
         private string[] inputSteps;
         private bool[] stepsRunning;
+
+        //lock for waitingForStepCompletion
+        private readonly object stepCompletionLock = new object();
         private bool waitingForStepCompletion;
+
         private int stepNum;
         private int totalSteps;
         private bool isRunning = false;
@@ -158,12 +162,17 @@ namespace LMSF_Scheduler
         {
             get
             {
-                return this.waitingForStepCompletion;
+                lock (stepCompletionLock)
+                {
+                    return this.waitingForStepCompletion;
+                }
             }
             set
             {
-                this.waitingForStepCompletion = value;
-                //OnPropertyChanged("WaitingForStepCompletion");
+                lock (stepCompletionLock)
+                {
+                    this.waitingForStepCompletion = value;
+                }
             }
         }
 
