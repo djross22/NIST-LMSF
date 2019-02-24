@@ -120,6 +120,7 @@
     <Compile Include="AppendExperimentIdDialog.xaml.cs">
       <DependentUpon>AppendExperimentIdDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IReportsRemoteStatus.cs" />
     <Compile Include="MediaIngredient.cs" />
     <Compile Include="ConcentrationDialog.xaml.cs">
       <DependentUpon>ConcentrationDialog.xaml</DependentUpon>

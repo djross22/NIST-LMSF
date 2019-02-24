@@ -62,6 +62,9 @@ namespace LMSF_Utilities
         //Units
         public static ObservableCollection<string> UnitsList => new ObservableCollection<string>() { "mmol/L", "umol/L", "mg/mL", "ug/mL", "ug/L", "%" };
 
+        // enumeration for reporting server status
+        public enum ServerStatusStates { Idle, Busy };
+
 
         //Utility methods
 

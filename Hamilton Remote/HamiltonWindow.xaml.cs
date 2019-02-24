@@ -24,7 +24,7 @@ namespace Hamilton_Remote
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class HamiltonWindow : Window, INotifyPropertyChanged
+    public partial class HamiltonWindow : Window, INotifyPropertyChanged, IReportsRemoteStatus
     {
         //Property change notification event required for INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -51,8 +51,8 @@ namespace Hamilton_Remote
         private readonly object messageHandlingLock = new object();
         private Queue<string> messageQueue = new Queue<string>();
         private Queue<string> oldMessageQueue = new Queue<string>();
-        public enum ServerStatusStates { Idle, Busy };
-        public ServerStatusStates ServerStatus { get; private set; }
+        //public enum ServerStatusStates { Idle, Busy };
+        public SharedParameters.ServerStatusStates ServerStatus { get; private set; }
 
         public HamiltonWindow()
         {
@@ -524,17 +524,17 @@ namespace Hamilton_Remote
             {
                 if (IsMethodQueuedOrRunning || IsVenusBusy)
                 {
-                    ServerStatus = ServerStatusStates.Busy;
+                    ServerStatus = SharedParameters.ServerStatusStates.Busy;
                 }
                 else
                 {
                     if (messageQueue.Count == 0)
                     {
-                        ServerStatus = ServerStatusStates.Idle;
+                        ServerStatus = SharedParameters.ServerStatusStates.Idle;
                     }
                     else
                     {
-                        ServerStatus = ServerStatusStates.Busy;
+                        ServerStatus = SharedParameters.ServerStatusStates.Busy;
                         string nextMsg = messageQueue.Dequeue();
                         oldMessageQueue.Enqueue(nextMsg);
                         ParseAndRunCommand(nextMsg);
