@@ -456,6 +456,145 @@ Test and merge into main branch
 
 TODO:
 
+Decide what to do about saving data from remote computers.
+	Save on local computer and then copy to Main?
+		Will require creating experiment directory on each remote computer - via LMSF_Utilities.GetExperimentId()
+
+
+
+
+
+
+Make everything thread safe:
+	First For each class with multiple threads, list all the threads other than the main/GUI thread, and then all the variables/properties accessed by each thread:
+		LMSF Scheduler.MainWindow
+			Thread runStepsThread
+				StepsThreadProc()
+					IsRunning, get
+					IsPaused, get
+					IsOneStep, get
+					InitSteps()
+						metaDictionary, set
+						concDictionary, set
+						isCollectingXml, set
+						inputSteps, get, set
+						InputText, get
+						stepNum, set
+						totalSteps, get, set
+						stepsRunning, set			can delete this variable
+						isValidating, get
+						OutputText, get, set		intentionally not locking this variable
+						ExperimentFileName, get
+						logFilePath, get
+						metaDataFilePath, set
+						NewLogFile()
+							logFilePath, set
+							NewLogFileName()
+					Step()
+						AbortCalled, get
+						IsRunning, set
+						stepNum, get, set
+						totalSteps, get
+						inputSteps, get
+						isValidating, get
+						logFilePath, get
+						IsRunning, set
+						IsOneStep, set
+						AddOutputText()
+						ParseStep()
+							metaDictionary, set
+							concDictionary, set
+							GetConnectedReadersList()
+								ReaderList, get
+								readerClients, get
+							RunOverlord()
+								WaitingForStepCompletion, set
+								ovProcess, get, set
+								isCollectingXml, get
+								protocolNode, get
+							RunHamilton()
+								WaitingForStepCompletion, set
+								hamProcess, get, set
+								isCollectingXml, get
+								protocolNode, get
+							RunRemoteHamilton()
+								isCollectingXml, get
+								protocolNode, get
+								SendTcpMessage()
+									readerClients, get
+									AbortCalled, set
+							RunGen5()
+								isCollectingXml, get
+								protocolNode, get
+								SendTcpMessage()
+									readerClients, get
+									AbortCalled, set
+									
+							RunTimer()
+								WaitingForStepCompletion, set
+								stepTimerDialog, get, set
+							WaitForOverlord()
+								WaitingForStepCompletion, get, set
+								ovProcess, get
+								isCollectingXml, get
+							WaitForHamilton()
+								WaitingForStepCompletion, get, set
+								hamProcess, get
+								isCollectingXml, get
+							WaitForTimer()
+								WaitingForStepCompletion, get, set
+							WaitForRemoteProcess()
+								WaitingForStepCompletion, get, set
+								isCollectingXml, get
+							RunNewXml()
+							RunAppendXml()
+							RunSaveXml()
+							RunUserPrompt()
+							RunUserYesNo()
+							RunAddXml()
+							RunSet()
+							RunGet()
+							RunGetExpId()
+							RunGetFile()
+							RunStartDialog()
+					
+			BackgroundWorker remoteMonitorWorker
+				RemoteProcessMonitor_DoWork()
+					GetRemoteServerStatus()
+						SendTcpMessage()
+							readerClients, get
+							AbortCalled, set
+				RemoteProcessMonitor_RunWorkerCompleted()
+					WaitingForStepCompletion, set
+					
+			BackgroundWorker ovMonitorWorker
+				OutsideProcessMonitor_DoWork()
+					outside_Process, get
+				OutsideProcessMonitor_RunWorkerCompleted()
+					WaitingForStepCompletion, set
+			
+			BackgroundWorker hamMonitorWorker
+				OutsideProcessMonitor_DoWork()
+					outside_Process, get
+				OutsideProcessMonitor_RunWorkerCompleted()
+					WaitingForStepCompletion, set
+			
+			BackgroundWorker timerMonitorWorker
+				TimerMonitor_DoWork()
+					stepTimerDialog, get
+				TimerMonitor_RunWorkerCompleted()
+					WaitingForStepCompletion, set
+			
+		LMSF Scheduler.MainWindow
+			fields/properties to lock:
+				WaitingForStepCompletion
+					At first, it might not seem like this is necessary because there is no place in the code where WaitingForStepCompletion needs to remain locked for more than one line;
+						but based on this: http://jonskeet.uk/csharp/threads/volatility.shtml, I'm going to put locks on all the flow control booleans.
+					lock is inside property getter and setter
+				IsRunning, IsPaused
+
+
+
 Message from server (reader/STAR) when finished instead of repeated inquiry from Scheduler
 
 TestReaderCommunication
@@ -466,7 +605,7 @@ Add sleep time as optional parameter to WaitFor/
 
 
 
-lock (messageHandlingLock)
+
 
 
 
