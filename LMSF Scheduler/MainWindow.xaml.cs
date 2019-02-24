@@ -400,12 +400,12 @@ namespace LMSF_Scheduler
         //temporary method for debugging/testing
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            //var client = new SimpleTcpClient();
-            //client.Delimiter = 0x13;
-            //client.Connect("localhost", 42222);
-            //client.WriteLine("test sending line");
-            string msg = "StatusCheck";
-            SendTcpMessage("Neo", msg);
+            if ((testTextBox.Text != null) && (testTextBox.Text != ""))
+            {
+                string reader = testTextBox.Text;
+                string msg = "StatusCheck";
+                SendTcpMessage(reader, msg);
+            }
         }
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
@@ -3923,6 +3923,11 @@ namespace LMSF_Scheduler
                 YesNoDialog.Response userResp = SharedParameters.ShowYesNoDialog(messageText, title);
 
                 ConfigureRemoteServer(reader, userResp);
+
+                if (userResp == YesNoDialog.Response.Yes)
+                {
+                    testTextBox.Text = reader;
+                }
             }
         }
 
@@ -4021,7 +4026,7 @@ namespace LMSF_Scheduler
             string replyStatus = "";
 
             SimpleTcpClient client = readerClients[reader];
-            while (!client.IsConnected())
+            while ((client == null) || !client.IsConnected())
             {
                 string warningText = $"{reader} is not connected. Make sure {remoteExe} is running and in \"Remote\" mode on the {reader} computer.";
                 warningText += $"\nThen click 'OK' to try again, or 'Cancel' to abort.";
