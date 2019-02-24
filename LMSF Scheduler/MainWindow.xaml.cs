@@ -327,7 +327,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
 
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
