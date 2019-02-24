@@ -22,7 +22,19 @@
         "Entry"
         {
         "MsmKey" = "8:_2DCA251C2227574A4586AF081B7CA3F9"
+        "OwnerKey" = "8:_3D66B5C1AC3440C7A7C3C52B28131B11"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2DCA251C2227574A4586AF081B7CA3F9"
         "OwnerKey" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3D66B5C1AC3440C7A7C3C52B28131B11"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -35,6 +47,12 @@
         {
         "MsmKey" = "8:_CF695ED28088F0ABBC71B1AB9A85059A"
         "OwnerKey" = "8:_E411F22A7CDF4870B0E7BF848E92A747"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CF695ED28088F0ABBC71B1AB9A85059A"
+        "OwnerKey" = "8:_3D66B5C1AC3440C7A7C3C52B28131B11"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -88,6 +106,12 @@
         "Entry"
         {
         "MsmKey" = "8:_ED0B0118571EDA9BB619FE6BADB8E327"
+        "OwnerKey" = "8:_3D66B5C1AC3440C7A7C3C52B28131B11"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ED0B0118571EDA9BB619FE6BADB8E327"
         "OwnerKey" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -107,6 +131,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_F5BF312DE9D24E099008CAF5F8C4BB39"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_3D66B5C1AC3440C7A7C3C52B28131B11"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -170,6 +200,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
             }
         }
         "Release"
@@ -194,6 +232,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
             }
         }
     }
@@ -638,6 +684,20 @@
             "Icon" = "8:_B286AFBB2DAC46D7B9889032B1BBC5E2"
             "Feature" = "8:"
             }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_C1185BD3CCFF494C80BD1883E2F5B9E1"
+            {
+            "Name" = "8:Hamilton Remote"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_3D66B5C1AC3440C7A7C3C52B28131B11"
+            "Folder" = "8:_B5A0630B1E524A5DABB87C3311ECE3CE"
+            "WorkingFolder" = "8:_9B6836642D994DAEA1D8B3AE5D12C5FC"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {
@@ -1037,6 +1097,34 @@
         }
         "ProjectOutput"
         {
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_3D66B5C1AC3440C7A7C3C52B28131B11"
+            {
+            "SourcePath" = "8:..\\Hamilton Remote\\obj\\Release\\Hamilton Remote.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_9B6836642D994DAEA1D8B3AE5D12C5FC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{5BBF49CC-59A5-4D06-AAD3-B02C30A35C68}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E411F22A7CDF4870B0E7BF848E92A747"
             {
             "SourcePath" = "8:..\\LMSF_Gen5\\obj\\Release\\LMSF_Gen5.exe"
