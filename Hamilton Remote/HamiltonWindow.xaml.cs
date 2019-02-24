@@ -64,6 +64,8 @@ namespace Hamilton_Remote
             //ComputerName = Environment.MachineName;
             SetTcpPort();
 
+            SetHamiltonName();
+
             NewLogFile();
         }
 
@@ -218,6 +220,19 @@ namespace Hamilton_Remote
                         yield return childOfChild;
                     }
                 }
+            }
+        }
+
+        private void SetHamiltonName()
+        {
+            ServerName = "Test";
+
+            string computerName = Environment.MachineName;
+            switch (computerName)
+            {
+                case ("HAMILTO-S4KKFGQ"):
+                    ServerName = "S-Cell-STAR";
+                    break;
             }
         }
 
