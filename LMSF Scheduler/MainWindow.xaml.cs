@@ -2708,7 +2708,7 @@ namespace LMSF_Scheduler
             XmlNode valueNode = xmlDoc.CreateElement("value");
             valueNode.InnerText = $"{conc.ConcValue}";
             stockNode.AppendChild(valueNode);
-            XmlNode unitsNode = xmlDoc.CreateElement("value");
+            XmlNode unitsNode = xmlDoc.CreateElement("units");
             unitsNode.InnerText = conc.Units;
             stockNode.AppendChild(unitsNode);
 
