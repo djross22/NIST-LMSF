@@ -1279,7 +1279,12 @@ namespace LMSF_Scheduler
                         //    Method folder as seen from this computer: @"\\129.6.167.35\Methods"
                         string localMethods = @"C:\Program Files (x86)\Hamilton\Methods";
                         string remoteMethods = @"\\" + readerIps[name] + @"\Methods";
+                        if (!methodPath.StartsWith(localMethods))
+                        {
+                            localMethods = @"C:\Program Files (x86)\HAMILTON\Methods";
+                        }
                         string pathFromHere = methodPath.Replace(localMethods, remoteMethods);
+
                         if (!File.Exists(pathFromHere))
                         {
                             outString += $"Method file/path does not exist: {methodPath}, {pathFromHere} ";
