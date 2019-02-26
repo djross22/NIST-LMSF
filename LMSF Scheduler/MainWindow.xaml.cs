@@ -3261,6 +3261,36 @@ namespace LMSF_Scheduler
             {
                 AbortCalled = true;
             }
+            else
+            {
+                //If saveDirectory is in "C:\Shared Files\"
+                //    create matching saveDirectory on all connected server computers
+                if (saveDirectory.StartsWith(@"C:\Shared Files\", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var serverList = GetConnectedReadersList();
+                    if (serverList.Count > 0)
+                    {
+                        foreach (string s in serverList)
+                        {
+                            string ip = readerIps[s];
+
+                            string localStart = @"C:\Shared Files";
+                            string remoteStart = @"\\" + ip + @"\Shared Files";
+                            string pathFromHere = saveDirectory.Replace(localStart, remoteStart);
+
+                            try
+                            {
+                                Directory.CreateDirectory(pathFromHere);
+                            }
+                            catch (Exception e)
+                            {
+                                MessageBox.Show($"LMSF Scheduler failed to create the directory, {saveDirectory}, on the remote {s} computer (IP adress: {ip}). Manually create that directory and click 'OK' to continue");
+                            }
+                        }
+                    }
+                }
+                
+            }
 
             return new string[] { expIdStr, metaDataFilePath, saveDirectory };
         }
