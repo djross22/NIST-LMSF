@@ -461,7 +461,9 @@ Decide what to do about saving data from remote computers.
 		Will require creating experiment directory on each remote computer - via LMSF_Utilities.GetExperimentId()
 
 
+Don't let get concentration dialog close with empty units field
 
+Test what happens if SaveXML/ is run twice
 
 
 
