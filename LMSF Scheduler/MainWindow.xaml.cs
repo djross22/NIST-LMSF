@@ -3242,25 +3242,7 @@ namespace LMSF_Scheduler
 
         }
 
-        private string[] GetExpId(string dataDirStr, string expIdStr)
-        {
-            //return string[0] = experimentId
-            //return string[1] = XML file path
-            //return string[2] = saveDirectory
-            string[] getIdStrings = SharedParameters.GetExperimentId(dataDirStr, expIdStr);
-            expIdStr = getIdStrings[0];
-            metaDataFilePath = getIdStrings[1];
-            string saveDirectory = getIdStrings[2];
-
-            if (expIdStr == "")
-            {
-                AbortCalled = true;
-            }
-
-            return new string[] { expIdStr, metaDataFilePath, saveDirectory };
-        }
-        //If a projectID is given, use it in the default filePath, via the overloaded SharedParameters.GetExperimentId()
-        private string[] GetExpId(string dataDirStr, string expIdStr, string projID)
+        private string[] GetExpId(string dataDirStr, string expIdStr, string projID = "")
         {
             //return string[0] = experimentId
             //return string[1] = XML file path
