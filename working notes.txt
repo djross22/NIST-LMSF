@@ -453,12 +453,12 @@ LMSF_Gen5: Add oldMessageQueue - to take messages that have been run - to avoid 
 
 Test and merge into main branch
 
+In GetExpId(), create matching saveDirectory on all connected server computers
+
 
 TODO:
 
-Decide what to do about saving data from remote computers.
-	Save on local computer and then copy to Main?
-		Will require creating experiment directory on each remote computer - via LMSF_Utilities.GetExperimentId()
+Make sure pressing Return on keyboard does not press OK button on User Prompt windows
 
 
 Don't let get concentration dialog close with empty units field
