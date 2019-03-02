@@ -2007,7 +2007,11 @@ namespace LMSF_Scheduler
                     keyStr = stepArgs[2];
 
                     //Make sure the metadata type is a valid type
-                    if (SharedParameters.IsValidMetaType(typeStr) || typeStr == "concentration" || typeStr == "note" || typeStr == "number")
+                    var getList = SharedParameters.GetMetaTypeList();
+                    getList.Add("concentration");
+                    getList.Add("note");
+                    getList.Add("number");
+                    if (getList.Contains(typeStr))
                     {
                         argsOk = true;
                         outString += $"{typeStr} -> {keyStr} ";
@@ -2015,7 +2019,12 @@ namespace LMSF_Scheduler
                     else
                     {
                         //Message for bad argument:
-                        outString += $"Not a valid metadata type: {typeStr}. ";
+                        outString += $"\"{typeStr}\" is not a valid Get/ type argument. ";
+                        outString += $"Valid Get/ type arguments are: ";
+                        foreach (string s in getList)
+                        {
+                            outString += $"{s}, ";
+                        }
                         valFailed.Add(num);
                     }
                 }
