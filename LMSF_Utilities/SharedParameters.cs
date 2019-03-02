@@ -71,7 +71,22 @@ namespace LMSF_Utilities
         //Check to see if type exists
         public static bool IsValidMetaType(string metaType)
         {
-            return !(GetMetaFilePath(metaType) is null);
+            return GetMetaTypeList().Contains(metaType);
+        }
+
+        public static List<string> GetMetaTypeList()
+        {
+            List<string> typeList = new List<string>();
+
+            typeList.Add("user");
+            typeList.Add("media");
+            typeList.Add("strain");
+            typeList.Add("plasmid");
+            typeList.Add("additive");
+            typeList.Add("antibiotic");
+            typeList.Add("project");
+
+            return typeList;
         }
 
         private static void StartNewMetaList(string metaType, string filePath)
