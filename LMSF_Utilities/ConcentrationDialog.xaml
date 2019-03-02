@@ -30,7 +30,7 @@
         </TextBox>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Units:" VerticalAlignment="Top" Margin="65,202,0,0" Foreground="White" FontSize="14"/>
         <StackPanel Margin="10" Grid.Row="1" Orientation="Horizontal" Width="190">
-            <Button x:Name="okButton" Content="OK" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Height="25" IsDefault="True" Click="OkButton_Click"/>
+            <Button x:Name="okButton" Content="OK" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" Width="75" Height="25" Click="OkButton_Click"/>
             <Button x:Name="cancelButton" Content="Cancel" HorizontalAlignment="Center" Margin="40,0,0,0" VerticalAlignment="Center" Width="75" Height="25" Click="CancelButton_Click"/>
         </StackPanel>
 

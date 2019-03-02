@@ -20,7 +20,7 @@
         </Grid.RowDefinitions>
         <TextBlock x:Name="promptTextBlock" HorizontalAlignment="Left" Margin="40,29,0,0" TextWrapping="Wrap" Text="Enter next media ingredient (or hit 'Done' if there are no more ingredients):" VerticalAlignment="Top" Foreground="White" FontSize="16" Height="68" Width="213"/>
         <ComboBox x:Name="selectComboBox" HorizontalAlignment="Left" Margin="65,301,0,0" VerticalAlignment="Top" Width="200" Height="25" ItemsSource="{Binding UnitsList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedUnits, Mode=TwoWay}"/>
-        <Button x:Name="doneButton" Content="Done" HorizontalAlignment="Left" Margin="275,0,0,0" VerticalAlignment="Center" Width="75" Grid.Row="1" Height="25" IsDefault="True" Click="DoneButton_Click"/>
+        <Button x:Name="doneButton" Content="Done" HorizontalAlignment="Left" Margin="275,0,0,0" VerticalAlignment="Center" Width="75" Grid.Row="1" Height="25" Click="DoneButton_Click"/>
         <Button x:Name="cancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="175,37.5,0,37.5" VerticalAlignment="Center" Width="75" Grid.Row="1" Height="25" Click="CancelButton_Click"/>
         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ingredient name:" VerticalAlignment="Top" Margin="65,123,0,0" Foreground="White" FontSize="14"/>
         <TextBox HorizontalAlignment="Left" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Margin="65,147,0,0">

@@ -23,7 +23,7 @@
         <TextBox x:Name="listTextBox" Margin="89,80,85,24" TextWrapping="NoWrap"  Text="{Binding StuffList}" Background="Transparent" Foreground="White" FontSize="14" VerticalScrollBarVisibility="Auto" BorderBrush="Transparent"/>
         <TextBlock x:Name="okAbortTextBlock" Margin="70,59,50,0" TextWrapping="Wrap" Text="Press 'OK' to continue or 'Abort' to abort." Foreground="White" FontSize="14" VerticalAlignment="Bottom"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="40" Margin="0" Grid.Row="1" VerticalAlignment="Center" Width="170">
-            <Button x:Name="okButton" Content="OK" Margin="0" VerticalAlignment="Center" Grid.Row="1" Height="24" IsDefault="True" Click="OkButton_Click" Width="75" HorizontalAlignment="Center"/>
+            <Button x:Name="okButton" Content="OK" Margin="0" VerticalAlignment="Center" Grid.Row="1" Height="24" Click="OkButton_Click" Width="75" HorizontalAlignment="Center"/>
             <Button x:Name="abortButton" Content="Abort" Margin="20,0,0,0" VerticalAlignment="Center" Height="24" Click="AbortButton_Click" Width="75" HorizontalAlignment="Center" IsCancel="True"/>
         </StackPanel>
 
