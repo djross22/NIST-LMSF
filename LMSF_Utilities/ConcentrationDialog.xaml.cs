@@ -133,11 +133,18 @@ namespace LMSF_Utilities
         {
             if (SharedParameters.IsValid(this) && !(ConcString is null))
             {
-                double doubVal;
-                if (double.TryParse(ConcString, out doubVal))
+                if ((SelectedUnits != null) && (SelectedUnits != ""))
                 {
-                    ConcDouble = doubVal;
-                    this.DialogResult = true;
+                    double doubVal;
+                    if (double.TryParse(ConcString, out doubVal))
+                    {
+                        ConcDouble = doubVal;
+                        this.DialogResult = true;
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
                 else
                 {
