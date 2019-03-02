@@ -455,13 +455,19 @@ Test and merge into main branch
 
 In GetExpId(), create matching saveDirectory on all connected server computers
 
+For all user dialog boxes in LMSF_Utilities, set IsDefault = false for all buttons
+
+LMSF_Utilities: Don't let get concentration dialog close with empty units field
+
+LMSF_Utilities: Add method GetMetaTypeList(), and change IsValidMetaType()
+
+LMSF Scheduler: With Get/ validation, add list of valid types if "Not a valid metadata type"
+
 
 TODO:
 
-Make sure pressing Return on keyboard does not press OK button on User Prompt windows
 
 
-Don't let get concentration dialog close with empty units field
 
 Test what happens if SaveXML/ is run twice
 
