@@ -57,14 +57,29 @@ Commands:
 		The first argument is the name of the Hamilton.
 			The valid Hamilton names are "S-Cell-STAR".
 		The second argument is the command to send to the Hamilton.
-			The valid commands that can be sent are "RunMethod".
+			The valid commands that can be sent are "RunMethod" and "ReadCounters".
 		If the second argument is RunMethod, the Remote Hamilton program on the remote computer will run the specified method.
 			For the RunMethod command, one additional argument is required:
 				The path to the method file to be run.
 					The path is read from the point of view of the computer controlling the Hamilton.
 					So, the method path will usually start with the Methods folder on that computer: "C:\Program Files (x86)\HAMILTON\Methods\..."
-					
-		Note: after calling a RemoteHam/ command, the appropriate WaitFor/ command to use is WaitFor/ <Hamilton name>
+			Note: after calling a "RemoteHam/ <Hamilton name>/ RunMethod/ ...", the appropriate WaitFor/ command to use is WaitFor/ <Hamilton name>
+			
+		If the second argument is ReadCounters, the Remote Hamilton program on the remote computer will run the Check Tip Counters method, and the LMSF Scheduler will read the status of the tip counters into the Metadata Dictionary.
+			The Metadata Dictionary keys that will be written to are:
+				tips1000Status1 = status of rack 1 (left side) for 1000 uL tips (1 = has tips; 2 = empty)
+				tips1000Status2 = status of rack 2 (right side) for 1000 uL tips (1 = has tips; 2 = empty)
+				tips1000Total = total number of 1000 uL tips in both racks
+				tips300Status1 = status of rack 1 (left side) for 300 uL tips (1 = has tips; 2 = empty)
+				tips300Status2 = status of rack 2 (right side) for 300 uL tips (1 = has tips; 2 = empty)
+				tips300Total = total number of 300 uL tips in both racks
+				tips50Status1 = status of rack 1 (left side) for 50 uL tips (1 = has tips; 2 = empty)
+				tips50Status2 = status of rack 2 (right side) for 50 uL tips (1 = has tips; 2 = empty)
+				tips50Total = total number of 50 uL tips in both racks\
+			The status and tip total Dictionary entries can be uses to make decisions on tip loading or User Prompts.
+				For example:
+					RemoteHam/ S-Cell-STAR/ ReadCounters
+					If/ {tips1000Status1} == 0/ UserPrompt/ Add More Tips/ Add additional 1000 uL tips.
 		
 		Syntax:
 			RemoteHam/ <Hamilton name>/ <Hamilton command>/<file path>
