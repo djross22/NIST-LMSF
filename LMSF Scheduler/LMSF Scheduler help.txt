@@ -67,15 +67,18 @@ Commands:
 			
 		If the second argument is ReadCounters, the Remote Hamilton program on the remote computer will run the Check Tip Counters method, and the LMSF Scheduler will read the status of the tip counters into the Metadata Dictionary.
 			The Metadata Dictionary keys that will be written to are:
-				tips1000Status1 = status of rack 1 (left side) for 1000 uL tips (1 = has tips; 2 = empty)
-				tips1000Status2 = status of rack 2 (right side) for 1000 uL tips (1 = has tips; 2 = empty)
+				tips1000Status1 = status of rack 1 (left side) for 1000 uL tips (1 = has tips; 0 = empty)
+				tips1000Status2 = status of rack 2 (right side) for 1000 uL tips (1 = has tips; 0 = empty)
 				tips1000Total = total number of 1000 uL tips in both racks
-				tips300Status1 = status of rack 1 (left side) for 300 uL tips (1 = has tips; 2 = empty)
-				tips300Status2 = status of rack 2 (right side) for 300 uL tips (1 = has tips; 2 = empty)
+				tips300Status1 = status of rack 1 (left side) for 300 uL tips (1 = has tips; 0 = empty)
+				tips300Status2 = status of rack 2 (right side) for 300 uL tips (1 = has tips; 0 = empty)
 				tips300Total = total number of 300 uL tips in both racks
-				tips50Status1 = status of rack 1 (left side) for 50 uL tips (1 = has tips; 2 = empty)
-				tips50Status2 = status of rack 2 (right side) for 50 uL tips (1 = has tips; 2 = empty)
-				tips50Total = total number of 50 uL tips in both racks\
+				tips50Status1 = status of rack 1 (left side) for 50 uL tips (1 = has tips; 0 = empty)
+				tips50Status2 = status of rack 2 (right side) for 50 uL tips (1 = has tips; 0 = empty)
+				tips50Total = total number of 50 uL tips in both racks
+				tipsOffsetStatus1 = status of rack 1 (only rack) for 1000 uL Offset Pickup tips (1 = has tips; 0 = empty)
+				tipsOffsetStatus2 = status of rack 2 for 1000 uL Offset Pickup tips; with the current deck configuration, there is no rack 2, so this should always be zero.
+				tipsOffsetTotal = total number of 1000 uL tips in the Offset Pickup rack
 			The status and tip total Dictionary entries can be uses to make decisions on tip loading or User Prompts.
 				For example:
 					RemoteHam/ S-Cell-STAR/ ReadCounters
