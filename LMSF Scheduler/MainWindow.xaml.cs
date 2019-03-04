@@ -1307,7 +1307,7 @@ namespace LMSF_Scheduler
                 //First two arguments are Hamilton name and command
                 string name;
                 string command;
-                List<string> commandList = new List<string> { "RunMethod" };
+                List<string> commandList = new List<string> { "RunMethod", "ReadCounters" };
                 //3rd argument is the method path
                 string methodPath;
 
@@ -1427,6 +1427,21 @@ namespace LMSF_Scheduler
                     else
                     {
                         //For anything that gets saved by the Run method to the dictionary, put placeholder values into dictionary
+                        if (stepArgs[2] == "ReadCounters")
+                        {
+                            metaDictionary["tips1000Status1"] = "0";
+                            metaDictionary["tips1000Status2"] = "0";
+                            metaDictionary["tips1000Total"] = "0";
+                            metaDictionary["tips300Status1"] = "0";
+                            metaDictionary["tips300Status2"] = "0";
+                            metaDictionary["tips300Total"] = "0";
+                            metaDictionary["tips50Status1"] = "0";
+                            metaDictionary["tips50Status2"] = "0";
+                            metaDictionary["tips50Total"] = "0";
+                            metaDictionary["tipsOffsetStatus1"] = "0";
+                            metaDictionary["tipsOffsetStatus2"] = "0";
+                            metaDictionary["tipsOffsetTotal"] = "0";
+                        }
                     }
                 }
             }
