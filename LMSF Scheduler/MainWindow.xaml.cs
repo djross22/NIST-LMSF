@@ -3719,15 +3719,7 @@ namespace LMSF_Scheduler
                 //methodPath = args[3];
                 msg = $"{command}/{methodPath}";
             }
-
-            string replyStatus = SendTcpMessage(name, msg);
-            while (replyStatus == "Idle")
-            {
-                replyStatus = SendTcpMessage(name, "StatusCheck");
-                Thread.Sleep(200);
-            }
-            AddOutputText($"... reader status: {replyStatus}.\n");
-
+            
             //Export the metaDicitonary to the Hamilton/LMSF_FrontEnd dirctory on the remote cmoputer
             string remoteFrontEndpath = @"\\" + readerIps[name] + @"\\LMSF_FrontEnd\\";
             int numTries = 0;
@@ -3746,7 +3738,18 @@ namespace LMSF_Scheduler
                 }
             }
 
-            if (!exportSucess)
+            if (exportSucess)
+            {
+                //send message to remote Hamilton
+                string replyStatus = SendTcpMessage(name, msg);
+                while (replyStatus == "Idle")
+                {
+                    replyStatus = SendTcpMessage(name, "StatusCheck");
+                    Thread.Sleep(200);
+                }
+                AddOutputText($"... reader status: {replyStatus}.\n");
+            }
+            else
             {
                 AddOutputText($"Attempt to write dictionary to Hamilton/LMSF_FrontEnd dirctory failed 10 times. Aborting automation protocol.\n");
                 AbortCalled = true;
