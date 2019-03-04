@@ -3716,6 +3716,20 @@ namespace LMSF_Scheduler
 
         }
 
+        private void ImportDictionary(string filePath)
+        {
+            string[] lines = File.ReadAllLines(filePath);
+            string[] split;
+            foreach (string entry in lines)
+            {
+                split = entry.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                if (split.Length == 2)
+                {
+                    metaDictionary[split[0]] = split[1];
+                }
+            }
+        }
+
         private void RunRemoteHamilton(int num, string[] args)
         {
             //First two arguments are Hamilton name and command
