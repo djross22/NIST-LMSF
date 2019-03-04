@@ -917,7 +917,6 @@ namespace LMSF_Scheduler
                 {
                     if (stepArgs[1].Contains("==") || stepArgs[1].Contains("!="))
                     {
-                        //string stringToSplit = stepArgs[1].Replace(" ", "");
                         string stringToSplit = stepArgs[1].Trim();
                         string[] logicStrings = stringToSplit.Split(new[] { "==", "!=" }, StringSplitOptions.RemoveEmptyEntries);
                         if (logicStrings.Length == 2)
@@ -957,10 +956,118 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        valFailed.Add(num);
-                        //exit the method early if the 2nd argument of an If/ command is not a logical comparison
-                        outString += "If/ commands need to have a logical test (with \"==\" or \"!=\") as the 2nd argument.\n\n";
-                        return outString;
+                        if (stepArgs[1].Contains(">=") || stepArgs[1].Contains("<="))
+                        {
+                            string stringToSplit = stepArgs[1].Trim();
+                            string[] logicStrings = stringToSplit.Split(new[] { ">=", "<=" }, StringSplitOptions.RemoveEmptyEntries);
+                            if (logicStrings.Length == 2)
+                            {
+                                string firstStr = logicStrings[0].Trim();
+                                string secondStr = logicStrings[1].Trim();
+                                double firstDbl;
+                                double secondDbl;
+                                if (double.TryParse(firstStr, out firstDbl) && double.TryParse(secondStr, out secondDbl))
+                                {
+                                    outString += $"If: {stringToSplit}, ";
+                                    if (stringToSplit.Contains(">="))
+                                    {
+                                        ifResult = (firstDbl >= secondDbl);
+                                    }
+                                    else
+                                    {
+                                        ifResult = (firstDbl <= secondDbl);
+                                    }
+                                    outString += $"{ifResult}. ";
+                                    //always mark ifResult as true when validating, so that the remaining arguments always get validated
+                                    if (isValidating)
+                                    {
+                                        ifResult = true;
+                                    }
+                                    //then take out the first two arguments and send the rest on to be parsed
+                                    string[] newStepArgs = new string[stepArgs.Length - 2];
+                                    for (int i = 2; i < stepArgs.Length; i++)
+                                    {
+                                        newStepArgs[i - 2] = stepArgs[i];
+                                    }
+                                    stepArgs = newStepArgs;
+                                }
+                                else
+                                {
+                                    valFailed.Add(num);
+                                    outString += $"If/ commands error: {firstStr} or {secondStr} not parsable as number.\n\n";
+                                    return outString;
+                                }
+                                
+                            }
+                            else
+                            {
+                                valFailed.Add(num);
+                                //exit the method early if the 2nd argument of an If/ command is not a valid comparison
+                                outString += "If/ commands need to have a valid comparison as the 2nd argument (e.g. {plateNum}>=3, or {tips1000Total}<=96).\n\n";
+                                return outString;
+                            }
+                        }
+                        else
+                        {
+                            if (stepArgs[1].Contains(">") || stepArgs[1].Contains("<"))
+                            {
+                                string stringToSplit = stepArgs[1].Trim();
+                                string[] logicStrings = stringToSplit.Split(new[] { ">", "<" }, StringSplitOptions.RemoveEmptyEntries);
+                                if (logicStrings.Length == 2)
+                                {
+                                    string firstStr = logicStrings[0].Trim();
+                                    string secondStr = logicStrings[1].Trim();
+                                    double firstDbl;
+                                    double secondDbl;
+                                    if (double.TryParse(firstStr, out firstDbl) && double.TryParse(secondStr, out secondDbl))
+                                    {
+                                        outString += $"If: {stringToSplit}, ";
+                                        if (stringToSplit.Contains(">"))
+                                        {
+                                            ifResult = (firstDbl > secondDbl);
+                                        }
+                                        else
+                                        {
+                                            ifResult = (firstDbl < secondDbl);
+                                        }
+                                        outString += $"{ifResult}. ";
+                                        //always mark ifResult as true when validating, so that the remaining arguments always get validated
+                                        if (isValidating)
+                                        {
+                                            ifResult = true;
+                                        }
+                                        //then take out the first two arguments and send the rest on to be parsed
+                                        string[] newStepArgs = new string[stepArgs.Length - 2];
+                                        for (int i = 2; i < stepArgs.Length; i++)
+                                        {
+                                            newStepArgs[i - 2] = stepArgs[i];
+                                        }
+                                        stepArgs = newStepArgs;
+                                    }
+                                    else
+                                    {
+                                        valFailed.Add(num);
+                                        outString += $"If/ commands error: {firstStr} or {secondStr} not parsable as number.\n\n";
+                                        return outString;
+                                    }
+
+                                }
+                                else
+                                {
+                                    valFailed.Add(num);
+                                    //exit the method early if the 2nd argument of an If/ command is not a valid comparison
+                                    outString += "If/ commands need to have a valid comparison as the 2nd argument (e.g. {plateNum}>3, or {tips1000Total}<96).\n\n";
+                                    return outString;
+                                }
+                            }
+                            else
+                            {
+                                valFailed.Add(num);
+                                //exit the method early if the 2nd argument of an If/ command is not a logical comparison
+                                outString += "If/ commands need to have a logical or comparison test (with \"==\", \"!=\", \">\", \"<\", \">=\", or \"<=\") as the 2nd argument.\n\n";
+                                return outString;
+                            }
+                        }
                     }
                 }
                 else

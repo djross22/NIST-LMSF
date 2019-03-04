@@ -463,10 +463,10 @@ LMSF_Utilities: Add method GetMetaTypeList(), and change IsValidMetaType()
 
 LMSF Scheduler: With Get/ validation, add list of valid types if "Not a valid metadata type"
 
+LMSF Scheduler: Add numeric comparisons to If/ command, ">, >=, <, <="
+
 
 TODO:
-
-Add numeric comparisons to If/ command, ">, >=, <, <="
 
 LMSF Scheduler: Add: RemoteHam/ <Hamilton name>/ ReadCounters
 
