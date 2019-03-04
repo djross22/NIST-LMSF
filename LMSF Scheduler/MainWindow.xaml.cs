@@ -3801,6 +3801,48 @@ namespace LMSF_Scheduler
                 //Date and time
                 AddDateTimeNodes(DateTime.Now, hamNode, "method started");
             }
+
+            //If command = "ReadCounters", wait until it's done, then read tip counter status into metaDeictionary
+            if (command == "ReadCounters") {
+                //Wait for ReadCounters method to finish
+                WaitingForStepCompletion = true;
+                BackgroundWorker remoteMonitorWorker = new BackgroundWorker();
+                remoteMonitorWorker.WorkerReportsProgress = false;
+                remoteMonitorWorker.DoWork += RemoteProcessMonitor_DoWork;
+                remoteMonitorWorker.RunWorkerCompleted += RemoteProcessMonitor_RunWorkerCompleted;
+
+                List<object> arguments = new List<object>();
+                arguments.Add(name);
+                remoteMonitorWorker.RunWorkerAsync(arguments);
+
+                while (WaitingForStepCompletion)
+                {
+                    System.Threading.Thread.Sleep(100);
+                }
+
+                //Read tip counter status
+                string tipStatusPath = @"\\" + readerIps[name] + @"\Shared Files\LMSF Scheduler\Hamilton\tip_status.txt";
+                numTries = 0;
+                bool tipReadSuccess = false;
+                while (!tipReadSuccess && numTries < 10)
+                {
+                    numTries++;
+                    try
+                    {
+                        ImportDictionary(tipStatusPath);
+                        tipReadSuccess = true;
+                    }
+                    catch
+                    {
+                        Thread.Sleep(3000);
+                    }
+                }
+                if (!tipReadSuccess)
+                {
+                    AddOutputText($"Attempt to read tip counter status on remote Hamilton computer failed 10 times. Aborting automation protocol.\n");
+                    AbortCalled = true;
+                }
+            }
         }
 
         private void RunHamilton(int num, string[] args)
