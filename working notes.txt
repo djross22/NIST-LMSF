@@ -465,6 +465,14 @@ LMSF Scheduler: With Get/ validation, add list of valid types if "Not a valid me
 
 LMSF Scheduler: Add numeric comparisons to If/ command, ">, >=, <, <="
 
+LMSF Scheduler: In RunRemoteHamilton(), make sure metaDicitonary is sucessfully exported before sending command to Hamilton
+
+LMSF Scheduler: Add parsing for RemoteHam/ <Hamilton name>/ ReadCounters command
+
+LMSF Scheduler: In RunRemoteHamilton() with ReadCounters command, add wait for method completion then read tip status into dictionary
+
+Hamilton Remote: Add handling of ReadCounters command
+
 
 TODO:
 

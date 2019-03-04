@@ -572,11 +572,20 @@ namespace Hamilton_Remote
             string[] messageParts = Message.UnwrapTcpMessage(msg);
             string command = messageParts[1];
 
+            string methodFilePath;
+
             // "RunMethod", "StatusCheck"
             switch (command)
             {
                 case "StatusCheck":
                     //Don't need to do anything here because the server status is automatically sent back
+                    break;
+                case "ReadCounters":
+                    methodFilePath = @"C:\Program Files (x86)\HAMILTON\Methods\Common\Tip Handling\With 96-Head\Check Tip Counters.hsl";
+                    this.Dispatcher.Invoke(() => {
+                        MethodPath = methodFilePath;
+                        RunHamilton();
+                    });
                     break;
                 default:
                     if (command.StartsWith("RunMethod"))
@@ -584,7 +593,7 @@ namespace Hamilton_Remote
                         //command = $"RunMethod/{methodPath};
                         //From LMSF_Scheduler: msg = $"{command}/{methodPath}";
                         string[] runExpParts = command.Split('/');
-                        string methodFilePath = runExpParts[1];
+                        methodFilePath = runExpParts[1];
                         this.Dispatcher.Invoke(() => {
                             MethodPath = methodFilePath;
                             RunHamilton();
