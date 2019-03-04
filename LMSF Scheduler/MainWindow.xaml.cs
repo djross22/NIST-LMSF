@@ -1400,7 +1400,7 @@ namespace LMSF_Scheduler
                         }
 
                         //Remote Hamilton method requiers write permission to the Hamilton/LMSF_FrontEnd dirctory on the remote cmoputer
-                        string remoteFrontEndpath = @"\\" + readerIps[name] + @"\\LMSF_FrontEnd\\";
+                        string remoteFrontEndpath = @"\\" + readerIps[name] + @"\LMSF_FrontEnd\";
                         if (!SharedParameters.IsDirectoryWritable(remoteFrontEndpath))
                         {
                             outString += $"Write permission to the Hamilton/LMSF_FrontEnd directory is required for the RemoteHam command. This permission was denied for the folder path: {remoteFrontEndpath}.\n";
@@ -3736,7 +3736,7 @@ namespace LMSF_Scheduler
             }
             
             //Export the metaDicitonary to the Hamilton/LMSF_FrontEnd dirctory on the remote cmoputer
-            string remoteFrontEndpath = @"\\" + readerIps[name] + @"\\LMSF_FrontEnd\\";
+            string remoteFrontEndpath = @"\\" + readerIps[name] + @"\LMSF_FrontEnd\";
             int numTries = 0;
             bool exportSucess = false;
             while (!exportSucess && numTries<10)
