@@ -818,8 +818,61 @@ namespace LMSF_Scheduler
 
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
-            string[] stepArgs = step.Split(new[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
 
+            //Check for opening and closing "(" and ")"
+            if (!step.EndsWith(")"))
+            {
+                valFailed.Add(num);
+                //exit the method early if the closing ")" is missing
+                outString += "Syntax error: missing closing \")\"\n\n";
+                return outString;
+            }
+            if (!step.Contains("("))
+            {
+                valFailed.Add(num);
+                //exit the method early if the opening "(" is missing
+                outString += "Syntax error: missing opening \"(\"\n\n";
+                return outString;
+            }
+
+            int scriptCommandEnd = step.IndexOf('(');
+            //int scriptLineLength = step.Length;
+            string scriptCommand = step.Substring(0, scriptCommandEnd);
+            string scriptArgStr = step.Substring(scriptCommandEnd + 1);
+            scriptArgStr = scriptArgStr.Remove(scriptArgStr.Length - 1); //remove the closing ")"
+            scriptArgStr = scriptArgStr.Trim(); //remove leading and trailing white space
+
+            //If the script command is "If(...)" check that the opening and closing "(" and ")" is there
+            //    then replace the first "(" with "," so that things get separated properly in the string.Split step, and delete the closing ")"
+            if (scriptCommand == "If")
+            {
+                if (!scriptArgStr.Contains("("))
+                {
+                    valFailed.Add(num);
+                    //exit the method early if the opening "(" is missing
+                    outString += "Syntax error: Command inside If() statment missing opening \"(\"\n\n";
+                    return outString;
+                }
+                if (!scriptArgStr.EndsWith(")"))
+                {
+                    valFailed.Add(num);
+                    //exit the method early if the opening "(" is missing
+                    outString += "Syntax error: If command missing closing \")\"\n\n";
+                    return outString;
+                }
+                scriptArgStr = scriptArgStr.Remove(scriptArgStr.Length - 1); //remove the closing ")"
+                scriptCommandEnd = scriptArgStr.IndexOf('(');
+                scriptArgStr = scriptArgStr.Remove(scriptCommandEnd, 1);
+                scriptArgStr = scriptArgStr.Insert(scriptCommandEnd, ",");
+            }
+
+            string[] scriptArgArr = scriptArgStr.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+            string[] stepArgs = new string[1 + scriptArgArr.Length];
+            stepArgs[0] = scriptCommand;
+            scriptArgArr.CopyTo(stepArgs, 1);
+
+            //The clean up stepArgs by trimming white space from ends of each string, and removing empty strings.
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
             stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
