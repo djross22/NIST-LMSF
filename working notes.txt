@@ -476,7 +476,13 @@ Hamilton Remote: Add handling of ReadCounters command
 
 TODO:
 
-LMSF Scheduler: Add: RemoteHam/ <Hamilton name>/ ReadCounters
+Change script format from "<Command>/ <parameter(s)>" to "<Command>(<parameter(s)>)"
+
+Nested If()
+
+Get/ Integer?
+
+Enable simple math (+, -, *, /, %) with numeric quantities
 
 
 
