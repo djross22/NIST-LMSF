@@ -476,7 +476,11 @@ Hamilton Remote: Add handling of ReadCounters command
 
 TODO:
 
+Update help document
+
 Change script format from "<Command>/ <parameter(s)>" to "<Command>(<parameter(s)>)"
+
+Enable commas in Set()
 
 Nested If()
 
