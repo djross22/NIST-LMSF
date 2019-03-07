@@ -473,14 +473,14 @@ LMSF Scheduler: In RunRemoteHamilton() with ReadCounters command, add wait for m
 
 Hamilton Remote: Add handling of ReadCounters command
 
+Re-write script parsing to use "Command(...)" format instead of "Command/" format
+
+LMSF Scheduler: Enable commas in Set() by re-concatenating arguments
+
 
 TODO:
 
 Update help document
-
-Change script format from "<Command>/ <parameter(s)>" to "<Command>(<parameter(s)>)"
-
-Enable commas in Set()
 
 Nested If()
 

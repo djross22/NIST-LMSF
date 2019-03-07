@@ -2113,6 +2113,7 @@ namespace LMSF_Scheduler
             {
                 //Set takes 2 arguments
                 //First two arguments are the key and value to be set in the metaDictionary
+                //If there are additional arguments, they get concatenated to the 2nd argument (valueString)
                 string keyString;
                 string valueString;
 
@@ -2129,13 +2130,26 @@ namespace LMSF_Scheduler
                     outString += "Set command requries two arguments (key and value).";
                     valFailed.Add(num);
                 }
-                //Then check the validity of the arguments (file types, parsable as numbers, etc.)
                 else
                 {
                     //key and value just have to be non-empty strings, which has already been ruled out,
                     //    so no additional validation checks needed
                     keyString = stepArgs[1];
-                    valueString = stepArgs[2];
+                    if (numArgs > 3)
+                    {
+                        string[] valueArr = new string[numArgs - 2];
+                        for (int i=2; i<numArgs; i++)
+                        {
+                            valueArr[i - 2] = stepArgs[i];
+                        }
+                        valueString = string.Join(", ", valueArr);
+                        stepArgs[2] = valueString;
+                    }
+                    else
+                    {
+                        valueString = stepArgs[2];
+                    }
+                    
                     argsOk = true;
                     outString += $"{valueString} -> {keyString} ";
                 }
