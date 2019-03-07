@@ -477,6 +477,8 @@ Re-write script parsing to use "Command(...)" format instead of "Command/" forma
 
 LMSF Scheduler: Enable commas in Set() by re-concatenating arguments
 
+LMSF Scheduler: Change action on SelectComboBox_DropDownClosed() to match new command format
+
 
 TODO:
 

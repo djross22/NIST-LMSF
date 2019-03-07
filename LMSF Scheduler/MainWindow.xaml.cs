@@ -4235,14 +4235,14 @@ namespace LMSF_Scheduler
             //Don't add text if SelectedCommand is null
             if (SelectedCommand != null)
             {
-                InsertInputText($"{SelectedCommand}/ ");
+                InsertInputText($"{SelectedCommand}(");
 
                 //if it is a NewXML or AppendXML command, also add in the SaveXML command automatically
                 if (SelectedCommand == "NewXML" || SelectedCommand == "AppendXML")
                 {
                     int caretPos = inputTextBox.SelectionStart;
 
-                    InsertInputText(" <protocol type>\n\nSaveXML/ ");
+                    InsertInputText("<protocol type>)\n\nSaveXML()");
 
                     //move caret to middle line between NewXML and SaveXML
                     inputTextBox.SelectionStart = caretPos + 1;
