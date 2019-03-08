@@ -1733,6 +1733,8 @@ namespace LMSF_Scheduler
                 {
                     string processWaitingFor = stepArgs[1];
                     bool writeEndTime = true;
+                    int pingInterval = 1000;
+
                     if (stepArgs.Length > 2)
                     {
                         if (stepArgs[2] == "false" || stepArgs[2] == "False")
@@ -1740,6 +1742,20 @@ namespace LMSF_Scheduler
                             writeEndTime = false;
                         }
                     }
+
+                    if (stepArgs.Length > 3)
+                    {
+                        int tempInt;
+                        if (int.TryParse(stepArgs[3], out tempInt))
+                        {
+                            pingInterval = tempInt;
+                            if (pingInterval < 100)
+                            {
+                                pingInterval = 100;
+                            }
+                        }
+                    }
+
                     switch (processWaitingFor)
                     {
                         case "Overlord":
@@ -1769,7 +1785,7 @@ namespace LMSF_Scheduler
                                 outString += $"{processWaitingFor}, Done.";
                                 if (!isValidating)
                                 {
-                                    WaitForRemoteProcess(processWaitingFor, writeEndTime);
+                                    WaitForRemoteProcess(processWaitingFor, writeEndTime, pingInterval);
                                 }
                             }
                             else
@@ -3631,7 +3647,7 @@ namespace LMSF_Scheduler
             }
         }
 
-        private void WaitForRemoteProcess(string remoteName, bool writeEndTime = true)
+        private void WaitForRemoteProcess(string remoteName, bool writeEndTime = true, int pingInterval = 1000)
         {
             WaitingForStepCompletion = true;
 
@@ -3662,6 +3678,7 @@ namespace LMSF_Scheduler
 
             List<object> arguments = new List<object>();
             arguments.Add(remoteName);
+            arguments.Add(pingInterval);
             remoteMonitorWorker.RunWorkerAsync(arguments);
 
             while (WaitingForStepCompletion)
@@ -3714,10 +3731,22 @@ namespace LMSF_Scheduler
         {
             List<object> argsList = e.Argument as List<object>;
             string remoteServer = (string)argsList[0];
+            int pingInterval = 1000;
+            if (argsList.Count>1)
+            {
+                try
+                {
+                    pingInterval = (int)argsList[1];
+                }
+                catch
+                {
+                    //don't need to do anything here - just use the default value, 1000
+                }
+            }
 
             while (GetRemoteServerStatus(remoteServer) == $"{SharedParameters.ServerStatusStates.Busy}")
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(pingInterval);
             }
 
         }
