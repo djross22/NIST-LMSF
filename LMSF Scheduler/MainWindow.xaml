@@ -74,20 +74,23 @@
             <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="25"/>
-                    <RowDefinition Height="10*"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="35"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="0.5*"/>
                     <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="inputTextBox" Margin="10,10,10,0" TextWrapping="NoWrap"  Text="{Binding InputText, Mode=TwoWay}" Grid.Row="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                <TextBox x:Name="inputTextBox" Margin="10,0,10,5.065" TextWrapping="NoWrap"  Text="{Binding InputText, Mode=TwoWay}" Grid.Row="1" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
                 <TextBlock Margin="10,0" TextWrapping="Wrap" Text="    Steps Input:" FontWeight="Bold" VerticalAlignment="Bottom" Height="20" Foreground="White"/>
-                <TextBox x:Name="outputTextBox" Grid.Column="1" Margin="10,10,10,0" Grid.Row="1" TextWrapping="Wrap"  Text="{Binding OutputText, Mode=TwoWay}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" Background="#FFCBCBCB" Grid.ColumnSpan="2"/>
+                <TextBox x:Name="outputTextBox" Grid.Column="1" Margin="10,0,10,5.065" Grid.Row="1" TextWrapping="Wrap"  Text="{Binding OutputText, Mode=TwoWay}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" Background="#FFCBCBCB" Grid.ColumnSpan="2"/>
                 <TextBlock Grid.Column="1" Margin="10,0" TextWrapping="Wrap" Text="    Steps Output:" FontWeight="Bold" VerticalAlignment="Bottom" Height="20" Foreground="White"/>
                 <Border x:Name="validationBorder" BorderBrush="Black" BorderThickness="1" Grid.Column="2" HorizontalAlignment="Left" Height="25" Margin="30,0,0,0" VerticalAlignment="Top" Width="180">
                     <TextBlock x:Name="validationTextBlock" TextWrapping="Wrap" Text="Validation" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"/>
                 </Border>
+                <TextBlock HorizontalAlignment="Left" Margin="50,0,0,1" Grid.Row="2" TextWrapping="Wrap" Text="Next Step:" VerticalAlignment="Center" Foreground="White"/>
+                <TextBox x:Name="nextStepTextBox" Height="23" Margin="109,6,50,6" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Grid.ColumnSpan="3" IsReadOnly="True" Background="#FFCBCBCB" Text="{Binding NextStep, Mode=TwoWay}"/>
             </Grid>
         </DockPanel>
 

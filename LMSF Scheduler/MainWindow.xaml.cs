@@ -37,6 +37,7 @@ namespace LMSF_Scheduler
         private string inputText = "";
         private bool inputChanged = false;
         private string outputText;
+        private string nextStep;
         private string experimentFileName = "";
 
         //For parsing and running steps
@@ -295,6 +296,16 @@ namespace LMSF_Scheduler
                 this.outputText = value;
                 OnPropertyChanged("OutputText");
                 this.Dispatcher.Invoke(() => { outputTextBox.ScrollToEnd(); });
+            }
+        }
+
+        public string NextStep
+        {
+            get { return this.nextStep; }
+            set
+            {
+                this.nextStep = value;
+                OnPropertyChanged("NextStep");
             }
         }
         #endregion
@@ -789,6 +800,14 @@ namespace LMSF_Scheduler
             {
                 if (stepNum < totalSteps)
                 {
+                    if (stepNum + 1 < totalSteps)
+                    {
+                        NextStep = inputSteps[stepNum + 1];
+                    }
+                    else
+                    {
+                        NextStep = "";
+                    }
                     string oldText = OutputText;
                     string newText = ParseStep(stepNum, inputSteps[stepNum]);
                     OutputText = oldText + newText;
