@@ -1711,6 +1711,14 @@ namespace LMSF_Scheduler
                 else
                 {
                     string processWaitingFor = stepArgs[1];
+                    bool writeEndTime = true;
+                    if (stepArgs.Length > 2)
+                    {
+                        if (stepArgs[2] == "false" || stepArgs[2] == "False")
+                        {
+                            writeEndTime = false;
+                        }
+                    }
                     switch (processWaitingFor)
                     {
                         case "Overlord":
@@ -1740,7 +1748,7 @@ namespace LMSF_Scheduler
                                 outString += $"{processWaitingFor}, Done.";
                                 if (!isValidating)
                                 {
-                                    WaitForRemoteProcess(processWaitingFor);
+                                    WaitForRemoteProcess(processWaitingFor, writeEndTime);
                                 }
                             }
                             else
@@ -3596,7 +3604,7 @@ namespace LMSF_Scheduler
             }
         }
 
-        private void WaitForRemoteProcess(string remoteName)
+        private void WaitForRemoteProcess(string remoteName, bool writeEndTime = true)
         {
             WaitingForStepCompletion = true;
 
@@ -3635,7 +3643,7 @@ namespace LMSF_Scheduler
             }
 
             //Send info to metadata if collecting
-            if (isCollectingXml)
+            if (writeEndTime && isCollectingXml)
             {
                 DateTime dt = DateTime.Now;
 
