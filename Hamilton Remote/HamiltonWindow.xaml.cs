@@ -434,12 +434,22 @@ namespace Hamilton_Remote
             bool goodMsg = false;
             bool msgQueued = false;
 
+            string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
+
             lock (messageHandlingLock)
             {
                 goodMsg = Message.CheckMessageHash(msg.MessageString);
                 if (goodMsg && !messageQueue.Contains(msg.MessageString) && !oldMessageQueue.Contains(msg.MessageString))
                 {
-                    messageQueue.Enqueue(msg.MessageString);
+                    if (msgParts[1] == "StatusCheck")
+                    {
+                        oldMessageQueue.Enqueue(msg.MessageString);
+                    }
+                    else
+                    {
+                        messageQueue.Enqueue(msg.MessageString);
+                    }
+
                     msgQueued = true;
                 }
             }
@@ -457,8 +467,6 @@ namespace Hamilton_Remote
             {
                 AddOutputText(textOutAdd);
             });
-
-            string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
 
             //Reply
             string replyStr;
