@@ -389,7 +389,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile", "CopyRemoteFiles" }; //SharedParameters.UnitsList;
 
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
@@ -1211,6 +1211,9 @@ namespace LMSF_Scheduler
                         break;
                     case "StartPrompt":
                         ParseStartPrompt();
+                        break;
+                    case "CopyRemoteFiles":
+                        ParseCopyRemoteFiles();
                         break;
                     default:
                         valFailed.Add(num);
@@ -2546,6 +2549,25 @@ namespace LMSF_Scheduler
                 }
             }
 
+            void ParseCopyRemoteFiles()
+            {
+                //CopyRemoteFiles takes no arguments
+                //so there is nothing to do here except run the method
+                bool argsOk = true; //place-holder in case I need to use it later
+                
+                if (argsOk)
+                {
+                    if (!isValidating)
+                    {
+                        //Run the step
+                        RunCopyRemoteFiles();
+                    }
+                    else
+                    {
+                    }
+                }
+            }
+
             //Don't actually use this local function, it's just here as a template for new ParseXxxxStep functions
             void ParseGenericStep()
             {
@@ -2761,6 +2783,56 @@ namespace LMSF_Scheduler
             inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
             Validate();
+        }
+
+        private void RunCopyRemoteFiles()
+        {
+            string saveDirectory;
+            if (metaDictionary.ContainsKey("dataDirectory"))
+            {
+                saveDirectory = metaDictionary["dataDirectory"];
+                //If saveDirectory is in "C:\Shared Files\"
+                //    copy files
+                if (saveDirectory.StartsWith(@"C:\Shared Files\", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var serverList = GetConnectedReadersList();
+                    if (serverList.Count > 0)
+                    {
+                        foreach (string s in serverList)
+                        {
+                            string ip = readerIps[s];
+
+                            string localStart = @"C:\Shared Files";
+                            string remoteStart = @"\\" + ip + @"\Shared Files";
+                            string pathFromHere = saveDirectory.Replace(localStart, remoteStart);
+
+                            try
+                            {
+                                string[] fileArray = Directory.GetFiles(pathFromHere, "*", SearchOption.AllDirectories);
+                                string localCopy;
+
+                                foreach (string f in fileArray)
+                                {
+                                    localCopy = f.Replace(remoteStart, localStart);
+                                    try
+                                    {
+                                        File.Copy(f, localCopy);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        MessageBox.Show($"LMSF Scheduler is not able to the file, {f} on the remote {s} computer (IP adress: {ip}) to the local computer. Manually copy the file and click 'OK' to continue");
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                MessageBox.Show($"LMSF Scheduler is not able to copy files from {saveDirectory} on the remote {s} computer (IP adress: {ip}). Manually copy files and click 'OK' to continue");
+                            }
+                        }
+                    }
+                }
+            }
+            
         }
 
         private void AddXmlProtocol(string typeStr, string sourceStr)
