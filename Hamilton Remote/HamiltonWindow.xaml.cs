@@ -49,7 +49,7 @@ namespace Hamilton_Remote
         private string serverName;
         private SimpleTcpServer server;
         private int tcpPort;
-        private readonly object messageHandlingLock = new object();
+        private readonly object serverStatusLock = new object();
         private Queue<string> messageQueue = new Queue<string>();
         private Queue<string> oldMessageQueue = new Queue<string>();
         //public enum ServerStatusStates { Idle, Busy };
@@ -436,7 +436,9 @@ namespace Hamilton_Remote
 
             string[] msgParts = Message.UnwrapTcpMessage(msg.MessageString);
 
-            lock (messageHandlingLock)
+            SharedParameters.ServerStatusStates statusForReply;
+
+            lock (serverStatusLock)
             {
                 goodMsg = Message.CheckMessageHash(msg.MessageString);
                 if (goodMsg && !messageQueue.Contains(msg.MessageString) && !oldMessageQueue.Contains(msg.MessageString))
@@ -448,10 +450,13 @@ namespace Hamilton_Remote
                     else
                     {
                         messageQueue.Enqueue(msg.MessageString);
+                        ServerStatus = SharedParameters.ServerStatusStates.Busy;
                     }
 
                     msgQueued = true;
                 }
+
+                statusForReply = ServerStatus;
             }
 
             string textOutAdd;
@@ -473,8 +478,8 @@ namespace Hamilton_Remote
             if (goodMsg)
             {
                 //send back status if good message
-                replyStr = $"{msgParts[0]},{ServerStatus},{msgParts[2]}";
-                textOutAdd = $"reply sent, {ServerStatus}.\n";
+                replyStr = $"{msgParts[0]},{statusForReply},{msgParts[2]}";
+                textOutAdd = $"reply sent, {statusForReply}.\n";
             }
             else
             {
@@ -553,17 +558,26 @@ namespace Hamilton_Remote
             {
                 if (IsVenusBusy)
                 {
-                    ServerStatus = SharedParameters.ServerStatusStates.Busy;
+                    lock (serverStatusLock)
+                    {
+                        ServerStatus = SharedParameters.ServerStatusStates.Busy;
+                    }
                 }
                 else
                 {
                     if (messageQueue.Count == 0)
                     {
-                        ServerStatus = SharedParameters.ServerStatusStates.Idle;
+                        lock (serverStatusLock)
+                        {
+                            ServerStatus = SharedParameters.ServerStatusStates.Idle;
+                        }
                     }
                     else
                     {
-                        ServerStatus = SharedParameters.ServerStatusStates.Busy;
+                        lock (serverStatusLock)
+                        {
+                            ServerStatus = SharedParameters.ServerStatusStates.Busy;
+                        }
                         string nextMsg = messageQueue.Dequeue();
                         oldMessageQueue.Enqueue(nextMsg);
                         ParseAndRunCommand(nextMsg);

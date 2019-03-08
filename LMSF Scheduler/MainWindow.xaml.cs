@@ -3684,12 +3684,13 @@ namespace LMSF_Scheduler
             }
 
             string replyStatus = SendTcpMessage(readerName, msg);
-            while (replyStatus == "Idle")
-            {
-                replyStatus = SendTcpMessage(readerName, "StatusCheck");
-                Thread.Sleep(100);
-            }
-            AddOutputText($"... reader status: {replyStatus}.\n");
+            //program got stuck here, so I edited the Server code so this loop is not needed
+            //while (replyStatus == "Idle")
+            //{
+            //    replyStatus = SendTcpMessage(readerName, "StatusCheck");
+            //    Thread.Sleep(100);
+            //}
+            AddOutputText($"... {readerName} status: {replyStatus}.\n");
 
             //Send info to metadata if collecting
             if (command == "RunExp" && isCollectingXml)
@@ -3984,12 +3985,13 @@ namespace LMSF_Scheduler
             {
                 //send message to remote Hamilton
                 string replyStatus = SendTcpMessage(name, msg);
-                while (replyStatus == "Idle")
-                {
-                    replyStatus = SendTcpMessage(name, "StatusCheck");
-                    Thread.Sleep(200);
-                }
-                AddOutputText($"... reader status: {replyStatus}.\n");
+                //The program might get stuck in this while loop, so I re-wrote the server code so that theis loop is not needed
+                //while (replyStatus == "Idle")
+                //{
+                //    replyStatus = SendTcpMessage(name, "StatusCheck");
+                //    Thread.Sleep(200);
+                //}
+                AddOutputText($"... {name} status: {replyStatus}.\n");
             }
             else
             {
