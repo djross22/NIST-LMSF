@@ -330,7 +330,8 @@ namespace LMSF_Scheduler
                     statusTextBlock.Text = "Running";
                 }
 
-                inputTextBox.IsEnabled = false;
+                inputTextBox.IsEnabled = true;
+                inputTextBox.IsReadOnly = true;
                 insertFileButton.IsEnabled = false;
                 mainMenu.IsEnabled = false;
             }
@@ -348,6 +349,7 @@ namespace LMSF_Scheduler
                 statusTextBlock.Text = "Stopped";
 
                 inputTextBox.IsEnabled = true;
+                inputTextBox.IsReadOnly = false;
                 insertFileButton.IsEnabled = true;
                 mainMenu.IsEnabled = true;
 
