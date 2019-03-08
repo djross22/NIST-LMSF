@@ -144,12 +144,12 @@ namespace Hamilton_Remote
                 OnPropertyChanged("IsVenusBusy");
                 if (isVenusBusy)
                 {
-                    statusBorder.Background = Brushes.LimeGreen;
+                    statusBorder.Background = Brushes.Yellow;
                     statusTextBlock.Text = "Hamilton Busy";
                 }
                 else
                 {
-                    statusBorder.Background = Brushes.Red;
+                    statusBorder.Background = Brushes.LimeGreen;
                     statusTextBlock.Text = "Hamilton Idle";
                 }
             }

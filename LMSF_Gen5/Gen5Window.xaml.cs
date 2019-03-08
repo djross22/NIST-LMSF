@@ -181,12 +181,12 @@ namespace LMSF_Gen5
                 OnPropertyChanged("IsReaderBusy");
                 if (isReaderBusy)
                 {
-                    statusBorder.Background = Brushes.LimeGreen;
+                    statusBorder.Background = Brushes.Yellow;
                     statusTextBlock.Text = "Reader Busy";
                 }
                 else
                 {
-                    statusBorder.Background = Brushes.Red;
+                    statusBorder.Background = Brushes.LimeGreen;
                     statusTextBlock.Text = "Reader Idle";
                 }
             }
