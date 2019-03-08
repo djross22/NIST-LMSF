@@ -3158,13 +3158,19 @@ namespace LMSF_Scheduler
                 //Add protocol finishing time to XML output
                 DateTime dt = DateTime.Now;
                 XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::protocol/dateTime");
-                XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
-                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
-                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
-                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
-                statusFiniAtt.Value = "protocol finished";
-                timeFiniNode.Attributes.Append(statusFiniAtt);
-                dateNode.AppendChild(timeFiniNode);
+                //If for some reason the dateNode is null (no protocol/dateTime Node previously added)
+                //  then don't try to append a child node to it, since that will throw an error
+                if (dateNodeList != null)
+                {
+                    XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
+                    XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                    timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                    XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                    statusFiniAtt.Value = "protocol finished";
+                    timeFiniNode.Attributes.Append(statusFiniAtt);
+                    dateNode.AppendChild(timeFiniNode);
+                }
+                
             }
             
             //Save the XML document
@@ -3651,23 +3657,33 @@ namespace LMSF_Scheduler
                 {
                     XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::Gen5Experiment/dateTime");
                     XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
-                    XmlNode timeFiniNode = xmlDoc.CreateElement("time");
-                    timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
-                    XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
-                    statusFiniAtt.Value = "experiment finished";
-                    timeFiniNode.Attributes.Append(statusFiniAtt);
-                    dateNode.AppendChild(timeFiniNode);
+                    //If for some reason the dateNode is null (no Gen5Experiment/dateTime Node previously added)
+                    //  then don't try to append a child node to it, since that will throw an error
+                    if (dateNode != null)
+                    {
+                        XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                        timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                        XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                        statusFiniAtt.Value = "experiment finished";
+                        timeFiniNode.Attributes.Append(statusFiniAtt);
+                        dateNode.AppendChild(timeFiniNode);
+                    }
                 }
                 if (isStar)
                 {
                     XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::hamiltonMethod/dateTime");
                     XmlNode dateNode = dateNodeList.Item(dateNodeList.Count - 1);
-                    XmlNode timeFiniNode = xmlDoc.CreateElement("time");
-                    timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
-                    XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
-                    statusFiniAtt.Value = "method finished";
-                    timeFiniNode.Attributes.Append(statusFiniAtt);
-                    dateNode.AppendChild(timeFiniNode);
+                    //If for some reason the dateNode is null (no hamiltonMethod/dateTime Node previously added)
+                    //  then don't try to append a child node to it, since that will throw an error
+                    if (dateNode != null)
+                    {
+                        XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                        timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                        XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                        statusFiniAtt.Value = "method finished";
+                        timeFiniNode.Attributes.Append(statusFiniAtt);
+                        dateNode.AppendChild(timeFiniNode);
+                    }
                 }
             }
 
@@ -4030,12 +4046,17 @@ namespace LMSF_Scheduler
                 //XmlNode testNode = xmlDoc.SelectSingleNode("descendant::overlordProcedure/dateTime");
                 XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::overlordProcedure/dateTime");
                 XmlNode dateNode = dateNodeList.Item(dateNodeList.Count-1);
-                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
-                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
-                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
-                statusFiniAtt.Value = "procedure finished";
-                timeFiniNode.Attributes.Append(statusFiniAtt);
-                dateNode.AppendChild(timeFiniNode);
+                //If for some reason the dateNode is null (no overlordProcedure/dateTime Node previously added)
+                //  then don't try to append a child node to it, since that will throw an error
+                if (dateNode != null)
+                {
+                    XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                    timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                    XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                    statusFiniAtt.Value = "procedure finished";
+                    timeFiniNode.Attributes.Append(statusFiniAtt);
+                    dateNode.AppendChild(timeFiniNode);
+                }
             }
 
         }
@@ -4070,12 +4091,17 @@ namespace LMSF_Scheduler
 
                 XmlNodeList dateNodeList = xmlDoc.SelectNodes("descendant::hamiltonMethod/dateTime");
                 XmlNode dateNode = dateNodeList.Item(dateNodeList.Count-1);
-                XmlNode timeFiniNode = xmlDoc.CreateElement("time");
-                timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
-                XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
-                statusFiniAtt.Value = "method finished";
-                timeFiniNode.Attributes.Append(statusFiniAtt);
-                dateNode.AppendChild(timeFiniNode);
+                //If for some reason the dateNode is null (no hamiltonMethod/dateTime Node previously added)
+                //  then don't try to append a child node to it, since that will throw an error
+                if (dateNode != null)
+                {
+                    XmlNode timeFiniNode = xmlDoc.CreateElement("time");
+                    timeFiniNode.InnerText = dt.ToString("HH:mm:ss");
+                    XmlAttribute statusFiniAtt = xmlDoc.CreateAttribute("status");
+                    statusFiniAtt.Value = "method finished";
+                    timeFiniNode.Attributes.Append(statusFiniAtt);
+                    dateNode.AppendChild(timeFiniNode);
+                }
             }
 
         }
