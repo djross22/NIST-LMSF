@@ -3,55 +3,48 @@ Blank lines are ignored.
 Lines can be commented out with two forward slashes at the start of the line ("//"). Commented lines will be ignored.
 
 Step syntax:
-<Command>/<parameter(s)>
+<Command>(<parameter(s)>)
 
-The Command and parameters are separated by a foreward slash "/"
-    White space before and after the slash is ignored
-	So,
-	    <Command>/<parameter(s)>
-		<Command>/ <parameter(s)>
-		<Command> / <parameter(s)>
-	all get read the same way.
-	
-If a Command takes multiple parameters, they are also separated by foreward slashes.
+The parameters for a Command are enclosed in parentheses "(" and ")". For Commands that take multiple parameters, the parameters are separated by commas.
+    White space before and after the commas is ignored.
 
 The parsing of Commands and parameters is generally case sensitive.
 
-Parameters can generally contain any character except "/" which is reserved for use as a command-parameter separator.
+Parameters can generally contain any character except "," which is reserved for use as a parameter separator. The one exception to this is the parameters of the Set() Command, which can contain commas.
 
 Parameters can contain key references, demarked by "{" and "}". The parser will replace the text, "{<key>}" with "<value>", where <key> and <value> are a key-value pair in the Metadata Dictionary (see below).
 	For example, the input step:
-		UserPrompt/ Test/ abc {testKey} def {testKey} ghi
-	get's parsed as:
-		User Prompt/ Test/ abc testValue def testValue ghi
+		UserPrompt(Test, abc {testKey} def {testKey} ghi)
+	gets parsed as:
+		UserPrompt(Test, abc testValue def testValue ghi)
 Key references that are not in the Metadata Dictionary will result in a Validation failure.
 
 
 Commands:
 
-	Overlord
+	Overlord()
 		Runs an Overlord procedure
 		
 		Syntax:
-			Overlord/ <file path>{/ <variables to be set (optional)>}
+			Overlord(<file path>, {<variables to be set (optional)>})
 			
 		Examples:
-			Overlord/ C:\Program Files (x86)\PAA\Overlord3\Procedures\Common\Add Lid.ovp
-			Overlord/ C:\Program Files (x86)\PAA\Overlord3\Procedures\Common\Add Lid.ovp/ [Plates] 10 [Barcode] "12345678"
+			Overlord(C:\Program Files (x86)\PAA\Overlord3\Procedures\Common\Add Lid.ovp)
+			Overlord(C:\Program Files (x86)\PAA\Overlord3\Procedures\Common\Add Lid.ovp, [Plates] 10 [Barcode] "12345678")
 			
 			
-	Hamilton
+	Hamilton()
 		Runs a Hamilton method (on the local computer with Hamilton Venus installed).
 		Also saves the Metadata Dictionary (metaDictionary) to a parameters file that can be read by a Hamilton Venus program (C:\Program Files (x86)\HAMILTON\LMSF_FrontEnd\parameters.csv).
 		
 		Syntax:
-			Hamilton/ <file path>
+			Hamilton(<method file path>)
 			
 		Examples:
-			Hamilton/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl
+			Hamilton(C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl)
 			
 			
-	RemoteHam
+	RemoteHam()
 		Runs a remote Hamilton method (on a different computer with Hamilton Venus installed).
 		Also saves the Metadata Dictionary (metaDictionary) to a parameters file that can be read by the Hamilton Venus program on the remote computer (\\<remote IP address>\LMSF_FrontEnd\parameters.csv).
 		The first argument is the name of the Hamilton.
@@ -63,7 +56,7 @@ Commands:
 				The path to the method file to be run.
 					The path is read from the point of view of the computer controlling the Hamilton.
 					So, the method path will usually start with the Methods folder on that computer: "C:\Program Files (x86)\HAMILTON\Methods\..."
-			Note: after calling a "RemoteHam/ <Hamilton name>/ RunMethod/ ...", the appropriate WaitFor/ command to use is WaitFor/ <Hamilton name>
+			Note: after calling a "RemoteHam(<Hamilton name>, RunMethod, ...)", the appropriate WaitFor() command to use is WaitFor(<Hamilton name>)
 			
 		If the second argument is ReadCounters, the Remote Hamilton program on the remote computer will run the Check Tip Counters method, and the LMSF Scheduler will read the status of the tip counters into the Metadata Dictionary.
 			The Metadata Dictionary keys that will be written to are:
@@ -79,19 +72,19 @@ Commands:
 				tipsOffsetStatus1 = status of rack 1 (only rack) for 1000 uL Offset Pickup tips (1 = has tips; 0 = empty)
 				tipsOffsetStatus2 = status of rack 2 for 1000 uL Offset Pickup tips; with the current deck configuration, there is no rack 2, so this should always be zero.
 				tipsOffsetTotal = total number of 1000 uL tips in the Offset Pickup rack
-			The status and tip total Dictionary entries can be uses to make decisions on tip loading or User Prompts.
+			The status and tip total Dictionary entries can be used to make decisions on tip loading or User Prompts.
 				For example:
-					RemoteHam/ S-Cell-STAR/ ReadCounters
-					If/ {tips1000Status1} == 0/ UserPrompt/ Add More Tips/ Add additional 1000 uL tips.
+					RemoteHam(S-Cell-STAR, ReadCounters)
+					If({tips1000Status1} == 0, UserPrompt(Add More Tips, Add additional 1000 uL tips.))
 		
 		Syntax:
-			RemoteHam/ <Hamilton name>/ <Hamilton command>/<file path>
+			RemoteHam(<Hamilton name>, <Hamilton command>, <file path>)
 			
 		Examples:
-			RemoteHam/ S-Cell-STAR/ RunMethod/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl
+			RemoteHam(S-Cell-STAR, RunMethod, C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl)
 			
 			
-	Gen5
+	Gen5()
 		Controls an instance of the LMSF_Gen5 program (with communication via TCP - so either for local reader or reader on another computer with network connection).
 		The first argument is the name of the reader.
 			The valid reader names are "Neo", "Epoch1", "Epoch2", "Epoch3", and "Epoch4".
@@ -111,48 +104,57 @@ Commands:
 					The save folder path is also read from the point of view of the computer controlling the reader.
 		
 		Syntax:
-			Gen5/ <reader name>/ <gen5 command>{/ <protocol path>/ <experiment ID>/ <save folder path>}
+			Gen5(<reader name>, <gen5 command>, {<protocol path>, <experiment ID>, <save folder path>})
 			
 		Examples:
-			Gen5/ Epoch1/ CarrierOut
-			Gen5/ Epoch2/ CarrierIn
-			Gen5/ Epoch1/ RunExp/ C:\Users\Public\Documents\Protocols\Growth Plate w Membrane 4h.37C.1C.prt/ {experimentId}/ C:\Shared Files\Data\GSF-IMS-coli\2019-02-04-0740_IPTG_gradient
+			Gen5(Epoch1, CarrierOut)
+			Gen5(Epoch2, CarrierIn)
+			Gen5(Epoch1, RunExp, C:\Users\Public\Documents\Protocols\Growth Plate w Membrane 4h.37C.1C.prt, {experimentId}, C:\Shared Files\Data\GSF-IMS-coli\2019-02-04-0740_IPTG_gradient)
 			
 		
-	Timer
+	Timer()
 		Starts a timer that runs for a specified amount of time, or until a specified time or date-time.
 		Parsing of time or date-time strings is done using: https://docs.microsoft.com/en-us/dotnet/api/system.datetime.tryparse?view=netframework-4.7.2.
 		With a time or date-time parameter, the Parser also checks to be sure the time or date-time is in the future.
 		
 		Syntax:
-			Timer/ <time in seconds (integer)>
-			Timer/ <parsable time or date-time string>
+			Timer(<time in seconds (integer)>)
+			Timer(<parsable time or date-time string>)
 			
 		Examples:
-			Timer/ 20
-			Timer/ 5
-			Timer/ 2000
-			Timer/ 7:30pm
-			Timer/ 2019-01-25 7:30pm
+			Timer(20)
+			Timer(5)
+			Timer(2000)
+			Timer(7:30pm)
+			Timer(2019-01-25 7:30pm)
 			
 			
-	WaitFor
+	WaitFor()
 		Pauses execution and waits for a previous step to finish
-		The <process to wait for> argument can be either "Overlord", "Hamilton", "Timer", or the name of a remote instrument that is connected (see the Gen5/ and RemoteHam/ command descriptions).
+		The <process to wait for> argument can be either "Overlord", "Hamilton", "Timer", or the name of a remote instrument that is connected (see the Gen5() and RemoteHam() command descriptions).
+		If the <process to wait for>  is a remote instrument, there are two additional optional parameters, <write end time> and <ping interval>.
+			The <write end time> is a boolean used to set whether or not the finish time of the remote process is appended to the XML node for that process.
+				Some remote processes don't have XML nodes, (e.g. CarrierIn), so it is not appropiate to try to append a finish time.
+				If <write end time> is any string other than "false" or "False", or if there is no second paramter, the finish time will be appended.
+			The <ping interval> parameter is an integer that sets the time (in milli-seconds) between "pings" to the remote process to check it's status.
+				If no <ping interval> is set in the WaitFor command, the default value (1000) will be used.
 		
 		Syntax:
-			WaitFor/ <process to wait for>
+			WaitFor(<process to wait for>, {<write end time>, <ping interval>})
 			
 		Examples:
-			WaitFor/ Overlord
-			WaitFor/ Hamilton
-			WaitFor/ Epoch1
-			WaitFor/ S-Cell-STAR
-			WaitFor/ Timer
+			WaitFor(Overlord)
+			WaitFor(Hamilton)
+			WaitFor(Epoch1)
+			WaitFor(S-Cell-STAR)
+			WaitFor(Timer)
+			WaitFor(Epoch1, false)
+			WaitFor(S-Cell-STAR, true, 3000)
 			
 			
-	NewXML
-		Starts a new XML metadata document.
+	NewXML()
+		Starts a new XML metadata document, and opens a user dialog box to get the project identifier.
+		The project identifier is saved in both the XML document and in the Metadata Dictionary (with the key "projectId").
 		Also, adds the protocol starting date and time to the Metadata Dictionary (key = "startDateTime") in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
 		Also, adds the protocol starting date to the Metadata Dictionary (key = "startDate") in a form that is suitable for use in file names/identifiers: "yyyy-MM-dd".
 		
@@ -161,102 +163,105 @@ Commands:
 			The <protocol type> is saved in the Metadata Dictionary with the key "protocol type".
 		
 		Syntax:
-			NewXML/ <protocol type>
+			NewXML(<protocol type>)
 			
 		Examples:
-			NewXML/ growth plate prep
-			NewXML/ cytometry plate prep
+			NewXML(growth plate prep)
+			NewXML(cytometry plate prep)
 			
 
-	AppendXML
+	AppendXML()
 		Similar to NewXML, but opens an existing XML metadata document and adds to it.
 		Also, adds the protocol starting date and time to the Metadata Dictionary (key = "startDateTime") in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
 		Also, adds the protocol starting date to the Metadata Dictionary (key = "startDate") in a form that is suitable for use in file names/identifiers: "yyyy-MM-dd".
 		
 		Syntax:
-			AppendXML/ <protocol type>
+			AppendXML(<protocol type>)
 			
 		Examples:
-			AppendXML/ growth plate prep
-			AppendXML/ cytometry plate prep
+			AppendXML(growth plate prep)
+			AppendXML(cytometry plate prep)
 			
 			
-	SaveXML
+	SaveXML()
 		Saves the XML metadata document.
 		By default, this command also appends the "protocol finished" node to the dateTime node in the XML document.
 		If the optional argument, "not finished" is used, the "protocol finished" node will not be appended.
 		
 		Syntax:
-			SaveXML{/ not finished (optinal)}
+			SaveXML({not finished (optinal)})
 			
 		Examples:
-			SaveXML/ 
-			SaveXML/ not finished
+			SaveXML()
+			SaveXML(not finished)
 			
 			
-	AddXML
+	AddXML()
 		Adds a new node to the XML metadata document. 
 		The name of the new node is <newNode>. It is added as a child to an existing node, <parentNode>.
 		If the <parentNode> does not exist, it is added to the protocol node, with <newNode> as a child node.
 		The inner text of the new node is set to <innerText>.
 		
 		Syntax:
-			AddXML/ <parentNode> / <newNode>{/ <innerText (opyional)>}
+			AddXML(<parentNode>, <newNode>, {<innerText (opyional)>})
 			
 		Examples:
-			AddXML/ additive/ newNode/
-			AddXML/ newNode/ testNewNode/ new node inner text
+			AddXML(additive, newNode)
+			AddXML(newNode, existingParentNode, new node inner text)
 			
 			
-	UserPrompt
+	UserPrompt()
 		Opens a message dialog box to prompt the user.
 		The <message> string parameter is interpretted using string escape sequences ("\t" for tab, "\n" for new line).
 			So, multi-line messages can be formateed and displayed.
-			Note that you need to be careful to use the double back-slash "\\" as folder/file separators when using a UserPrompt to display file path information
-			For a complete list of escape sequences, see https://blogs.msdn.microsoft.com/csharpfaq/2004/03/12/what-character-escape-sequences-are-available/
-				Not all of the escape sequences on that list work as expected in the context of this command, so try them.
-				If <message> includes an unrecognized escape sequence, the entire message will be displayed as a litteral string ignoring all escape sequences.
 		
 		Syntax:
-			UserPrompt/ <title>/ <message>{/ <image file path (optional)>}
+			UserPrompt(<title>, <message>, {<image file path (optional)>})
 			
 		Examples:
-			UserPrompt/ Add Bacteria/ Add bacteria to growth plate, put plate in reader, and click 'OK'
-			UserPrompt/ Add Bacteria/ Add bacteria to growth plate and click 'OK'/ C:\Users\djross\Documents\temp\spinner.PNG 
-			UserPrompt/ Add Bacteria/ Add bacteria to growth plate, \nput plate in reader, and click 'OK'
+			UserPrompt(Add Bacteria, Add bacteria to growth plate. Put plate in reader. Then click 'OK')
+			UserPrompt(Add Bacteria, Add bacteria to growth plate and click 'OK', C:\Users\djross\Documents\temp\spinner.PNG)
+			UserPrompt(Add Bacteria, Add bacteria to growth plate. \nPut plate in reader. Then click 'OK')
+			
+			Set(msg1, Review the following, then click 'OK' to accept or 'Abort' to abort and start over:\n\n)
+			Set(msg2, \tMedia: \t\t\t{media}\n\n \tBacteria: \t\t\t{strain1}, with {plasmid1}\n\n)
+			Set(msg3, \tInducer: \t\t\t{inducer}, stock concentration: {inducerStock}\n \tLeft-side additive:  \t{leftAdditive}, stock concentration: {leftAdditiveStock}\n)
+			Set(msg4, \tRight-side additive:  \t{rightAdditive}, stock concentration: {rightAdditiveStock}\n  \n)
+			Set(msg5, \tExperiment ID: \n\t\t{experimentId}\n \tData directory: \n\t\t{dataDirectory}\n\n \tNotes:\n\t\t{note})
+			UserPrompt(Review Protocol Details: {experimentId}, {msg1} {msg2} {msg3} {msg4} {msg5})
 			
 			
-	GetExpId
+	GetExpId()
 		Opens a user dialog box to get the experiment identifier and data directory from the user.
 		The dialog starts with default/suggested values defined by the parameters.
-		If no <default data directory> parameter is given, "C:\Shared Files\Data" is used.
+		If no <default data directory> parameter is given, "C:\Shared Files\Data\{projectId}" is used.
 		By default, the command creates a new directory with the same name as the experiment ID,
 			So, the default file will be saved as "<default data directory>\<default experiment ID>\<default experiment ID>.xml"
 		The user can manually override the defaults in the dialog or accept them.
 		After the user confirms, GetExpId also adds the experiment ID (key = "experimentId"), and the data directory (key = "dataDirectory") to the Metadata Dictionary 
 		
 		Syntax:
-			GetExpId/ <default experiment ID>{/ <default data directory (optional)>}
+			GetExpId(<default experiment ID>, {<default data directory (optional)>})
 			
 		Examples:
-			GetExpId/ {startDateTime}-{strain1}
-			GetExpId/ {startDateTime}-{strain1}/ C:\Users\djross\Documents\LMSF data
+			GetExpId({startDateTime}_{strain1})
+			GetExpID({startDateTime}_{inducer}_{leftAdditive}_{rightAdditive}_2DGradients)
 			
 			
-	GetUserYesNo
+	GetUserYesNo()
 		Opens a user dialog box to get a Yes/No response from the user.
 		The user's response is saved in teh Metadata Dictionary with the key given as the first argument.
 			The strings saved to the Dictionary are capitalized, "Yes" or "No".
 		
 		Syntax:
-			GetUserYesNo/ <key>/ <title>/ <prompt>
+			GetUserYesNo(<key>, <title>, <prompt>)
 			
 		Examples:
-			GetUserYesNo/ test/ title/ choose yes or no
-			GetUserYesNo/ gen5/ Normalize With OD?/ Use Gen5 output file to normalize cell density in cytometry plate?
+			GetUserYesNo(test, title, choose yes or no)
+			GetUserYesNo(gen5, Normalize With OD?, Use Gen5 output file to normalize cell density in cytometry plate?)
 			
 			
-	GetFile
+	GetFile()
 		Opens a user dialog box to get the location of a file from the user.
 		The dialog starts by looking in the default data directory.
 		If no <default data directory> parameter is given, "C:\Shared Files\Data" is used.
@@ -270,27 +275,27 @@ Commands:
 			For more details on file filters, see: https://docs.microsoft.com/en-us/dotnet/api/microsoft.win32.filedialog.filter?view=netframework-4.7.2
 		
 		Syntax:
-			GetFile/ <file key>/ <file prompt>{/ <file filter (optional)>/ <default data directory (optional)>}
+			GetFile(<file key>, <file prompt>, {<file filter (optional)>, <default data directory (optional)>})
 			
 		Examples:
-			GetFile/ file/ Select file for input data
-			GetFile/ file/ Select file for input data/ CSV files (.csv)|*.csv/
-			GetFile/ file/ Select file for input data/ CSV files (.csv)|*.csv/ {dataDirectory}
+			GetFile(file, Select file for input data
+			GetFile(file, Select file for input data, CSV files (.csv)|*.csv)
+			GetFile(file, Select file for input data, CSV files (.csv)|*.csv, {dataDirectory})
 			
 
-	Get
+	Get()
 		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.
 		
 		The list of valid metadata types is: "user", "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", "note", and "number"
 		
 		The <key> parameter is meant to be a short, human-readable indentifier of the function of the media, strain, plasmid, etc. in the current experiment.
-		It is also used as the key for storage of Get/ result in the metaDictionary.
+		It is also used as the key for storage of Get() result in the metaDictionary.
 
 		For metadata type "concentration", the user dialog gets the numeric value and units for the concentration.
 		
-		In the XML output, the result of a "Get/ concentration/..." command is attached to the last additive or antibiotic XML output (if there is one).
-		So, a "Get/ concentration/..." command should be immediately after the matching "Get/ additive/..." command, so that the automated XML document script will attach them together correctly. 
-		With a "Get/ concentration/ <key>" command, the concentration is saved in the Metadata Dictionaries (both of them); 
+		In the XML output, the result of a "Get(concentration,...)" command is attached to the last additive or antibiotic XML output (if there is one).
+		So, a "Get(concentration,...)" command should be immediately after the matching "Get(additive,..." command, so that the automated XML document script will attach them together correctly. 
+		With a "Get(concentration, <key>)" command, the concentration is saved in the Metadata Dictionaries (both of them); 
 			the Concentration is saved as an object with both value and units in the concDictionary; 
 			the numeric value and units are also saved in the metaDictionary using the keys "<key>Conc" and "<key>Units".
 		
@@ -307,64 +312,78 @@ Commands:
 		
 		
 		Syntax:
-			Get/ <metadata type>/ <key>{/ <message prompt(optinal)>/ <note (optional)>}
+			Get(<metadata type>, <key>, {<message prompt(optinal)>, <note (optional)>})
 			
 		Examples:
-			Get/ strain/ strain1
-			Get/ media/ baseMedia
-			Get/ additive/ inducer
-			Get/ additive/ inducer/ Select the inducer used for the left side of the plate:
-			Get/ additive/ inducer/ default/ note to add to the XML file
-			Get/ concentration/ inducerStock
+			Get(strain, strain1)
+			Get(media, baseMedia)
+			Get(additive, inducer)
+			Get(additive, inducer, Select the inducer used for the left side of the plate:)
+			Get(additive, inducer, default, note to add to the XML file)
+			Get(concentration, inducerStock)
 			
 			
-	Set
+	Set()
 		Directly sets an entry in the Metadata Dictionary.
+		Unlike other commands, the <value> parameter of a Set() command can have commas in it.
 		
 		Syntax:
-			Set/ <key>/ <value>
+			Set(<key>, <value>)
 			
 		Examples:
-			Set/ count/ 20
-			Set/ strain/ MG1655
+			Set(count, 20)
+			Set(strain, MG1655)
+			Set(msg1, Add bacteria to growth plate, put plate in reader, and click 'OK'.\n\n)
 			
 			
-	StartPrompt
+	StartPrompt()
 		Opens a message dialog box for the start of a protocol. Lists the protocol requirements and offers 'OK' or 'Abort'.
 		The protocol title appears near the top of the dialog
 		The list file is a text file with a list of requirements. The contents of the list file will be displayed in the dialog exactly as they are in the text file.
 		
 		Syntax:
-			StartPrompt/ <protocol title>/ <list file path>
+			StartPrompt(<protocol title>, <list file path>)
 			
 		Examples:
-			StartPrompt/ Inducer Gradient Plus Bacteria/ C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Inducer gradient plus 1000x bacteria-list.txt
+			StartPrompt(Inducer Gradient Plus Bacteria, C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Inducer gradient plus 1000x bacteria-list.txt)
 			
 			
-	If
-		Any other command can be preceded by an If/ command, which can control whether or not the command is run.
+	If()
+		Any other command can be preceded by an If() command, which can control whether or not the command is run.
 		This can be used to change the protocol steps in response to user input.
 		
 		Syntax:
-			If/ <logical test>/ <other valid command, with normal arguments>
+			If(<logical test>, <other valid command, with normal arguments>)
 			
 		Examples:
-			If/ {a} == b/ UserPrompt/ Add Bacteria/ Add bacteria to growth plate, put plate in reader, and click 'OK'
-			If/ {num}==2/ Get/ strain/ strain1
-			If/ {num}!=2/ GetFile/ file/ Select file for input data/ CSV files (.csv)|*.csv/
+			If({a} == b, UserPrompt(Add Bacteria, {msg1}))
+			If({num}==2, Get(strain, strain1))
+			If({num}!=2, GetFile(file, Select file for input data, CSV files (.csv)|*.csv)
+			If({isEnoughOffsetTips} == Yes, Hamilton(C:\Program Files (x86)\HAMILTON\Methods\Common\Tip Handling\Edit Tip Counter Offset_1000.hsl) )
+			
+			
+	CopyRemoteFiles()
+		Attempts to copy data files from remote computers to local computer.
+		If the dataDirectory is a sub-folder of C:\Shared Files\, CopyRemoteFiles() will look for any files in the dataDirectory on the remote computers (the ones that are connected) and attempt to copy them to the dataDirectory of the local computer
+		
+		Syntax:
+			CopyRemoteFiles()
+			
+		Examples:
+			CopyRemoteFiles()
 			
 
 Metadata Dictionary:
 	The LMSF Scheduler has two Dictionary objects that effectively give the user the ability to create, store, and access variables for use across multiple steps.
 	The first dictionary is for storage of string identifiers, the second is for storage of concentrations.
 	The Metadata Dictionaries (metaDictionary and concDictionary in the C# code) consist of key-value pairs. 
-	A value can be saved in one of the dictionaries, either directly with a Set/ command or using a user dialog command such as Get/.
+	A value can be saved in one of the dictionaries, either directly with a Set() command or using a user dialog command such as Get().
 	Values in either dictionary can then be accessed using the "{key}" syntax in a subsequent parameter entry.
 		The command parser first looks for a key in the string identifier dictionary (metaDictionary),
 		and then looks in the concentration dictionary if the key is not found in the string identifier dictionary.
 		So, it is possible to use the same key to store values in both dictionaries, but the parser will only be able to find the corresponding value in the string dictionary.
 		It is reccomended to use related, but not identical keys for matching additive identifiers and concentrations,
-			for example, "Get/ additive/ inducer" followed by "Get/ concentration/ inducer stock"
+			for example, "Get(additive, inducer)" followed by "Get(concentration, inducer stock)"
 			
 		If the command parser finds the requested key in one of the dictionaries, it replaces the sub-string, "{<key>}", with the sub-string "<value>" in the parameter string.
 	

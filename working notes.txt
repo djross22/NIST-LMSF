@@ -479,10 +479,25 @@ LMSF Scheduler: Enable commas in Set() by re-concatenating arguments
 
 LMSF Scheduler: Change action on SelectComboBox_DropDownClosed() to match new command format
 
+Change Enabled state of input text box to true during run, but set editable state to false
+
+Add "next step" text box to show the next line that will be run
+
+Change status indicator colors in remotes (Hamilton and Gen5): Busy=yellow, Idle=green
+
+In remotes, StatusCheck messages get queued directly to oldMessageQueue
+
+Add parameter to set ping interval on WaitFor()
+
+Add CopyRemoteFiles command to copy files from remote data directories to local data directory
+
+Update help document
+
 
 TODO:
 
-Update help document
+Add automatic generation of database with run times for Hamilton and Gen5 methods?
+
 
 Nested If()
 
@@ -490,6 +505,8 @@ Get/ Integer?
 
 Enable simple math (+, -, *, /, %) with numeric quantities
 
+
+Change arguments passed to BackgroundWorkers to dictionaries, instead of lists.
 
 
 
