@@ -286,7 +286,7 @@ Commands:
 	Get()
 		Opens a user dialog box to get metadata information from the user, and saves the result in the Metadata Dictionary.
 		
-		The list of valid metadata types is: "user", "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", "note", and "number"
+		The list of valid metadata types is: "user", "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", "note", "number", and "integer"
 		
 		The <key> parameter is meant to be a short, human-readable indentifier of the function of the media, strain, plasmid, etc. in the current experiment.
 		It is also used as the key for storage of Get() result in the metaDictionary.
@@ -321,6 +321,7 @@ Commands:
 			Get(additive, inducer, Select the inducer used for the left side of the plate:)
 			Get(additive, inducer, default, note to add to the XML file)
 			Get(concentration, inducerStock)
+			Get(integer, stackTotal, Enter the number of plates in stack 7.)
 			
 			
 	Set()

@@ -879,10 +879,18 @@ namespace LMSF_Utilities
             }
         }
 
-        public static string GetNumber(string prompt)
+        public static string GetNumber(string prompt, bool isInteger = false)
         {
             string numStr = "";
-            NumericInputDialog dlg = new NumericInputDialog();
+            NumericInputDialog dlg;
+            if (isInteger)
+            {
+                dlg = new NumericInputDialog(true);
+            }
+            else
+            {
+                dlg = new NumericInputDialog();
+            }
             // Configure the dialog box
             //dlg.Title = "Long Name";
             dlg.PromptText = prompt;

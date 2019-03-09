@@ -2248,6 +2248,7 @@ namespace LMSF_Scheduler
                     getList.Add("concentration");
                     getList.Add("note");
                     getList.Add("number");
+                    getList.Add("integer");
                     if (getList.Contains(typeStr))
                     {
                         argsOk = true;
@@ -2282,15 +2283,22 @@ namespace LMSF_Scheduler
                         }
                         else
                         {
-                            if (typeStr == "concentration")
+                            switch (typeStr)
                             {
-                                concDictionary[keyStr] = new Concentration(0, SharedParameters.UnitsList[0]);
-                                metaDictionary[$"{keyStr}Conc"] = "0.00";
-                                metaDictionary[$"{keyStr}Units"] = SharedParameters.UnitsList[0];
-                            }
-                            else
-                            {
-                                metaDictionary[keyStr] = $"place-holder-{typeStr}";
+                                case "concentration":
+                                    concDictionary[keyStr] = new Concentration(0, SharedParameters.UnitsList[0]);
+                                    metaDictionary[$"{keyStr}Conc"] = "0.00";
+                                    metaDictionary[$"{keyStr}Units"] = SharedParameters.UnitsList[0];
+                                    break;
+                                case "number":
+                                    metaDictionary[keyStr] = "2.71828182846";
+                                    break;
+                                case "integer":
+                                    metaDictionary[keyStr] = "42";
+                                    break;
+                                default:
+                                    metaDictionary[keyStr] = $"place-holder-{typeStr}";
+                                    break;
                             }
 
                         }
@@ -3421,6 +3429,9 @@ namespace LMSF_Scheduler
                 case "number":
                     GetNumber();
                     break;
+                case "integer":
+                    GetInteger();
+                    break;
                 case "concentration":
                     GetConcentration();
                     break;
@@ -3446,6 +3457,22 @@ namespace LMSF_Scheduler
                 //this has to be delegated becasue it interacts with the GUI by calling up a dialog box
                 this.Dispatcher.Invoke(() => {
                     valueStr = GetNumberFromUser(promptStr);
+                    metaDictionary[keyStr] = valueStr;
+                });
+
+            }
+
+            void GetInteger()
+            {
+                //Default prompt for number
+                if (promptStr == "")
+                {
+                    promptStr = $"Enter the number (integer): ";
+                }
+
+                //this has to be delegated becasue it interacts with the GUI by calling up a dialog box
+                this.Dispatcher.Invoke(() => {
+                    valueStr = GetNumberFromUser(promptStr, true);
                     metaDictionary[keyStr] = valueStr;
                 });
 
@@ -3536,9 +3563,18 @@ namespace LMSF_Scheduler
 
         }
 
-        private string GetNumberFromUser(string prompt)
+        private string GetNumberFromUser(string prompt, bool isInteger = false)
         {
-            string numStr = SharedParameters.GetNumber(prompt);
+            string numStr;
+
+            if (isInteger)
+            {
+                numStr = SharedParameters.GetNumber(prompt, true);
+            }
+            else
+            {
+                numStr = SharedParameters.GetNumber(prompt);
+            }
 
             if (numStr == "")
             {
