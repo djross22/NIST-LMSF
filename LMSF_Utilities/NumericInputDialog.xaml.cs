@@ -51,9 +51,14 @@ namespace LMSF_Utilities
         }
         #endregion
 
-        public NumericInputDialog()
+        public NumericInputDialog(bool isInteger = false)
         {
             InitializeComponent();
+            if (isInteger)
+            {
+                numberRegexRule.RegexText = "^[0-9]+$";
+            }
+            
             DataContext = this;
         }
 

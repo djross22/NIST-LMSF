@@ -25,7 +25,7 @@
             <TextBox.Text>
                 <Binding Path="NumString" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
-                        <local:RegexValidationRule RegexText = "^[0-9.]+$" ErrorMessage="Long names can only contain letters, numbers, spaces, or '-'." ValidationOptions="None"/>
+                        <local:RegexValidationRule x:Name="numberRegexRule" RegexText = "^[0-9.]+$" ErrorMessage="Input must be a number." ValidationOptions="None"/>
                     </Binding.ValidationRules>
                 </Binding>
             </TextBox.Text>
