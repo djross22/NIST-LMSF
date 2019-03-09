@@ -106,6 +106,9 @@ namespace LMSF_Scheduler
         private Dictionary<string, string> metaDictionary;
         private Dictionary<string, Concentration> concDictionary;
 
+        //Dictionary for labware on Carousel
+        private Dictionary<string, string> carouselInventory;
+
         //variables for TCP communication
         public List<string> ReaderList { get; set; }
         public ObservableCollection<TextBlock> ReaderBlockList { get; set; }
@@ -3976,6 +3979,70 @@ namespace LMSF_Scheduler
                 if (split.Length == 2)
                 {
                     metaDictionary[split[0]] = split[1];
+                }
+            }
+        }
+
+        private void ExportCarouselInventory(string dir, string fileName)
+        {
+            //First, create directory if it does not exits
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            //Then, overwite any item in the carouselInventory for which there is a matching key in the metaDictionary
+            foreach (string key in carouselInventory.Keys)
+            {
+                if (metaDictionary.ContainsKey(key))
+                {
+                    carouselInventory[key] = metaDictionary[key];
+                }
+            }
+
+            string outPath = System.IO.Path.Combine(dir, fileName);
+
+            //string header = String.Join(",", metaDictionary.Keys);
+            //string values = String.Join(",", metaDictionary.Values);
+
+            try
+            {
+                using (StreamWriter outputFile = new StreamWriter(outPath))
+                {
+                    //outputFile.WriteLine(header);
+                    //outputFile.WriteLine(values);
+                    foreach (string key in carouselInventory.Keys)
+                    {
+                        outputFile.WriteLine($"{key},{carouselInventory[key]}");
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                MessageBox.Show(e.Message);
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => { AbortCalled = true; });
+            }
+
+        }
+
+        private void ImportCarouselInventory(string filePath)
+        {
+            string[] lines = File.ReadAllLines(filePath);
+
+            int splitIndex;
+            string keyStr;
+            string valueStr;
+
+            //string[] split;
+            foreach (string entry in lines)
+            {
+                splitIndex = entry.IndexOf(',');
+                if (splitIndex > 0)
+                {
+                    keyStr = entry.Substring(0, splitIndex);
+                    valueStr = entry.Substring(splitIndex + 1);
+                    carouselInventory[keyStr] = valueStr;
                 }
             }
         }
