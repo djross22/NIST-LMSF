@@ -1389,7 +1389,7 @@ namespace LMSF_Scheduler
                 string command;
                 List<string> commandList = new List<string> { "RunMethod", "ReadCounters" };
                 //3rd argument is the method path
-                string methodPath;
+                string methodPath = "";
 
                 outString += "Running RemoteHam Command: ";
 
@@ -1397,9 +1397,9 @@ namespace LMSF_Scheduler
                 bool argsOk = false;
 
                 //Requires at least three arguments (plus RemoteHam command itself)
-                if (numArgs < 4)
+                if (numArgs < 3)
                 {
-                    outString += "Not enough arguments; RemoteHam command requires at least 3 arguments: Hamilton name, command, and method path. ";
+                    outString += "Not enough arguments; RemoteHam command requires at least 2 arguments: Hamilton name and command. ";
                     valFailed.Add(num);
                 }
                 else
@@ -1454,6 +1454,13 @@ namespace LMSF_Scheduler
                     //If arguments are ok so far, check additional arguments of RunMethod command
                     if (argsOk && command == "RunMethod")
                     {
+                        if (numArgs < 4)
+                        {
+                            outString += "Not enough arguments; RemoteHam(<STAR>, RunMethod...) command requires at least 3 arguments: Hamilton name, command, and method path. ";
+                            valFailed.Add(num);
+                            argsOk = false;
+                        }
+
                         //Check if method path is valid file with .prt extension
                         if (!methodPath.EndsWith(".hsl"))
                         {
@@ -1506,8 +1513,13 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
+                        bool isEditCountersMethod = false;
+                        if (numArgs > 3 && methodPath.EndsWith("Edit Tip Counters.hsl"))
+                        {
+                            isEditCountersMethod = true;
+                        }
                         //For anything that gets saved by the Run method to the dictionary, put placeholder values into dictionary
-                        if (stepArgs[2] == "ReadCounters")
+                        if (stepArgs[2] == "ReadCounters" || isEditCountersMethod)
                         {
                             metaDictionary["tips1000Status1"] = "0";
                             metaDictionary["tips1000Status2"] = "0";
@@ -3985,19 +3997,19 @@ namespace LMSF_Scheduler
 
         private void ExportCarouselInventory(string dir, string fileName)
         {
-            //First, create directory if it does not exits
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-            //Then, overwite any item in the carouselInventory for which there is a matching key in the metaDictionary
+            //First, overwite any item in the carouselInventory for which there is a matching key in the metaDictionary
             foreach (string key in carouselInventory.Keys)
             {
                 if (metaDictionary.ContainsKey(key))
                 {
                     carouselInventory[key] = metaDictionary[key];
                 }
+            }
+
+            //First, create directory if it does not exits
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
             }
 
             string outPath = System.IO.Path.Combine(dir, fileName);
@@ -4120,8 +4132,8 @@ namespace LMSF_Scheduler
                 AddDateTimeNodes(DateTime.Now, hamNode, "method started");
             }
 
-            //If command = "ReadCounters", wait until it's done, then read tip counter status into metaDeictionary
-            if (command == "ReadCounters") {
+            //If command = "ReadCounters" or methodPath ends with "Edit Tip Counters.hsl", wait until it's done, then read tip counter status into metaDictionary
+            if (command == "ReadCounters" || methodPath.EndsWith("Edit Tip Counters.hsl")) {
                 //Wait for ReadCounters method to finish
                 WaitingForStepCompletion = true;
                 BackgroundWorker remoteMonitorWorker = new BackgroundWorker();
