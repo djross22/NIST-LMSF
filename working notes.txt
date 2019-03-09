@@ -496,14 +496,16 @@ Update help document
 
 TODO:
 
+Combine metadata list/database from multiple computers
+
+Enable simple math (+, -, *, /, %) with numeric quantities
+
+Get/ Integer?
+
 Add automatic generation of database with run times for Hamilton and Gen5 methods?
 
 
 Nested If()
-
-Get/ Integer?
-
-Enable simple math (+, -, *, /, %) with numeric quantities
 
 
 Change arguments passed to BackgroundWorkers to dictionaries, instead of lists.
