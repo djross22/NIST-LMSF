@@ -493,14 +493,17 @@ Add CopyRemoteFiles command to copy files from remote data directories to local 
 
 Update help document
 
+Fix validation error with Remote Hamilton(rem, ReadCounters) - validation expects a 3rd parameter
+	Also, if methodPath ends with "Edit Tip Counters.hsl", also read tip counter file (and change the validation check accordingly)
+
 
 TODO:
+
+Command to read/write from/to the carousel inventory file
 
 Combine metadata list/database from multiple computers
 
 Enable simple math (+, -, *, /, %) with numeric quantities
-
-Get/ Integer?
 
 Add automatic generation of database with run times for Hamilton and Gen5 methods?
 

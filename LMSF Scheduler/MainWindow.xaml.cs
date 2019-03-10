@@ -1406,7 +1406,6 @@ namespace LMSF_Scheduler
                 {
                     name = stepArgs[1];
                     command = stepArgs[2];
-                    methodPath = stepArgs[3];
                     // Check if 1st argument is valid Hamilton name 
                     if (name.Contains("STAR") && ReaderList.Contains(name))
                     {
@@ -1459,6 +1458,10 @@ namespace LMSF_Scheduler
                             outString += "Not enough arguments; RemoteHam(<STAR>, RunMethod...) command requires at least 3 arguments: Hamilton name, command, and method path. ";
                             valFailed.Add(num);
                             argsOk = false;
+                        }
+                        else
+                        {
+                            methodPath = stepArgs[3];
                         }
 
                         //Check if method path is valid file with .prt extension
@@ -4065,7 +4068,7 @@ namespace LMSF_Scheduler
             string name = args[1];
             string command = args[2];
             //3rd argument is the method path
-            string methodPath = args[3];
+            string methodPath = "";
 
             string msg;
             if (command != "RunMethod")
@@ -4074,7 +4077,7 @@ namespace LMSF_Scheduler
             }
             else
             {
-                //methodPath = args[3];
+                methodPath = args[3];
                 msg = $"{command}/{methodPath}";
             }
             
