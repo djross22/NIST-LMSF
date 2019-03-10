@@ -4616,7 +4616,15 @@ namespace LMSF_Scheduler
                     InsertInputText("<protocol type>)\n\nSaveXML()");
 
                     //move caret to middle line between NewXML and SaveXML
-                    inputTextBox.SelectionStart = caretPos + 1;
+                    inputTextBox.SelectionStart = caretPos + 17;
+                    inputTextBox.SelectionLength = 0;
+                }
+                else
+                {
+                    InsertInputText(")");
+                    //otherwise, move caret to between parentheses
+                    int caretPos = inputTextBox.SelectionStart;
+                    inputTextBox.SelectionStart = caretPos - 1;
                     inputTextBox.SelectionLength = 0;
                 }
             }
