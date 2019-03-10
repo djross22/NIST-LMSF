@@ -502,6 +502,18 @@ Add RunScript() command
 
 TODO:
 
+fix bug: if script file not found, protocol aborts but input window is not editable
+
+Add parameters to ReadScript to set dictionary values needed by the script
+
+fix startup status colors on remotes
+
+set default filename on SaveAs
+
+Nested keys
+
+Add else to If(...
+
 Run-time error handling
 	Retry
 	Manually change dictionary entry, then retry
