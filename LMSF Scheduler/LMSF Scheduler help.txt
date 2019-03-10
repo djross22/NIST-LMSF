@@ -22,6 +22,19 @@ Key references that are not in the Metadata Dictionary will result in a Validati
 
 Commands:
 
+	ReadScript()
+		Reads another .lmsf script file and runs it as if it were typed into the Steps Input box.
+		ReadScript cannot be used inside an If() statement (see below)
+		The <file path> must be an existing path to a .lmsf script file.
+			The <file path> parameter cannot contain any key references.
+		
+		Syntax:
+			ReadScript(<file path>)
+			
+		Examples:
+			ReadScript(C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Double 2D gradient plus 1000x bacteria.lmsf)
+	
+	
 	Overlord()
 		Runs an Overlord procedure
 		

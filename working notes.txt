@@ -495,11 +495,23 @@ Update help document
 
 Fix validation error with Remote Hamilton(rem, ReadCounters) - validation expects a 3rd parameter
 	Also, if methodPath ends with "Edit Tip Counters.hsl", also read tip counter file (and change the validation check accordingly)
+	
+Add RunScript() command
+	Read in script file in InitSteps(), just after inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
 
 TODO:
 
+Run-time error handling
+	Retry
+	Manually change dictionary entry, then retry
+	Edit command line then retry
+	Ignore/Continue
+	
+Change step list (inputSteps) to Queue or Stack?
+
 Command to read/write from/to the carousel inventory file
+Or Carousel inventory that works like Hamilton Tip Counter.
 
 Combine metadata list/database from multiple computers
 

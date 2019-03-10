@@ -392,7 +392,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile", "CopyRemoteFiles" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript" }; //SharedParameters.UnitsList;
 
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
@@ -708,6 +708,42 @@ namespace LMSF_Scheduler
             inputTextBox.Focus();
         }
 
+        private string[] ReadScriptFile(string line)
+        {
+            string[] lines;
+
+            int scriptCommandEnd = line.IndexOf('(');
+            string scriptCommand = line.Substring(0, scriptCommandEnd);
+            string scriptFilePath = line.Substring(scriptCommandEnd + 1);
+            scriptFilePath = scriptFilePath.Remove(scriptFilePath.Length - 1); //remove the closing ")"
+            scriptFilePath = scriptFilePath.Trim(); //remove leading and trailing white space
+
+            if (scriptCommand == "ReadScript")
+            {
+                if (File.Exists(scriptFilePath))
+                {
+                    if (scriptFilePath.EndsWith(".lmsf"))
+                    {
+                        lines = File.ReadAllLines(scriptFilePath);
+                    }
+                    else
+                    {
+                        throw new FileFormatException($"Script file must end in \".lmsf\": {scriptFilePath}.");
+                    }
+                }
+                else
+                {
+                    throw new FileNotFoundException($"Script file not found: {scriptFilePath}.");
+                }
+            }
+            else
+            {
+                throw new ArgumentException($"{scriptCommand} != ReadScript");
+            }
+
+            return lines;
+        }
+
         //Breaks the InputText into steps/lines
         private bool InitSteps()
         {
@@ -721,6 +757,65 @@ namespace LMSF_Scheduler
             isCollectingXml = false;
 
             inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            string[] scriptSteps;
+            bool checkReadScript = true;
+            int maxRecursion = 8;
+            int recursion = 0;
+            string notReadLine = "";
+            while (checkReadScript)
+            {
+                List<string> stepsList = new List<string>();
+                checkReadScript = false;
+
+                foreach (string line in inputSteps)
+                {
+                    if (line.StartsWith("ReadScript"))
+                    {
+                        if (recursion < maxRecursion)
+                        {
+                            try
+                            {
+                                scriptSteps = ReadScriptFile(line);
+                                checkReadScript = true;
+                                foreach (string scriptLine in scriptSteps)
+                                {
+                                    stepsList.Add(scriptLine);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                initOK = false;
+                                string msg = $"Error reading script file, {line}, {e}";
+                                SharedParameters.ShowPrompt(msg, "Script File Error");
+                                return initOK;
+                            }
+                        }
+                        else
+                        {
+                            notReadLine = line;
+                        }
+                    }
+                    else
+                    {
+                        stepsList.Add(line);
+                    }
+                }
+
+                if (recursion >= maxRecursion)
+                {
+                    string msg = $"Warning: Reached recursion limit for reading script file references. Script not read into protocol: {notReadLine}.\n";
+                    msg += "Check for self-referencing script file or change the maxRecursion parameter in the InitSteps() method.";
+                    msg += $"\nrecursion: {recursion}; checkReadScript: {checkReadScript}";
+                    SharedParameters.ShowPrompt(msg, "Script File Warning");
+                }
+
+                if (checkReadScript)
+                {
+                    inputSteps = stepsList.ToArray();
+                }
+                recursion++;
+            }
 
             //remove leading and trailing white space from each line
             inputSteps = inputSteps.Select(s => s.Trim()).ToArray();
