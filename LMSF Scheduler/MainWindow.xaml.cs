@@ -1482,7 +1482,7 @@ namespace LMSF_Scheduler
                 //First two arguments are Hamilton name and command
                 string name;
                 string command;
-                List<string> commandList = new List<string> { "RunMethod", "ReadCounters" };
+                List<string> remHamCommandList = new List<string> { "RunMethod", "ReadCounters" };
                 //3rd argument is the method path
                 string methodPath = "";
 
@@ -1508,7 +1508,7 @@ namespace LMSF_Scheduler
                         if (GetConnectedReadersList().Contains(name))
                         {
                             //Check if 2nd argument is valid Hamilton command
-                            if (commandList.Contains(command))
+                            if (remHamCommandList.Contains(command))
                             {
                                 argsOk = true;
                                 outString += $"{name}/ {command} ";
@@ -1517,7 +1517,7 @@ namespace LMSF_Scheduler
                             {
                                 outString += "Not a valid Hamilton command: ";
                                 outString += $"{command}. Valid Hamilton commands are: ";
-                                foreach (string s in commandList)
+                                foreach (string s in remHamCommandList)
                                 {
                                     outString += $"{s}, ";
                                 }
