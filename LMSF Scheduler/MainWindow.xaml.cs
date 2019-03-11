@@ -872,6 +872,13 @@ namespace LMSF_Scheduler
                     Step();
                 }
             }
+            else
+            {
+                string doneText = $"{SharedParameters.GetDateTimeString()}; Protocol failed to start.\n";
+                AddOutputText(doneText);
+
+                this.Dispatcher.Invoke(() => { IsRunning = false; });
+            }
 
         }
 

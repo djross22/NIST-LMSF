@@ -499,10 +499,10 @@ Fix validation error with Remote Hamilton(rem, ReadCounters) - validation expect
 Add RunScript() command
 	Read in script file in InitSteps(), just after inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
+fix bug: if script file not found, protocol aborts but input window is not editable
+
 
 TODO:
-
-fix bug: if script file not found, protocol aborts but input window is not editable
 
 Add parameters to ReadScript to set dictionary values needed by the script
 
@@ -536,6 +536,8 @@ Nested If()
 
 
 Change arguments passed to BackgroundWorkers to dictionaries, instead of lists.
+
+send email alerts
 
 
 
