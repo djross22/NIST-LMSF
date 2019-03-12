@@ -4176,6 +4176,7 @@ namespace LMSF_Scheduler
             if (command != "RunMethod")
             {
                 msg = command;
+                methodPath = @"C:\Program Files (x86)\HAMILTON\Methods\Common\Tip Handling\With 96-Head\Check Tip Counters.hsl";
             }
             else
             {
@@ -4205,7 +4206,7 @@ namespace LMSF_Scheduler
             {
                 //send message to remote Hamilton
                 string replyStatus = SendTcpMessage(name, msg);
-                //The program might get stuck in this while loop, so I re-wrote the server code so that theis loop is not needed
+                //The program might get stuck in this while loop, so I re-wrote the server code so that this loop is not needed
                 //while (replyStatus == "Idle")
                 //{
                 //    replyStatus = SendTcpMessage(name, "StatusCheck");
