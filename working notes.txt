@@ -501,26 +501,37 @@ Add RunScript() command
 
 fix bug: if script file not found, protocol aborts but input window is not editable
 
+Make sure user prompts are always on top
+
+In RemoteHam(S-Cell-STAR, ReadCounters), attach method file path to XML node
+
+In send-TCP-message loop, if AbortCalled=true, then exit loop
+	Also, automatically recconect if send message fails N times.
+
 
 TODO:
 
-Add parameters to ReadScript to set dictionary values needed by the script
+Test this: In send-TCP-message loop, if AbortCalled=true, then exit loop
+	Also, automatically recconect if send message fails N times.
+	
+Add "Are you sure you want to abort?" dialog.
 
 fix startup status colors on remotes
 
+Preview user prompts
+
+
+
+
+ovp variables that are set by Overlord() call, should get appended to the XML\
+	Also, change formatting from '[variable] "value"' to variable = "value"  
+
+Add additional optional parameters to Hamilton() and RemoteHam() that set dictionary keys and write values to XML
+
+Add parameters to ReadScript to set dictionary values needed by the script
+	have #Required parameters on first line of script?
+
 set default filename on SaveAs
-
-Nested keys
-
-Add else to If(...
-
-Run-time error handling
-	Retry
-	Manually change dictionary entry, then retry
-	Edit command line then retry
-	Ignore/Continue
-	
-Change step list (inputSteps) to Queue or Stack?
 
 Command to read/write from/to the carousel inventory file
 Or Carousel inventory that works like Hamilton Tip Counter.
@@ -529,11 +540,27 @@ Combine metadata list/database from multiple computers
 
 Enable simple math (+, -, *, /, %) with numeric quantities
 
+Run-time error handling
+	Retry
+	Manually change dictionary entry, then retry
+	Edit command line then retry
+	Ignore/Continue
+
+
+
+
+
+
+
+Nested keys
+
+Add else to If(...
+	
+Change step list (inputSteps) to Queue or Stack?
+
 Add automatic generation of database with run times for Hamilton and Gen5 methods?
 
-
 Nested If()
-
 
 Change arguments passed to BackgroundWorkers to dictionaries, instead of lists.
 

@@ -95,6 +95,7 @@ Commands:
 			
 		Examples:
 			RemoteHam(S-Cell-STAR, RunMethod, C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Cell gradient plate.lmsf.hsl)
+			RemoteHam(S-Cell-STAR, ReadCounters)
 			
 			
 	Gen5()
