@@ -4789,8 +4789,24 @@ namespace LMSF_Scheduler
             AddOutputText($"sending message to {reader}, {wrappedMessage} ... ");
             //TODO: add maxRetries
             int numTries = 0;
-            while (replyMsg == null)
+            while (replyMsg == null && !AbortCalled)
             {
+                if ((numTries % 5) == 4)
+                {
+                    try
+                    {
+                        client.Connect(readerIps[reader], 42222);
+                    }
+                    catch (System.Net.Sockets.SocketException e)
+                    {
+                        MessageBox.Show($"{reader} is not accepting the connection. Make sure {remoteExe} is running and in \"Remote\" mode on the {reader} computer. Then click 'OK'.");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show($"Exception: {e}");
+                    }
+                }
+
                 numTries++;
                 AddOutputText($"try {numTries}, ");
                 //replyMsg = client.WriteLineAndGetReply(wrappedMessage, TimeSpan.FromSeconds(3));
