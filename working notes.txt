@@ -508,30 +508,29 @@ In RemoteHam(S-Cell-STAR, ReadCounters), attach method file path to XML node
 In send-TCP-message loop, if AbortCalled=true, then exit loop
 	Also, automatically recconect if send message fails N times.
 
+fix startup status colors on remotes
+	
+Add "Are you sure you want to abort?" dialog to make sure protocol does not get accidentally aborted.
+
+ovp variables that are set by Overlord() call, should get appended to the XML\
+
 
 TODO:
 
 Test this: In send-TCP-message loop, if AbortCalled=true, then exit loop
-	Also, automatically recconect if send message fails N times.
-	
-Add "Are you sure you want to abort?" dialog.
-
-fix startup status colors on remotes
+	Also, automatically reconnect if send message fails N times.
 
 Preview user prompts
 
 
 
 
-ovp variables that are set by Overlord() call, should get appended to the XML\
-	Also, change formatting from '[variable] "value"' to variable = "value"  
+
 
 Add additional optional parameters to Hamilton() and RemoteHam() that set dictionary keys and write values to XML
 
 Add parameters to ReadScript to set dictionary values needed by the script
 	have #Required parameters on first line of script?
-
-set default filename on SaveAs
 
 Command to read/write from/to the carousel inventory file
 Or Carousel inventory that works like Hamilton Tip Counter.
@@ -546,6 +545,7 @@ Run-time error handling
 	Edit command line then retry
 	Ignore/Continue
 
+Copy/write script (input and/or output?) file to data directory on CopyRemoteFiles()
 
 
 
