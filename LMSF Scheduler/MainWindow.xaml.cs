@@ -637,6 +637,11 @@ namespace LMSF_Scheduler
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "LMSF file (*.lmsf)|*.lmsf";
+            if (ExperimentFileName != null)
+            {
+                
+                saveFileDialog.FileName = System.IO.Path.GetFileName(ExperimentFileName);
+            }
             bool didSave;
             if (saveFileDialog.ShowDialog() == true)
             {
