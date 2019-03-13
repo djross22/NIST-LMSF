@@ -2853,10 +2853,15 @@ namespace LMSF_Scheduler
             //Make sure that any edits in the inputTextBox are updated to the InputTest property
             inputTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
-            AbortCalled = true;
+            YesNoDialog.Response response = SharedParameters.ShowYesNoDialog("Are you sure you want to abort?", "OK to Abort?");
 
-            //Set IsPaused = true, so that StepsThreadProc() will go ahead to the next step where the Abort action happens
-            IsPaused = false;
+            if (response == YesNoDialog.Response.Yes)
+            {
+                AbortCalled = true;
+
+                //Set IsPaused = false, so that StepsThreadProc() will go ahead to the next step where the Abort action happens
+                IsPaused = false;
+            }
         }
 
         private bool Validate()
