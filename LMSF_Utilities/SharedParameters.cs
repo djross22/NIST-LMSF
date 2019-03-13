@@ -1056,9 +1056,9 @@ namespace LMSF_Utilities
             return dlg.ShowDialog();
         }
 
-        public static bool? ShowPrompt(string messageText, string title, string bitmapFilePath)
+        public static bool? ShowPrompt(string messageText, string title, string bitmapFilePath, int width = 400)
         {
-            UserPromptImageDialog dlg = new UserPromptImageDialog(title, messageText, bitmapFilePath);
+            UserPromptImageDialog dlg = new UserPromptImageDialog(title, messageText, bitmapFilePath, width);
 
             //int numLines = messageText.Split('\n').Length;
 

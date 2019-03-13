@@ -230,12 +230,13 @@ Commands:
 			So, multi-line messages can be formateed and displayed.
 		
 		Syntax:
-			UserPrompt(<title>, <message>, {<image file path (optional)>})
+			UserPrompt(<title>, <message>, {<image file path (optional)>, <image width (optional)>})
 			
 		Examples:
 			UserPrompt(Add Bacteria, Add bacteria to growth plate. Put plate in reader. Then click 'OK')
 			UserPrompt(Add Bacteria, Add bacteria to growth plate and click 'OK', C:\Users\djross\Documents\temp\spinner.PNG)
 			UserPrompt(Add Bacteria, Add bacteria to growth plate. \nPut plate in reader. Then click 'OK')
+			UserPrompt(test, test, C:\Users\djross\Documents\temp\Overnight Double Gradient Layout.PNG, 1000)
 			
 			Set(msg1, Review the following, then click 'OK' to accept or 'Abort' to abort and start over:\n\n)
 			Set(msg2, \tMedia: \t\t\t{media}\n\n \tBacteria: \t\t\t{strain1}, with {plasmid1}\n\n)

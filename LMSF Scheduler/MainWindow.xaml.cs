@@ -2051,12 +2051,14 @@ namespace LMSF_Scheduler
 
             void ParseUserPrompt()
             {
-                //UserPrompt takes 2 or 3 arguments
+                //UserPrompt takes 2, 3, or 4 arguments
                 //First two arguments are title and message
                 string titleString;
                 string messageString;
                 //third argument is string/path to a bitmap file
                 string imagePath;
+                //4th argument is width to display image
+                string imageWidthStr;
 
                 //string for start of output from ParseStep()
                 outString += "User Prompt: ";
@@ -2112,6 +2114,26 @@ namespace LMSF_Scheduler
                             //Message for bad filename
                             outString += "; Not a valid image filename: ";
                             outString += imagePath;
+                            valFailed.Add(num);
+                            argsOk = false;
+                        }
+
+                    }
+
+                    if (argsOk && (numArgs > 4))
+                    {
+                        //check 4th argument; needs to be an int
+                        imageWidthStr = stepArgs[4];
+                        int tempWidth;
+                        if (int.TryParse(imageWidthStr, out tempWidth))
+                        {
+                            argsOk = true;
+                        }
+                        else
+                        {
+                            //Message for non-integer argument
+                            outString += "; Image Width paramter must be an integer: ";
+                            outString += imageWidthStr;
                             valFailed.Add(num);
                             argsOk = false;
                         }
@@ -3445,20 +3467,15 @@ namespace LMSF_Scheduler
 
         private void RunUserPrompt(int num, string[] args)
         {
-            //
-            //string messageStr;// = Regex.Unescape(args[2]);
-            //try
-            //{
-            //    messageStr = Regex.Unescape(args[2]);
-            //}
-            //catch (ArgumentException e)
-            //{
-            //    MessageBox.Show("Warning: Unrecognized escape characters.");
-            //    messageStr = args[2];
-            //}
             string messageStr = args[2];
             messageStr = messageStr.Replace(@"\t", "\t");
             messageStr = messageStr.Replace(@"\n", "\n");
+
+            int imageWidth = 400;
+            if (args.Length > 4)
+            {
+                int.TryParse(args[4], out imageWidth);
+            }
 
             string titleStr = args[1];
             bool? oKToGo = false;
@@ -3477,7 +3494,7 @@ namespace LMSF_Scheduler
             {
                 string imagePath = args[3];
                 this.Dispatcher.Invoke(() => {
-                    oKToGo = SharedParameters.ShowPrompt(messageStr, titleStr, imagePath);
+                    oKToGo = SharedParameters.ShowPrompt(messageStr, titleStr, imagePath, imageWidth);
                     if (!(oKToGo == true))
                     {
                         AbortCalled = true;

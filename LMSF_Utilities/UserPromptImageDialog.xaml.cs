@@ -28,8 +28,19 @@ namespace LMSF_Utilities
 
         private string promptText;
         private ImageSource picture;
+        private int imageWidth;
 
         #region Properties Getters and Setters
+        public int ImageWidth
+        {
+            get { return this.imageWidth; }
+            set
+            {
+                this.imageWidth = value;
+                OnPropertyChanged("ImageWidth");
+            }
+        }
+
         public string PromptText
         {
             get { return this.promptText; }
@@ -67,13 +78,14 @@ namespace LMSF_Utilities
             Picture = pic;
         }
 
-        public UserPromptImageDialog(string title, string prompt, string bitmapFilePath)
+        public UserPromptImageDialog(string title, string prompt, string bitmapFilePath, int width = 400)
         {
             InitializeComponent();
             DataContext = this;
 
             Title = title;
             PromptText = prompt;
+            ImageWidth = width;
 
             BitmapImage bi = new BitmapImage();
             // BitmapImage.UriSource must be in a BeginInit/EndInit block.
