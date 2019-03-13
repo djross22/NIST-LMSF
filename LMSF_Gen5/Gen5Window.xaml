@@ -61,7 +61,7 @@
             <Button x:Name="carrierOutButton" Content="Carrier Out" HorizontalAlignment="Left" Margin="222,35,0,0" VerticalAlignment="Top" Width="75" Click="CarrierOutButton_Click" Focusable="False"/>
             <Button x:Name="carrierInButton" Content="Carrier In" HorizontalAlignment="Left" Margin="222,70,0,0" VerticalAlignment="Top" Width="75" Click="CarrierInButton_Click" Focusable="False"/>
             <Button x:Name="instrCntrlButton" Content="Instrument Control" HorizontalAlignment="Right" Margin="0,70,50,0" VerticalAlignment="Top" Click="InstrCntrlButton_Click" RenderTransformOrigin="1.688,0.773" Focusable="False" Width="120"/>
-            <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="0,10,50,0" VerticalAlignment="Top" Width="110" Background="Red">
+            <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="0,10,50,0" VerticalAlignment="Top" Width="110" Background="LimeGreen">
                 <TextBlock x:Name="statusTextBlock" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Reader Idle" VerticalAlignment="Center" FontWeight="Bold"/>
             </Border>
             <Grid x:Name="topRightGrid" Margin="0">

@@ -27,7 +27,7 @@
                 <TextBlock x:Name="remoteTextBlock" TextWrapping="Wrap" Text="Not Connected" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
             </Border>
             <Button x:Name="remoteButton" Content="Switch to Remote" Width="120" Margin="20,0,0,0" Click="RemoteButton_Click"/>
-            <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="60,0,50,0" VerticalAlignment="Top" Width="110" Background="Red">
+            <Border x:Name="statusBorder" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Right" Height="24" Margin="60,0,50,0" VerticalAlignment="Top" Width="110" Background="LimeGreen">
                 <TextBlock x:Name="statusTextBlock" HorizontalAlignment="Center" Margin="0" TextWrapping="Wrap" Text="Hamilton Idle" VerticalAlignment="Center" FontWeight="Bold"/>
             </Border>
         </StackPanel>
