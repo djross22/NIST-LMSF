@@ -4052,6 +4052,23 @@ namespace LMSF_Scheduler
                 //Date and time
                 AddDateTimeNodes(DateTime.Now, ovpNode, "procedure started");
 
+                if (args.Length > 2)
+                {
+                    //Add variables/parameters that got set to XML document
+                    startInfo.Arguments = "\"" + file + "\"" + " -r -c -v " + args[2];
+                    XmlNode paramsNode = xmlDoc.CreateElement("parameters");
+                    ovpNode.AppendChild(paramsNode);
+
+                    string varString = args[2];
+                    string[] varArgs = varString.Split(new[] { " " }, StringSplitOptions.None);
+                    for (int i = 0; i < varArgs.Length; i += 2)
+                    {
+                        string param = varArgs[i].Trim(new char[] { '[', ']' } );
+                        XmlNode pNode = xmlDoc.CreateElement(param);
+                        pNode.InnerText = varArgs[i+1];
+                        paramsNode.AppendChild(pNode);
+                    }
+                }
             }
         }
 
