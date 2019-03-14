@@ -2132,7 +2132,7 @@ namespace LMSF_Scheduler
                         else
                         {
                             //Message for non-integer argument
-                            outString += "; Image Width paramter must be an integer: ";
+                            outString += "; Image Width parameter must be an integer: ";
                             outString += imageWidthStr;
                             valFailed.Add(num);
                             argsOk = false;
