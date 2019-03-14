@@ -514,16 +514,20 @@ Add "Are you sure you want to abort?" dialog to make sure protocol does not get 
 
 ovp variables that are set by Overlord() call, should get appended to the XML\
 
-
-TODO:
-
 Test this: In send-TCP-message loop, if AbortCalled=true, then exit loop
 	Also, automatically reconnect if send message fails N times.
 
-Preview user prompts
+
+TODO:
 
 
 
+
+Combine metadata list/database from multiple computers
+
+Enable simple math (+, -, *, /, %) with numeric quantities
+
+Change Overlord variable setting format from "[varibale] value" to "variable = value" (wait for SDK)
 
 
 
@@ -534,10 +538,6 @@ Add parameters to ReadScript to set dictionary values needed by the script
 
 Command to read/write from/to the carousel inventory file
 Or Carousel inventory that works like Hamilton Tip Counter.
-
-Combine metadata list/database from multiple computers
-
-Enable simple math (+, -, *, /, %) with numeric quantities
 
 Run-time error handling
 	Retry
