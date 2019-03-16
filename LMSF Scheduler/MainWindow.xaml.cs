@@ -405,7 +405,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
 
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
@@ -1354,6 +1354,12 @@ namespace LMSF_Scheduler
                         break;
                     case "CopyRemoteFiles":
                         ParseCopyRemoteFiles(ref valReport);
+                        break;
+                    case "ImportDictionary":
+                        ParseImportDictionary(ref valReport);
+                        break;
+                    case "ExportDictionary":
+                        ParseExportDictionary(ref valReport);
                         break;
                     default:
                         valReport.Add(num);
@@ -2749,6 +2755,102 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
+                    }
+                }
+            }
+
+            void ParseImportDictionary(ref List<int> val)
+            {
+                //Boolean used to track validity of arguments/parameters
+                bool argsOk = true;
+
+                //string for start of output from ParseImportDictionary()
+                outString += "Importing Dictionary: ";
+
+                //Requires an argument for the file path:
+                if (numArgs < 2)
+                {
+                    argsOk = false;
+                    //Message for missing argument or not enough arguments:
+                    outString += "No file path argument given.";
+                    val.Add(num);
+                }
+                else
+                {
+                    string filePath = stepArgs[1];
+                    //If the file path argument exists, make sure it is a .txt file that actually exists
+                    if (filePath.EndsWith(".txt"))
+                    {
+                        if (!File.Exists(filePath))
+                        {
+                            outString += $"Dictionary file not found: {filePath}";
+                            val.Add(num);
+                            argsOk = false;
+                        }
+                    }
+                    else
+                    {
+                        outString += $"Dictionary files must be plain text files (*.txt): {filePath}";
+                        val.Add(num);
+                        argsOk = false;
+                    }
+                }
+
+                if (argsOk)
+                {
+                    //if (!localIsValidating)
+                    //{
+                    //    RunNewXml(num, stepArgs);
+                    //}
+                    //For this command, it doesn't matter whether or not isValidating
+                    ImportDictionary(stepArgs[1]);
+                }
+            }
+
+            void ParseExportDictionary(ref List<int> val)
+            {
+                //Boolean used to track validity of arguments/parameters
+                bool argsOk = true;
+
+                //string for start of output from ParseImportDictionary()
+                outString += "Exporting Dictionary: ";
+
+                //Requires an argument for the file path:
+                if (numArgs < 2)
+                {
+                    argsOk = false;
+                    //Message for missing argument or not enough arguments:
+                    outString += "No file path argument given.";
+                    val.Add(num);
+                }
+                else
+                {
+                    string filePath = stepArgs[1];
+                    //If the file path argument exists, make sure it is a .txt file that actually exists
+                    if (filePath.EndsWith(".txt"))
+                    {
+                        string dir = System.IO.Path.GetDirectoryName(filePath);
+                        //Make sure program can write to the specified location:
+                        if (!SharedParameters.IsDirectoryWritable(dir))
+                        {
+                            outString += $"Directory for dictionary export is not writable: {dir}";
+                            val.Add(num);
+                            argsOk = false;
+                        }
+                    }
+                    else
+                    {
+                        outString += $"Dictionary files must be plain text files (*.txt): {filePath}";
+                        val.Add(num);
+                        argsOk = false;
+                    }
+                }
+
+                if (argsOk)
+                {
+                    if (!localIsValidating)
+                    {
+                        ExportDictionary(stepArgs[1]);
                     }
                 }
             }
@@ -4218,6 +4320,13 @@ namespace LMSF_Scheduler
                     MessageBox.Show($"Error saving XML document: {e}");
                 }
             }
+        }
+
+        private void ExportDictionary(string filePath)
+        {
+            string dir = System.IO.Path.GetDirectoryName(filePath);
+            string file = System.IO.Path.GetFileName(filePath);
+            ExportDictionary(dir, file);
         }
 
         private void ExportDictionary(string dir, string fileName)

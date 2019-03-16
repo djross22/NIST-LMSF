@@ -203,7 +203,7 @@ Commands:
 		If the optional argument, "not finished" is used, the "protocol finished" node will not be appended.
 		
 		Syntax:
-			SaveXML({not finished (optinal)})
+			SaveXML({not finished (optional)})
 			
 		Examples:
 			SaveXML()
@@ -388,6 +388,29 @@ Commands:
 			
 		Examples:
 			CopyRemoteFiles()
+			
+			
+	ImportDictionary()
+		Reads data from a text file (extension .txt) into the Metadata Dictionary.
+		Each non-empty line of the text file should be a key-value pair separated by a comma
+			Any lines that do not conform to the "<key>,<value>" format will be ignored.
+		
+		Syntax:
+			ImportDictionary(<file path>)
+			
+		Examples:
+			ImportDictionary(C:\Users\djross\Documents\temp\Test Dictionary.txt)
+			
+			
+	ExportDictionary()
+		Writes data from  the Metadata Dictionary to a text file (extension .txt).
+		For each entry in the dictionay the method writes a line in the text file with the format, "<key>,<value>".
+		
+		Syntax:
+			ExportDictionary(<file path>)
+			
+		Examples:
+			ExportDictionary(C:\Users\djross\Documents\temp\Test Dictionary.txt)
 			
 
 Metadata Dictionary:
