@@ -5310,7 +5310,10 @@ namespace LMSF_Scheduler
 
         private void InsertStepButton_Click(object sender, RoutedEventArgs e)
         {
-            //First make sure it is not an empty or null string
+            //Make sure that any edits in the insertStepTextBox are updated to the InsertStepText property
+            insertStepTextBox.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+
+            //Then make sure it is not an empty or null string
             if (!string.IsNullOrWhiteSpace(InsertStepText))
             {
                 //Validate, and execute step that is manually typed into insertStepTextBox (property: InsertStepText); during paused run.
@@ -5327,9 +5330,12 @@ namespace LMSF_Scheduler
                     {
                         inputSteps.Insert(stepNum + 1, InsertStepText);
                     }
-                    
+
+                    //Take out Dialog if the step validates - just run it
                     //dialog to let user know it got inserted, and allow for protocol Cancel
-                    bool? oKToGo = SharedParameters.ShowPrompt($"Manually entered step validated and inserted: {InsertStepText}", "Step Inserted");
+                    //string msg = $"Manually entered step validated and inserted: {InsertStepText}\n";
+                    //msg += "Click 'OK' to execute step, or 'Abort' to abort experiment.";
+                    bool? oKToGo = true;// SharedParameters.ShowPrompt(msg, "Step Inserted");
                     if (!(oKToGo == true))
                     {
                         AbortCalled = true;
@@ -5337,6 +5343,7 @@ namespace LMSF_Scheduler
                     else
                     {
                         AddOutputText($"User inserted step during run: {InsertStepText}\n");
+                        IsOneStep = true;
                     }
                 }
                 else
