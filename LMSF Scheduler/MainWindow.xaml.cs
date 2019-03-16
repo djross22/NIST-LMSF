@@ -852,7 +852,7 @@ namespace LMSF_Scheduler
             inputSteps = newList;
             
 
-            stepNum = 0;
+            stepNum = -1;
 
             if (isValidating)
             {
@@ -892,7 +892,9 @@ namespace LMSF_Scheduler
                         Thread.Sleep(100);
                     }
 
+                    stepNum++;
                     Step();
+                    
                 }
             }
             else
@@ -944,7 +946,7 @@ namespace LMSF_Scheduler
                         File.AppendAllText(logFilePath, newText);
                     }
 
-                    stepNum++;
+                    //stepNum++;
                 }
                 else
                 {
