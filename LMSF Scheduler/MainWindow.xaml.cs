@@ -937,7 +937,7 @@ namespace LMSF_Scheduler
                         NextStep = "";
                     }
                     string oldText = OutputText;
-                    string newText = ParseStep(stepNum, inputSteps[stepNum], isValidating);
+                    string newText = ParseStep(stepNum, inputSteps[stepNum], isValidating, ref valFailed);
                     OutputText = oldText + newText;
                     if (!isValidating)
                     {
@@ -959,11 +959,14 @@ namespace LMSF_Scheduler
 
         }
 
-        private string ParseStep(int num, string step, bool localIsValidating)
+        private string ParseStep(int num, string step, bool localIsValidating, ref List<int> valReport)
         {
             //Note on step validation:
-            //    valFailed is intialized to an empty list at the beginning of each run,
-            //    if a step fails a validation check, the step number is added to the valFailed list
+            //    valFailed is intialized to an empty list at the beginning of each run, 
+            //        and then passed to this method as valReport
+            //    if a step fails a validation check, the step number is added to the valFailed/valReport list
+            //Validation of single steps inserted during a pause in the run is handled similarly, 
+            //    but with a different valReport target
 
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
@@ -978,14 +981,14 @@ namespace LMSF_Scheduler
             //Check for opening and closing "(" and ")"
             if (!step.EndsWith(")"))
             {
-                valFailed.Add(num);
+                valReport.Add(num);
                 //exit the method early if the closing ")" is missing
                 outString += "Syntax error: missing closing \")\"\n\n";
                 return outString;
             }
             if (!step.Contains("("))
             {
-                valFailed.Add(num);
+                valReport.Add(num);
                 //exit the method early if the opening "(" is missing
                 outString += "Syntax error: missing opening \"(\"\n\n";
                 return outString;
@@ -1004,14 +1007,14 @@ namespace LMSF_Scheduler
             {
                 if (!scriptArgStr.Contains("("))
                 {
-                    valFailed.Add(num);
+                    valReport.Add(num);
                     //exit the method early if the opening "(" is missing
                     outString += "Syntax error: Command inside If() statment missing opening \"(\"\n\n";
                     return outString;
                 }
                 if (!scriptArgStr.EndsWith(")"))
                 {
-                    valFailed.Add(num);
+                    valReport.Add(num);
                     //exit the method early if the opening "(" is missing
                     outString += "Syntax error: If command missing closing \")\"\n\n";
                     return outString;
@@ -1068,7 +1071,7 @@ namespace LMSF_Scheduler
                 if (keysOk)
                 {
                     //If the key syntax is ok, replace the keys with their values from the metaDictionary
-                    //    or signal valFailed if the key is not in the dictionary
+                    //    or signal valReport if the key is not in the dictionary
                     while (newArg.Contains('{'))
                     {
                         int startInd = newArg.IndexOf('{');
@@ -1112,7 +1115,7 @@ namespace LMSF_Scheduler
 
             if (!keysOk)
             {
-                valFailed.Add(num);
+                valReport.Add(num);
                 //exit the method early if there are still key syntax errors
                 outString += "\n\n";
                 return outString;
@@ -1157,7 +1160,7 @@ namespace LMSF_Scheduler
                         }
                         else
                         {
-                            valFailed.Add(num);
+                            valReport.Add(num);
                             //exit the method early if the 2nd argument of an If/ command is not a logical comparison
                             outString += "If/ commands need to have a valid logical test as the 2nd argument (e.g. {strain1}==MG1655, or {userChoice}!=No).\n\n";
                             return outString;
@@ -1202,7 +1205,7 @@ namespace LMSF_Scheduler
                                 }
                                 else
                                 {
-                                    valFailed.Add(num);
+                                    valReport.Add(num);
                                     outString += $"If/ commands error: {firstStr} or {secondStr} not parsable as number.\n\n";
                                     return outString;
                                 }
@@ -1210,7 +1213,7 @@ namespace LMSF_Scheduler
                             }
                             else
                             {
-                                valFailed.Add(num);
+                                valReport.Add(num);
                                 //exit the method early if the 2nd argument of an If/ command is not a valid comparison
                                 outString += "If/ commands need to have a valid comparison as the 2nd argument (e.g. {plateNum}>=3, or {tips1000Total}<=96).\n\n";
                                 return outString;
@@ -1255,7 +1258,7 @@ namespace LMSF_Scheduler
                                     }
                                     else
                                     {
-                                        valFailed.Add(num);
+                                        valReport.Add(num);
                                         outString += $"If/ commands error: {firstStr} or {secondStr} not parsable as number.\n\n";
                                         return outString;
                                     }
@@ -1263,7 +1266,7 @@ namespace LMSF_Scheduler
                                 }
                                 else
                                 {
-                                    valFailed.Add(num);
+                                    valReport.Add(num);
                                     //exit the method early if the 2nd argument of an If/ command is not a valid comparison
                                     outString += "If/ commands need to have a valid comparison as the 2nd argument (e.g. {plateNum}>3, or {tips1000Total}<96).\n\n";
                                     return outString;
@@ -1271,7 +1274,7 @@ namespace LMSF_Scheduler
                             }
                             else
                             {
-                                valFailed.Add(num);
+                                valReport.Add(num);
                                 //exit the method early if the 2nd argument of an If/ command is not a logical comparison
                                 outString += "If/ commands need to have a logical or comparison test (with \"==\", \"!=\", \">\", \"<\", \">=\", or \"<=\") as the 2nd argument.\n\n";
                                 return outString;
@@ -1281,7 +1284,7 @@ namespace LMSF_Scheduler
                 }
                 else
                 {
-                    valFailed.Add(num);
+                    valReport.Add(num);
                     //exit the method early if there are not enough arguments for an If/ command
                     outString += "If/ commands need to have a logical test followed by a normal command line.\n\n";
                     return outString;
@@ -1297,61 +1300,61 @@ namespace LMSF_Scheduler
                 switch (stepType)
                 {
                     case "Overlord":
-                        ParseOverlordStep();
+                        ParseOverlordStep(ref valReport);
                         break;
                     case "Hamilton":
-                        ParseHamiltonStep();
+                        ParseHamiltonStep(ref valReport);
                         break;
                     case "RemoteHam":
-                        ParseRemoteHamiltonStep();
+                        ParseRemoteHamiltonStep(ref valReport);
                         break;
                     case "Gen5":
-                        ParseGen5Step();
+                        ParseGen5Step(ref valReport);
                         break;
                     case "WaitFor":
-                        ParseWaitForStep();
+                        ParseWaitForStep(ref valReport);
                         break;
                     case "Timer":
-                        ParseTimerStep();
+                        ParseTimerStep(ref valReport);
                         break;
                     case "NewXML":
-                        ParseNewXml();
+                        ParseNewXml(ref valReport);
                         break;
                     case "AppendXML":
-                        ParseAppendXml();
+                        ParseAppendXml(ref valReport);
                         break;
                     case "AddXML":
-                        ParseAddXml();
+                        ParseAddXml(ref valReport);
                         break;
                     case "SaveXML":
-                        ParseSaveXml();
+                        ParseSaveXml(ref valReport);
                         break;
                     case "UserPrompt":
-                        ParseUserPrompt();
+                        ParseUserPrompt(ref valReport);
                         break;
                     case "GetUserYesNo":
-                        ParseUserYesNo();
+                        ParseUserYesNo(ref valReport);
                         break;
                     case "Set":
-                        ParseSet();
+                        ParseSet(ref valReport);
                         break;
                     case "Get":
-                        ParseGet();
+                        ParseGet(ref valReport);
                         break;
                     case "GetExpID":
-                        ParseGetExpId();
+                        ParseGetExpId(ref valReport);
                         break;
                     case "GetFile":
-                        ParseGetFile();
+                        ParseGetFile(ref valReport);
                         break;
                     case "StartPrompt":
-                        ParseStartPrompt();
+                        ParseStartPrompt(ref valReport);
                         break;
                     case "CopyRemoteFiles":
-                        ParseCopyRemoteFiles();
+                        ParseCopyRemoteFiles(ref valReport);
                         break;
                     default:
-                        valFailed.Add(num);
+                        valReport.Add(num);
                         outString += "Step Command not recongnized: ";
                         foreach (string s in stepArgs)
                         {
@@ -1367,7 +1370,7 @@ namespace LMSF_Scheduler
             return outString;
 
             //Local functions to parse each type of step
-            void ParseOverlordStep()
+            void ParseOverlordStep(ref List<int> val)
             {
                 outString += "Running Overlord proccedure: ";
                 bool isOvpFileName = false;
@@ -1375,7 +1378,7 @@ namespace LMSF_Scheduler
                 if (numArgs < 2)
                 {
                     outString += "No procedure path given.";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -1387,7 +1390,7 @@ namespace LMSF_Scheduler
                     {
                         outString += "Not a valid Overlord procedure filename: ";
                         outString += stepArgs[1];
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                     if (numArgs > 2)
                     {
@@ -1435,7 +1438,7 @@ namespace LMSF_Scheduler
                         {
                             outString += "Overlord variable syntax incorrect: ";
                             outString += stepArgs[2];
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
 
                     }
@@ -1462,12 +1465,12 @@ namespace LMSF_Scheduler
                     {
                         outString += "Procedure file not found: ";
                         outString += stepArgs[1];
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
             }
 
-            void ParseHamiltonStep()
+            void ParseHamiltonStep(ref List<int> val)
             {
                 outString += "Running Hamilton Venus Method: ";
                 bool isHslFileName = false;
@@ -1476,7 +1479,7 @@ namespace LMSF_Scheduler
                 if (numArgs < 2)
                 {
                     outString += "No method file path given.";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -1488,7 +1491,7 @@ namespace LMSF_Scheduler
                     {
                         outString += "Not a valid Hamilton method (*.hsl) filename: ";
                         outString += stepArgs[1];
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
 
@@ -1508,12 +1511,12 @@ namespace LMSF_Scheduler
                     {
                         outString += "Method file not found: ";
                         outString += stepArgs[1];
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
             }
 
-            void ParseRemoteHamiltonStep()
+            void ParseRemoteHamiltonStep(ref List<int> val)
             {
                 //Gen5 takes 3 arguments
                 //First two arguments are Hamilton name and command
@@ -1532,7 +1535,7 @@ namespace LMSF_Scheduler
                 if (numArgs < 3)
                 {
                     outString += "Not enough arguments; RemoteHam command requires at least 2 arguments: Hamilton name and command. ";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -1558,14 +1561,14 @@ namespace LMSF_Scheduler
                                 {
                                     outString += $"{s}, ";
                                 }
-                                valFailed.Add(num);
+                                val.Add(num);
                             }
                         }
                         else
                         {
                             outString += $"{name} not connected. Make sure Hamilton Remote is running and in \"Remote\" mode on the {name} computer,\n";
                             outString += $"then establish the remote connection to {name} using the drop-down \"Remote Connections\" control at the bottom right of this window.";
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
                     }
                     else
@@ -1579,7 +1582,7 @@ namespace LMSF_Scheduler
                                 outString += $"{r}, ";
                             }
                         }
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
 
                     //If arguments are ok so far, check additional arguments of RunMethod command
@@ -1588,7 +1591,7 @@ namespace LMSF_Scheduler
                         if (numArgs < 4)
                         {
                             outString += "Not enough arguments; RemoteHam(<STAR>, RunMethod...) command requires at least 3 arguments: Hamilton name, command, and method path. ";
-                            valFailed.Add(num);
+                            val.Add(num);
                             argsOk = false;
                         }
                         else
@@ -1600,7 +1603,7 @@ namespace LMSF_Scheduler
                         if (!methodPath.EndsWith(".hsl"))
                         {
                             outString += $"Method path needs to end with .hsl, you enetered: {methodPath} ";
-                            valFailed.Add(num);
+                            val.Add(num);
                             argsOk = false;
                         }
                         //Need to check the existence of the method file from this computer, via the IP address of the Hamilton computer.
@@ -1617,7 +1620,7 @@ namespace LMSF_Scheduler
                         if (!File.Exists(pathFromHere))
                         {
                             outString += $"Method file/path does not exist: {methodPath}, {pathFromHere} ";
-                            valFailed.Add(num);
+                            val.Add(num);
                             argsOk = false;
                         }
 
@@ -1627,7 +1630,7 @@ namespace LMSF_Scheduler
                         {
                             outString += $"Write permission to the Hamilton/LMSF_FrontEnd directory is required for the RemoteHam command. This permission was denied for the folder path: {remoteFrontEndpath}.\n";
                             outString += $"Manually check the remote connection to that directory and try again. ";
-                            valFailed.Add(num);
+                            val.Add(num);
                             argsOk = false;
                         }
 
@@ -1673,7 +1676,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseGen5Step()
+            void ParseGen5Step(ref List<int> val)
             {
                 //Gen5 takes 2 or 5 arguments
                 //First two arguments are reader name and reader command
@@ -1694,7 +1697,7 @@ namespace LMSF_Scheduler
                 if (numArgs < 3)
                 {
                     outString += "Not enough arguments; Gen5 command requires at least 2 arguments: reader name, and reader command. ";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -1720,14 +1723,14 @@ namespace LMSF_Scheduler
                                 {
                                     outString += $"{s}, ";
                                 }
-                                valFailed.Add(num);
+                                val.Add(num);
                             }
                         }
                         else
                         {
                             outString += $"{name} not connected. Make sure LMSF_Gen5 is running and in \"Remote\" mode on the {name} computer,\n";
                             outString += $"then establish the remote connection to {name} using the drop-down \"Remote Connections\" control at the bottom right of this window.";
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
                     }
                     else
@@ -1738,7 +1741,7 @@ namespace LMSF_Scheduler
                         {
                             outString += $"{r}, ";
                         }
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
 
                     //If arguments are ok so far, check additional arguments of RunExp command
@@ -1748,7 +1751,7 @@ namespace LMSF_Scheduler
                         if (numArgs < 6)
                         {
                             outString += "Not enough arguments; Gen5/ <reader name>/ RunExp/ command requires three additional: protocol path, experiment Id, and save folder path. ";
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
                         else
                         {
@@ -1760,13 +1763,13 @@ namespace LMSF_Scheduler
                             if (!protocolPath.EndsWith(".prt"))
                             {
                                 outString += $"Protocol path needs to end with .prt, you enetered: {protocolPath} ";
-                                valFailed.Add(num);
+                                val.Add(num);
                                 argsOk = false;
                             }
                             if (!File.Exists(protocolPath))
                             {
                                 outString += $"Protocol file/path does not exist: {protocolPath} ";
-                                valFailed.Add(num);
+                                val.Add(num);
                                 argsOk = false;
                             }
                             //check validity of expId
@@ -1777,13 +1780,13 @@ namespace LMSF_Scheduler
                                 argsOk = false;
                                 //Message for bad Experiment ID argument
                                 outString += "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
-                                valFailed.Add(num);
+                                val.Add(num);
                             }
                             //check if save file directory exists
                             if (!Directory.Exists(saveFolderPath))
                             {
                                 outString += $"Save folder path does not exist: {saveFolderPath} ";
-                                valFailed.Add(num);
+                                val.Add(num);
                                 argsOk = false;
                             }
                             else
@@ -1792,7 +1795,7 @@ namespace LMSF_Scheduler
                                 if (!SharedParameters.IsDirectoryWritable(saveFolderPath))
                                 {
                                     outString += $"Write permission denied for save folder path: {saveFolderPath} ";
-                                    valFailed.Add(num);
+                                    val.Add(num);
                                     argsOk = false;
                                 }
                             }
@@ -1819,7 +1822,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseTimerStep()
+            void ParseTimerStep(ref List<int> val)
             {
                 outString += "Running Timer: ";
                 int waitTime = 0;
@@ -1828,7 +1831,7 @@ namespace LMSF_Scheduler
                 if (numArgs < 2)
                 {
                     outString += "No time given for the timer.";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -1852,14 +1855,14 @@ namespace LMSF_Scheduler
                                 argsOk = false;
                                 outString += "Timer date-time parameter is in the past: ";
                                 outString += stepArgs[1];
-                                valFailed.Add(num);
+                                val.Add(num);
                             }
                         }
                         else
                         {
                             outString += "Timer parameter is not an integer nor a parsable date-time string: ";
                             outString += stepArgs[1];
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
                     }
                 }
@@ -1874,13 +1877,13 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseWaitForStep()
+            void ParseWaitForStep(ref List<int> val)
             {
                 outString += "WaitFor: ";
                 if (numArgs < 2)
                 {
                     outString += "Must specify the process to WaitFor (Overlord, Hamilton, Reader, or Timer)";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -1945,14 +1948,14 @@ namespace LMSF_Scheduler
                             {
                                 outString += "WaitFor process not recognized: ";
                                 outString += stepArgs[1];
-                                valFailed.Add(num);
+                                val.Add(num);
                             }
                             break;
                     }
                 }
             }
 
-            void ParseNewXml()
+            void ParseNewXml(ref List<int> val)
             {
                 //Boolean used to track validity of arguments/parameters
                 bool argsOk = true;
@@ -1966,7 +1969,7 @@ namespace LMSF_Scheduler
                     argsOk = false;
                     //Message for missing argument or not enough arguments:
                     outString += "No protocol type argument given.";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -1980,7 +1983,7 @@ namespace LMSF_Scheduler
                         argsOk = false;
                         //Message for bad Protocol argument
                         outString += "Protocol type arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
 
@@ -2001,7 +2004,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseAppendXml()
+            void ParseAppendXml(ref List<int> val)
             {
                 //Boolean used to track validity of arguments/parameters
                 bool argsOk = true;
@@ -2015,7 +2018,7 @@ namespace LMSF_Scheduler
                     argsOk = false;
                     //Message for missing argument or not enough arguments:
                     outString += "No protocol type argument given.";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -2029,7 +2032,7 @@ namespace LMSF_Scheduler
                         argsOk = false;
                         //Message for bad step typ argument
                         outString += "Experiment step arguments can only contain letters, numbers, spaces, or \"-\" or \"_\"";
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
 
@@ -2062,7 +2065,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseSaveXml()
+            void ParseSaveXml(ref List<int> val)
             {
                 //string for start of output from ParseStep()
                 outString += "Saving XML document: ";
@@ -2074,7 +2077,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseUserPrompt()
+            void ParseUserPrompt(ref List<int> val)
             {
                 //UserPrompt takes 2, 3, or 4 arguments
                 //First two arguments are title and message
@@ -2096,7 +2099,7 @@ namespace LMSF_Scheduler
                 {
                     //Message for missing argument or not enough arguments:
                     outString += "Missing arguments; UserPrompt requires at least two arguments (title and message).";
-                    valFailed.Add(num);
+                    val.Add(num);
                     argsOk = false;
                 }
                 //Then check the validity of the arguments (file types, parsable as numbers, etc.)
@@ -2114,7 +2117,7 @@ namespace LMSF_Scheduler
                     {
                         //Message to explain what is wrong
                         outString += "Not a valid message string: ";
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                     outString += messageString;
 
@@ -2131,7 +2134,7 @@ namespace LMSF_Scheduler
                                 //Message to explain what is wrong
                                 outString += "; Image file not found: ";
                                 outString += imagePath;
-                                valFailed.Add(num);
+                                val.Add(num);
                             }
                         }
                         else
@@ -2139,7 +2142,7 @@ namespace LMSF_Scheduler
                             //Message for bad filename
                             outString += "; Not a valid image filename: ";
                             outString += imagePath;
-                            valFailed.Add(num);
+                            val.Add(num);
                             argsOk = false;
                         }
 
@@ -2159,7 +2162,7 @@ namespace LMSF_Scheduler
                             //Message for non-integer argument
                             outString += "; Image Width parameter must be an integer: ";
                             outString += imageWidthStr;
-                            valFailed.Add(num);
+                            val.Add(num);
                             argsOk = false;
                         }
 
@@ -2189,7 +2192,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseUserYesNo()
+            void ParseUserYesNo(ref List<int> val)
             {
                 //UserYesNo takes 3 arguments
                 //dictionary key, title, and message
@@ -2208,7 +2211,7 @@ namespace LMSF_Scheduler
                 {
                     //Message for missing argument or not enough arguments:
                     outString += "Missing arguments; GetUserYesNo/ requires at least three arguments (key, title, and message).";
-                    valFailed.Add(num);
+                    val.Add(num);
                     argsOk = false;
                 }
                 //Then check the validity of the arguments (file types, parsable as numbers, etc.)
@@ -2227,7 +2230,7 @@ namespace LMSF_Scheduler
                     {
                         //Message to explain what is wrong
                         outString += "Not a valid message string: ";
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                     outString += messageString;
                 }
@@ -2255,7 +2258,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseAddXml()
+            void ParseAddXml(ref List<int> val)
             {
                 //UserPrompt takes 2 or 3 arguments
                 //First two arguments are parentNode and newNode names
@@ -2275,7 +2278,7 @@ namespace LMSF_Scheduler
                 {
                     //Message for missing argument or not enough arguments:
                     outString += "Missing arguments; AddXML requires at least two arguments (parentNode and newNodee).";
-                    valFailed.Add(num);
+                    val.Add(num);
                     argsOk = false;
                 }
                 //need to check that parentNodeStr and newNodeStr are acceptable XML element names
@@ -2299,7 +2302,7 @@ namespace LMSF_Scheduler
                             argsOk = false;
                             //Message for bad XML element name
                             outString += "XML element names cannot start with \"xml\"";
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
                         else
                         {
@@ -2311,7 +2314,7 @@ namespace LMSF_Scheduler
                         argsOk = false;
                         //Message for bad XML element name
                         outString += "XML element names can only contain letters, numbers, or \"-\" or \"_\"; they also must start with a letter or underscore";
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
 
@@ -2329,7 +2332,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseSet()
+            void ParseSet(ref List<int> val)
             {
                 //Set takes 2 arguments
                 //First two arguments are the key and value to be set in the metaDictionary
@@ -2348,7 +2351,7 @@ namespace LMSF_Scheduler
                 {
                     //Message for missing argument or not enough arguments:
                     outString += "Set command requries two arguments (key and value).";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 else
                 {
@@ -2381,7 +2384,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseGet()
+            void ParseGet(ref List<int> val)
             {
                 //Get takes 2 or 3 arguments
                 //The first 2 arguments are the metadata type and the key for saving the result in the metaDictionary
@@ -2407,7 +2410,7 @@ namespace LMSF_Scheduler
                 {
                     //Message for missing argument or not enough arguments:
                     outString += "Get command requries two arguments (metadata type and key).";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 //Then check the validity of the arguments
                 else
@@ -2435,7 +2438,7 @@ namespace LMSF_Scheduler
                         {
                             outString += $"{s}, ";
                         }
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
 
@@ -2480,7 +2483,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseGetExpId()
+            void ParseGetExpId(ref List<int> val)
             {
                 //GetExpId takes 1 or 2 arguments
                 //The first argument is the default experiment ID
@@ -2500,7 +2503,7 @@ namespace LMSF_Scheduler
                     argsOk = false;
                     //Message for missing argument or not enough arguments:
                     outString += "GetExpId command requries at least one argument (default experiment ID).";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 //Then check the validity of the arguments
                 else
@@ -2514,7 +2517,7 @@ namespace LMSF_Scheduler
                         argsOk = false;
                         //Message for bad Experiment ID argument
                         outString += "Experiment IDs can only contain letters, numbers, or \"-\" or \"_\"";
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                     else
                     {
@@ -2528,7 +2531,7 @@ namespace LMSF_Scheduler
                                 argsOk = false;
                                 //Message for bad dataDirStr argument
                                 outString += "Second argument must be a path to a valid directory. ";
-                                valFailed.Add(num);
+                                val.Add(num);
                             }
                         }
                     }
@@ -2560,7 +2563,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseGetFile()
+            void ParseGetFile(ref List<int> val)
             {
                 //GetFile takes 2, 3, or 4 arguments
                 //The first argument is the file key for saving the file path in the metaDictionary
@@ -2584,7 +2587,7 @@ namespace LMSF_Scheduler
                     argsOk = false;
                     //Message for missing argument or not enough arguments:
                     outString += "GetFile command requries at least two arguments (file key, and message).";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 //Then check the validity of the arguments
                 else
@@ -2607,7 +2610,7 @@ namespace LMSF_Scheduler
                             argsOk = false;
                             //Message for bad file filter argument
                             outString += "Third argument must be a valid file filter string, see help document. ";
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
                     }
 
@@ -2622,7 +2625,7 @@ namespace LMSF_Scheduler
                             //Message for bad dataDirStr argument
                             outString += "Fourth argument must be a path to a valid directory; ";
                             outString += dataDirStr;
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
                     }
 
@@ -2652,7 +2655,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseStartPrompt()
+            void ParseStartPrompt(ref List<int> val)
             {
                 //UserPrompt takes 2 arguments
                 //First two arguments are title and listFilePath
@@ -2670,7 +2673,7 @@ namespace LMSF_Scheduler
                 {
                     //Message for missing argument or not enough arguments:
                     outString += "Missing arguments; StartPrompt requires two arguments (title and list file path).";
-                    valFailed.Add(num);
+                    val.Add(num);
                     argsOk = false;
                 }
                 //Then check the validity of the arguments (file types, parsable as numbers, etc.)
@@ -2688,7 +2691,7 @@ namespace LMSF_Scheduler
                             //Message to explain what is wrong
                             outString += "; List file not found: ";
                             outString += listFilePath;
-                            valFailed.Add(num);
+                            val.Add(num);
                         }
                         else
                         {
@@ -2700,7 +2703,7 @@ namespace LMSF_Scheduler
                         //Message for bad filename
                         outString += "; Not a valid list filename (.txt): ";
                         outString += listFilePath;
-                        valFailed.Add(num);
+                        val.Add(num);
                         argsOk = false;
                     }
 
@@ -2729,7 +2732,7 @@ namespace LMSF_Scheduler
                 }
             }
 
-            void ParseCopyRemoteFiles()
+            void ParseCopyRemoteFiles(ref List<int> val)
             {
                 //CopyRemoteFiles takes no arguments
                 //so there is nothing to do here except run the method
@@ -2749,7 +2752,7 @@ namespace LMSF_Scheduler
             }
 
             //Don't actually use this local function, it's just here as a template for new ParseXxxxStep functions
-            void ParseGenericStep()
+            void ParseGenericStep(ref List<int> val)
             {
                 //string for start of output from ParseStep()
                 outString += "Running Generic Step: ";
@@ -2762,7 +2765,7 @@ namespace LMSF_Scheduler
                 {
                     //Message for missing argument or not enough arguments:
                     outString += "No command argument given.";
-                    valFailed.Add(num);
+                    val.Add(num);
                 }
                 //Then check the validity of the arguments (file types, parsable as numbers, etc.)
                 else
@@ -2777,7 +2780,7 @@ namespace LMSF_Scheduler
                         //Message to explain what is wrong
                         outString += "Not a valid ovp filename: ";
                         outString += stepArgs[1];
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
 
@@ -2801,7 +2804,7 @@ namespace LMSF_Scheduler
                         //Message if the file does not exist
                         outString += "Procedure file not found: ";
                         outString += stepArgs[1];
-                        valFailed.Add(num);
+                        val.Add(num);
                     }
                 }
             }
@@ -5073,6 +5076,7 @@ namespace LMSF_Scheduler
         private void InsertStepButton_Click(object sender, RoutedEventArgs e)
         {
             //Validate, and execute step that is manually typed into insertStepTextBox (property: InsertStepText); during paused run.
+
         }
     }
 
