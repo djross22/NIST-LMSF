@@ -937,7 +937,7 @@ namespace LMSF_Scheduler
                         NextStep = "";
                     }
                     string oldText = OutputText;
-                    string newText = ParseStep(stepNum, inputSteps[stepNum]);
+                    string newText = ParseStep(stepNum, inputSteps[stepNum], isValidating);
                     OutputText = oldText + newText;
                     if (!isValidating)
                     {
@@ -959,7 +959,7 @@ namespace LMSF_Scheduler
 
         }
 
-        private string ParseStep(int num, string step)
+        private string ParseStep(int num, string step, bool localIsValidating)
         {
             //Note on step validation:
             //    valFailed is intialized to an empty list at the beginning of each run,
@@ -1143,7 +1143,7 @@ namespace LMSF_Scheduler
                             }
                             outString += $"{ifResult}. ";
                             //always mark ifResult as true when validating, so that the remaining arguments always get validated
-                            if (isValidating)
+                            if (localIsValidating)
                             {
                                 ifResult = true;
                             }
@@ -1188,7 +1188,7 @@ namespace LMSF_Scheduler
                                     }
                                     outString += $"{ifResult}. ";
                                     //always mark ifResult as true when validating, so that the remaining arguments always get validated
-                                    if (isValidating)
+                                    if (localIsValidating)
                                     {
                                         ifResult = true;
                                     }
@@ -1241,7 +1241,7 @@ namespace LMSF_Scheduler
                                         }
                                         outString += $"{ifResult}. ";
                                         //always mark ifResult as true when validating, so that the remaining arguments always get validated
-                                        if (isValidating)
+                                        if (localIsValidating)
                                         {
                                             ifResult = true;
                                         }
@@ -1452,7 +1452,7 @@ namespace LMSF_Scheduler
                             outString += ", " + stepArgs[2];
                         }
 
-                        if (!isValidating)
+                        if (!localIsValidating)
                         {
                             //RunOverlord(num, stepArgs[1]);
                             RunOverlord(num, stepArgs);
@@ -1499,7 +1499,7 @@ namespace LMSF_Scheduler
                     {
                         outString += stepArgs[1];
 
-                        if (!isValidating)
+                        if (!localIsValidating)
                         {
                             RunHamilton(num, stepArgs);
                         }
@@ -1641,7 +1641,7 @@ namespace LMSF_Scheduler
                 //If arguments are all ok, then run the step
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         //Run the step
                         RunRemoteHamilton(num, stepArgs);
@@ -1807,7 +1807,7 @@ namespace LMSF_Scheduler
                 //If arguments are all ok, then run the step
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         //Run the step
                         RunGen5(num, stepArgs);
@@ -1867,7 +1867,7 @@ namespace LMSF_Scheduler
                 if (argsOk)
                 {
                     outString += stepArgs[1];
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         RunTimer(num, stepArgs);
                     }
@@ -1913,21 +1913,21 @@ namespace LMSF_Scheduler
                     {
                         case "Overlord":
                             outString += "Overlord, Done.";
-                            if (!isValidating)
+                            if (!localIsValidating)
                             {
                                 WaitForOverlord(num);
                             }
                             break;
                         case "Hamilton":
                             outString += "Hamilton, Done.";
-                            if (!isValidating)
+                            if (!localIsValidating)
                             {
                                 WaitForHamilton(num);
                             }
                             break;
                         case "Timer":
                             outString += "Timer, Done.";
-                            if (!isValidating)
+                            if (!localIsValidating)
                             {
                                 WaitForTimer(num);
                             }
@@ -1936,7 +1936,7 @@ namespace LMSF_Scheduler
                             if (GetConnectedReadersList().Contains(processWaitingFor))
                             {
                                 outString += $"{processWaitingFor}, Done.";
-                                if (!isValidating)
+                                if (!localIsValidating)
                                 {
                                     WaitForRemoteProcess(processWaitingFor, writeEndTime, pingInterval);
                                 }
@@ -1986,7 +1986,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         RunNewXml(num, stepArgs);
                     }
@@ -2035,7 +2035,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         RunAppendXml(num, stepArgs);
                     }
@@ -2068,7 +2068,7 @@ namespace LMSF_Scheduler
                 outString += "Saving XML document: ";
 
                 // no arguments to check, so go straigt to running it
-                if (!isValidating)
+                if (!localIsValidating)
                 {
                     RunSaveXml(num, stepArgs);
                 }
@@ -2168,7 +2168,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         //Run the step
                         RunUserPrompt(num, stepArgs);
@@ -2234,7 +2234,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         //Run the step
                         RunUserYesNo(num, stepArgs);
@@ -2317,7 +2317,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         //Run the step
                         RunAddXml(num, stepArgs);
@@ -2441,7 +2441,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         RunGet(num, stepArgs);
                     }
@@ -2537,7 +2537,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         RunGetExpId(num, stepArgs);
                     }
@@ -2630,7 +2630,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         RunGetFile(num, stepArgs);
                     }
@@ -2708,7 +2708,7 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         //Run the step
                         RunStartDialog(num, stepArgs);
@@ -2737,7 +2737,7 @@ namespace LMSF_Scheduler
                 
                 if (argsOk)
                 {
-                    if (!isValidating)
+                    if (!localIsValidating)
                     {
                         //Run the step
                         RunCopyRemoteFiles();
@@ -2789,7 +2789,7 @@ namespace LMSF_Scheduler
                     {
                         outString += stepArgs[1];
 
-                        if (!isValidating)
+                        if (!localIsValidating)
                         {
                             //Put in the code to actaully run the step here, e.g. RunOverlord(num, stepArgs);
                             //  that method has to be written separately
