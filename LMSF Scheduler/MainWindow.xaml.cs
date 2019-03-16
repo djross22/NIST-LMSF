@@ -40,6 +40,8 @@ namespace LMSF_Scheduler
         private string nextStep;
         private string experimentFileName = "";
 
+        private string insertStepText;
+
         //For parsing and running steps
         private List<string> inputSteps;
 
@@ -115,6 +117,16 @@ namespace LMSF_Scheduler
         Dictionary<string, SimpleTcpClient> readerClients = new Dictionary<string, SimpleTcpClient>();
 
         #region Properties Getters and Setters
+        public string InsertStepText
+        {
+            get { return this.insertStepText; }
+            set
+            {
+                this.insertStepText = value;
+                OnPropertyChanged("InsertStepText");
+            }
+        }
+
         public bool IsValUserInput
         {
             get { return this.isValUserInput; }
@@ -322,6 +334,9 @@ namespace LMSF_Scheduler
                 stepButton.IsEnabled = isPaused;
                 rewindButton.IsEnabled = isPaused;
                 abortButton.IsEnabled = true;
+
+                insertStepButton.IsEnabled = isPaused;
+                insertStepTextBox.IsEnabled = isPaused;
 
                 selectComboBox.IsEnabled = false;
                 readerComboBox.IsEnabled = false;
