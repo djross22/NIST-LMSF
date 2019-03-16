@@ -4006,16 +4006,16 @@ namespace LMSF_Scheduler
 
             if (isReader)
             {
-                outText = "... waiting for Gen5 to finish.";
+                outText = "... waiting for Gen5 to finish.\n";
             }
             else {
                 if (isStar)
                 {
-                    outText = "... waiting for remote Hamilton to finish.";
+                    outText = "... waiting for remote Hamilton to finish.\n";
                 }
                 else
                 {
-                    outText = "... waiting for unknown remote proecess.";
+                    outText = "... waiting for unknown remote proecess.\n";
                 }
             }
             AddOutputText(outText);
@@ -4128,7 +4128,7 @@ namespace LMSF_Scheduler
             {
                 if (!ovProcess.HasExited)
                 {
-                    AddOutputText("... waiting for last Overlord Process to exit.");
+                    AddOutputText("... waiting for last Overlord Process to exit.\n");
                     while (!ovProcess.HasExited)
                     {
                         Thread.Sleep(100);
@@ -4458,7 +4458,7 @@ namespace LMSF_Scheduler
             {
                 if (!hamProcess.HasExited)
                 {
-                    AddOutputText("... waiting for last Hamilton Process to exit.");
+                    AddOutputText("... waiting for last Hamilton Process to exit.\n");
                     while (!hamProcess.HasExited)
                     {
                         Thread.Sleep(100);
@@ -4536,7 +4536,7 @@ namespace LMSF_Scheduler
         {
             WaitingForStepCompletion = true;
 
-            AddOutputText("... waiting for Overlord to finish and exit.");
+            AddOutputText("... waiting for Overlord to finish and exit.\n");
 
             BackgroundWorker ovMonitorWorker = new BackgroundWorker();
             ovMonitorWorker.WorkerReportsProgress = false;
@@ -4590,7 +4590,7 @@ namespace LMSF_Scheduler
         {
             WaitingForStepCompletion = true;
 
-            AddOutputText("... waiting for Hamilton Runtime Engine to finish and exit.");
+            AddOutputText("... waiting for Hamilton Runtime Engine to finish and exit.\n");
 
             BackgroundWorker hamMonitorWorker = new BackgroundWorker();
             hamMonitorWorker.WorkerReportsProgress = false;
@@ -4688,7 +4688,7 @@ namespace LMSF_Scheduler
             {
                 if (!stepTimerDialog.IsClosed)
                 {
-                    AddOutputText("... waiting for last Timer to finish.");
+                    AddOutputText("... waiting for last Timer to finish.\n");
                     while (!stepTimerDialog.IsClosed)
                     {
                         Thread.Sleep(100);
@@ -4710,7 +4710,7 @@ namespace LMSF_Scheduler
         {
             WaitingForStepCompletion = true;
 
-            AddOutputText("... waiting for Timer to finish.");
+            AddOutputText("... waiting for Timer to finish.\n");
 
             BackgroundWorker timerMonitorWorker = new BackgroundWorker();
             timerMonitorWorker.WorkerReportsProgress = false;
