@@ -41,15 +41,13 @@ namespace LMSF_Scheduler
         private string experimentFileName = "";
 
         //For parsing and running steps
-        private string[] inputSteps;
-        private bool[] stepsRunning;
+        private List<string> inputSteps;
 
         //lock for waitingForStepCompletion
         private readonly object stepCompletionLock = new object();
         private bool waitingForStepCompletion;
 
         private int stepNum;
-        private int totalSteps;
 
         private readonly object runControlLock = new object();
         private bool isRunning = false;
@@ -761,7 +759,8 @@ namespace LMSF_Scheduler
             //by default, don't collect metadata
             isCollectingXml = false;
 
-            inputSteps = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] stepsArray = InputText.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            inputSteps = new List<string>(stepsArray);
 
             string[] scriptSteps;
             bool checkReadScript = true;
@@ -817,24 +816,29 @@ namespace LMSF_Scheduler
 
                 if (checkReadScript)
                 {
-                    inputSteps = stepsList.ToArray();
+                    inputSteps = stepsList;
                 }
                 recursion++;
             }
 
             //remove leading and trailing white space from each line
-            inputSteps = inputSteps.Select(s => s.Trim()).ToArray();
-            //then delete any lines that were just white space (are now empty)
-            inputSteps = inputSteps.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-
-            //then delete any lines that start with "//" - comment lines
-            inputSteps = inputSteps.Where(s => !s.StartsWith("//")).ToArray();
+            //also delete any lines that were just white space (are now empty)
+            //    any lines that start with "//" - comment lines
+            List<string> newList = new List<string>();
+            string listLine;
+            foreach (string s in inputSteps)
+            {
+                listLine = s.Trim();
+                if (!string.IsNullOrEmpty(listLine) && !listLine.StartsWith("//"))
+                {
+                    newList.Add(listLine);
+                }
+                
+            }
+            inputSteps = newList;
+            
 
             stepNum = 0;
-            totalSteps = inputSteps.Length;
-
-            //init running state for each step
-            stepsRunning = Enumerable.Repeat(false, totalSteps).ToArray();
 
             if (isValidating)
             {
@@ -908,9 +912,9 @@ namespace LMSF_Scheduler
             }
             else
             {
-                if (stepNum < totalSteps)
+                if (stepNum < inputSteps.Count)
                 {
-                    if (stepNum + 1 < totalSteps)
+                    if (stepNum + 1 < inputSteps.Count)
                     {
                         NextStep = inputSteps[stepNum + 1];
                     }
@@ -4019,9 +4023,7 @@ namespace LMSF_Scheduler
             string file = args[1];
             //second argument (if any) is the variables to pass
 
-            //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
-            stepsRunning[num] = true;
 
             if ( !(ovProcess is null) )
             {
@@ -4331,9 +4333,7 @@ namespace LMSF_Scheduler
             //args[1] is file path
             string file = args[1];
 
-            //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
-            stepsRunning[num] = true;
 
             if ( !(hamProcess is null) )
             {
@@ -4406,9 +4406,7 @@ namespace LMSF_Scheduler
 
         private void WaitForOverlord(int num)
         {
-            //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
-            stepsRunning[num] = true;
 
             AddOutputText("... waiting for Overlord to finish and exit.");
 
@@ -4452,9 +4450,7 @@ namespace LMSF_Scheduler
         
         private void WaitForHamilton(int num)
         {
-            //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
-            stepsRunning[num] = true;
 
             AddOutputText("... waiting for Hamilton Runtime Engine to finish and exit.");
 
@@ -4515,9 +4511,7 @@ namespace LMSF_Scheduler
 
         private void RunTimer(int num, string[] args)
         {
-            //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
-            stepsRunning[num] = true;
 
             int waitTime;
             DateTime waitUntil;
@@ -4566,9 +4560,7 @@ namespace LMSF_Scheduler
 
         private void WaitForTimer(int num)
         {
-            //TODO: re-evaluate the need for these variables-
             WaitingForStepCompletion = true;
-            stepsRunning[num] = true;
 
             AddOutputText("... waiting for Timer to finish.");
 
