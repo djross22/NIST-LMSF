@@ -1033,7 +1033,7 @@ namespace LMSF_Scheduler
             stepArgs[0] = scriptCommand;
             scriptArgArr.CopyTo(stepArgs, 1);
 
-            //The clean up stepArgs by trimming white space from ends of each string, and removing empty strings.
+            //Then clean up stepArgs by trimming white space from ends of each string, and removing empty strings.
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
             stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
@@ -1102,9 +1102,36 @@ namespace LMSF_Scheduler
                             }
                             catch (KeyNotFoundException)
                             {
-                                outString += $"Key not in metaDictionary: {keyStr} in {arg}. ";
-                                keysOk = false;
-                                break;
+                                if (localIsValidating)
+                                {
+                                    outString += $"Key not in metaDictionary: {keyStr} in {step}. ";
+                                    keysOk = false;
+                                    break;
+                                }
+                                else
+                                {
+                                    //If a key is missing at run time
+                                    string msg = $"Key not in metaDictionary: {keyStr} in {step}.\n";
+                                    outString += msg;
+                                    msg += "Run is paused.\n";
+                                    msg += $"Click 'OK' then manually insert a step to Set() a value for {keyStr} then continue run.\n";
+                                    msg += "Or click 'Abort' to cancel the run.";
+                                    
+                                    this.Dispatcher.Invoke(() => {
+                                        bool? oKToGo = SharedParameters.ShowPrompt(msg, "Key Not Found!");
+                                        if (!(oKToGo == true))
+                                        {
+                                            AbortCalled = true;
+                                        }
+
+                                        IsPaused = true;
+                                    });
+
+                                    stepNum = stepNum - 1;
+                                    //Then exit ParseSteps() and hope the user can fix it.
+                                    keysOk = false;
+                                    break;
+                                }
                             }
                         }
                     }

@@ -523,20 +523,20 @@ Keep comment lines in inputSteps list, but ignore them in ParseStep()
 
 Save XML file every time it the XML is added to; Don't add to xml if abortCalled
 
+Add code to validate and insert manually entered step during pause
+
+Add ExportDictionary and ImportDictionary() commands mechanism for stop/pause, re-write, continue
+	ExportDictionary() - exports dictionary either to dataDirectory or user specified directory
+	ImportDictionary() - imports dictionary from user specified file
+
+Add options to handle runtime key-not-found error: user can manually enter key/value into dictionary - and re-run step-
+
 
 TODO:
 
-
-
-mechanism for stop/pause, re-write, continue
-	SaveState() - exports dictionary and saves steps that have not yet been run
-	LoadState() - imports dictionary and loads steps
-	
-View/edit dictionary entries during pause
-
-key not found error, user can manually enter key/value into dictionary
-
 error log
+
+Check Timer - it seems to leave a thread running- the delegated 
 
 
 
