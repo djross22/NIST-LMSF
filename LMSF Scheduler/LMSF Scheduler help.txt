@@ -253,7 +253,8 @@ Commands:
 		By default, the command creates a new directory with the same name as the experiment ID,
 			So, the default file will be saved as "<default data directory>\<default experiment ID>\<default experiment ID>.xml"
 		The user can manually override the defaults in the dialog or accept them.
-		After the user confirms, GetExpId also adds the experiment ID (key = "experimentId"), and the data directory (key = "dataDirectory") to the Metadata Dictionary 
+		After the user confirms, GetExpId also adds the experiment ID (key = "experimentId"), and the data directory (key = "dataDirectory") to the Metadata Dictionary
+			GetExpId() also sets the file name and directory of the XML document for the experiment to <experimentId>.xml and <dataDirectory>, respectively
 		
 		Syntax:
 			GetExpId(<default experiment ID>, {<default data directory (optional)>})

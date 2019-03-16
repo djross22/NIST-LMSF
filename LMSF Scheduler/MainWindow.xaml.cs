@@ -3065,6 +3065,16 @@ namespace LMSF_Scheduler
                 experimentNode.AppendChild(protocolNode);
             }
 
+            //Save the XML document
+            try
+            {
+                xmlDoc.Save(metaDataFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error saving XML document: {e}");
+            }
+
         }
 
         private void AddXmlMetaDetail(string metaType, string idStr, string key, string notes)
@@ -3163,7 +3173,15 @@ namespace LMSF_Scheduler
                 }
             }
 
-
+            //Save the XML document
+            try
+            {
+                xmlDoc.Save(metaDataFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error saving XML document: {e}");
+            }
         }
 
         private void AddXmlConcentration(Concentration conc, string keyStr)
@@ -3202,6 +3220,15 @@ namespace LMSF_Scheduler
             unitsNode.InnerText = conc.Units;
             stockNode.AppendChild(unitsNode);
 
+            //Save the XML document
+            try
+            {
+                xmlDoc.Save(metaDataFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error saving XML document: {e}");
+            }
         }
 
         private string GetProjectIdentifier()
@@ -3318,6 +3345,16 @@ namespace LMSF_Scheduler
                 metaDictionary["projectId"] = xmlDoc.SelectSingleNode("descendant::projectId").InnerText;
                 metaDictionary["dataDirectory"] = argsBack[2];
                 metaDictionary["protocol type"] = protocolTypeStr;
+
+                //Save the XML document
+                try
+                {
+                    xmlDoc.Save(metaDataFilePath);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error saving XML document: {e}");
+                }
             }
             
         }
@@ -3375,6 +3412,16 @@ namespace LMSF_Scheduler
             //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
             metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
             metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
+
+            //Save the XML document
+            try
+            {
+                xmlDoc.Save(metaDataFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error saving XML document: {e}");
+            }
         }
 
         private void RunAddXml(int num, string[] args)
@@ -3418,6 +3465,16 @@ namespace LMSF_Scheduler
             //newNode.InnerText = innerText.Replace(@"\\",@"\");
             newNode.InnerText = innerText;
             parentNode.AppendChild(newNode);
+
+            //Save the XML document
+            try
+            {
+                xmlDoc.Save(metaDataFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error saving XML document: {e}");
+            }
         }
 
         private void RunSaveXml(int num, string[] args)
@@ -3451,9 +3508,16 @@ namespace LMSF_Scheduler
                 }
                 
             }
-            
+
             //Save the XML document
-            xmlDoc.Save(metaDataFilePath);
+            try
+            {
+                xmlDoc.Save(metaDataFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error saving XML document: {e}");
+            }
 
             //turn off metadata collection
             //isCollectingXml = false;
@@ -3676,7 +3740,7 @@ namespace LMSF_Scheduler
                 });
 
                 //Then save to XML document if...
-                if (isCollectingXml)
+                if (isCollectingXml && !AbortCalled)
                 {
                     AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
                 }
@@ -3694,7 +3758,7 @@ namespace LMSF_Scheduler
                 this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr; });
 
                 //Then save to XML document if...
-                if (isCollectingXml)
+                if (isCollectingXml && !AbortCalled)
                 {
                     AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
                 }
@@ -3712,7 +3776,7 @@ namespace LMSF_Scheduler
                 this.Dispatcher.Invoke(() => { valueStr = GetMetaIdentifier(typeStr, promptStr); metaDictionary[keyStr] = valueStr; });
 
                 //Then save to XML document if...
-                if (isCollectingXml)
+                if (isCollectingXml && !AbortCalled)
                 {
                     AddXmlMetaDetail(typeStr, valueStr, keyStr, notes);
                 }
@@ -3759,6 +3823,15 @@ namespace LMSF_Scheduler
             
             idNode.InnerText = expIdStr;
 
+            //Save the XML document
+            try
+            {
+                xmlDoc.Save(metaDataFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error saving XML document: {e}");
+            }
         }
 
         private string[] GetExpId(string dataDirStr, string expIdStr, string projID = "")
@@ -3886,7 +3959,7 @@ namespace LMSF_Scheduler
             AddOutputText($"... {readerName} status: {replyStatus}.\n");
 
             //Send info to metadata if collecting
-            if (command == "RunExp" && isCollectingXml)
+            if (command == "RunExp" && isCollectingXml && !AbortCalled)
             {
                 //Add <Gen5Experiment> node to metadata
                 XmlNode gen5Node = xmlDoc.CreateElement("Gen5Experiment");
@@ -3910,6 +3983,16 @@ namespace LMSF_Scheduler
 
                 //Date and time
                 AddDateTimeNodes(DateTime.Now, gen5Node, "experiment started");
+
+                //Save the XML document
+                try
+                {
+                    xmlDoc.Save(metaDataFilePath);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error saving XML document: {e}");
+                }
             }
         }
 
@@ -3953,7 +4036,7 @@ namespace LMSF_Scheduler
             }
 
             //Send info to metadata if collecting
-            if (writeEndTime && isCollectingXml)
+            if (writeEndTime && isCollectingXml && !AbortCalled)
             {
                 DateTime dt = DateTime.Now;
 
@@ -3988,6 +4071,16 @@ namespace LMSF_Scheduler
                         timeFiniNode.Attributes.Append(statusFiniAtt);
                         dateNode.AppendChild(timeFiniNode);
                     }
+                }
+
+                //Save the XML document
+                try
+                {
+                    xmlDoc.Save(metaDataFilePath);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error saving XML document: {e}");
                 }
             }
 
@@ -4062,7 +4155,7 @@ namespace LMSF_Scheduler
             ovProcess = Process.Start(startInfo);
 
             //Send info to metadata if collecting
-            if (isCollectingXml)
+            if (isCollectingXml && !AbortCalled)
             {
                 //Add <overlordProcudure> node to metadata
                 XmlNode ovpNode = xmlDoc.CreateElement("overlordProcedure");
@@ -4093,6 +4186,16 @@ namespace LMSF_Scheduler
                         pNode.InnerText = varArgs[i+1];
                         paramsNode.AppendChild(pNode);
                     }
+                }
+
+                //Save the XML document
+                try
+                {
+                    xmlDoc.Save(metaDataFilePath);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error saving XML document: {e}");
                 }
             }
         }
@@ -4274,7 +4377,7 @@ namespace LMSF_Scheduler
             
             
             //Send info to metadata if collecting
-            if (isCollectingXml)
+            if (isCollectingXml && !AbortCalled)
             {
                 //Add <hamiltonMethod> node to metadata
                 XmlNode hamNode = xmlDoc.CreateElement("hamiltonMethod");
@@ -4288,6 +4391,16 @@ namespace LMSF_Scheduler
 
                 //Date and time
                 AddDateTimeNodes(DateTime.Now, hamNode, "method started");
+
+                //Save the XML document
+                try
+                {
+                    xmlDoc.Save(metaDataFilePath);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error saving XML document: {e}");
+                }
             }
 
             //If command = "ReadCounters" or methodPath ends with "Edit Tip Counters.hsl", wait until it's done, then read tip counter status into metaDictionary
@@ -4366,7 +4479,7 @@ namespace LMSF_Scheduler
             hamProcess = Process.Start(startInfo);
 
             //Send info to metadata if collecting
-            if (isCollectingXml)
+            if (isCollectingXml && !AbortCalled)
             {
                 //Add <hamiltonMethod> node to metadata
                 XmlNode hamNode = xmlDoc.CreateElement("hamiltonMethod");
@@ -4381,6 +4494,15 @@ namespace LMSF_Scheduler
                 //Date and time
                 AddDateTimeNodes(DateTime.Now, hamNode, "method started");
 
+                //Save the XML document
+                try
+                {
+                    xmlDoc.Save(metaDataFilePath);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error saving XML document: {e}");
+                }
             }
         }
 
@@ -4432,7 +4554,7 @@ namespace LMSF_Scheduler
             }
 
             //Send info to metadata if collecting
-            if (isCollectingXml)
+            if (isCollectingXml && !AbortCalled)
             {
                 DateTime dt = DateTime.Now;
 
@@ -4449,6 +4571,16 @@ namespace LMSF_Scheduler
                     statusFiniAtt.Value = "procedure finished";
                     timeFiniNode.Attributes.Append(statusFiniAtt);
                     dateNode.AppendChild(timeFiniNode);
+                }
+
+                //Save the XML document
+                try
+                {
+                    xmlDoc.Save(metaDataFilePath);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error saving XML document: {e}");
                 }
             }
 
@@ -4476,7 +4608,7 @@ namespace LMSF_Scheduler
             }
 
             //Send finish info to metadata if collecting
-            if (isCollectingXml)
+            if (isCollectingXml && !AbortCalled)
             {
                 DateTime dt = DateTime.Now;
 
@@ -4492,6 +4624,16 @@ namespace LMSF_Scheduler
                     statusFiniAtt.Value = "method finished";
                     timeFiniNode.Attributes.Append(statusFiniAtt);
                     dateNode.AppendChild(timeFiniNode);
+                }
+
+                //Save the XML document
+                try
+                {
+                    xmlDoc.Save(metaDataFilePath);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Error saving XML document: {e}");
                 }
             }
 
