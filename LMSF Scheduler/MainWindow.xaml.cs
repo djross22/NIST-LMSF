@@ -460,7 +460,7 @@ namespace LMSF_Scheduler
             }
         }
 
-        //temporary method for debugging/testing
+        //Method to manually test status of remote
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
             if ((testTextBox.Text != null) && (testTextBox.Text != ""))
@@ -5053,6 +5053,11 @@ namespace LMSF_Scheduler
             AddOutputText($"... done.\n");
 
             return replyStatus;
+        }
+
+        private void InsertStepButton_Click(object sender, RoutedEventArgs e)
+        {
+            //Validate, and execute step that is manually typed into insertStepTextBox (property: InsertStepText); during paused run.
         }
     }
 
