@@ -405,7 +405,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "LoadXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
 
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
@@ -1358,6 +1358,9 @@ namespace LMSF_Scheduler
                     case "SaveXML":
                         ParseSaveXml(ref valReport);
                         break;
+                    case "LoadXML":
+                        ParseLoadXml(ref valReport);
+                        break;
                     case "UserPrompt":
                         ParseUserPrompt(ref valReport);
                         break;
@@ -2032,6 +2035,7 @@ namespace LMSF_Scheduler
                     {
                         metaDictionary["protocol type"] = stepArgs[1];
                         metaDictionary["projectId"] = "place-holder-projectId";
+                        metaDictionary["metaDataFilePath"] = "place-holder-metaDataFilePath";
                         DateTime startDt = DateTime.Now;
                         metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
                         metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
@@ -2093,6 +2097,7 @@ namespace LMSF_Scheduler
 
                             metaDictionary["experimentId"] = "place-holder-expId";
                             metaDictionary["projectId"] = "place-holder-projectId";
+                            metaDictionary["metaDataFilePath"] = "place-holder-metaDataFilePath";
                             metaDictionary["dataDirectory"] = SharedParameters.WorklistFolderPath;
                         }
 
@@ -2109,6 +2114,60 @@ namespace LMSF_Scheduler
                 if (!localIsValidating)
                 {
                     RunSaveXml(num, stepArgs);
+                }
+            }
+
+            void ParseLoadXml(ref List<int> val)
+            {
+                //Boolean used to track validity of arguments/parameters
+                bool argsOk = true;
+
+                //string for start of output from ParseLoadXml()
+                outString += "Loading XML file: ";
+
+                //Requires an argument for the file path:
+                if (numArgs < 2)
+                {
+                    argsOk = false;
+                    //Message for missing argument or not enough arguments:
+                    outString += "No file path argument given.";
+                    val.Add(num);
+                }
+                else
+                {
+                    string filePath = stepArgs[1];
+                    //If the file path argument exists, make sure it is a .xml file that it actually exists
+                    if (filePath.EndsWith(".xml"))
+                    {
+                        if (!File.Exists(filePath))
+                        {
+                            outString += $"XML file not found: {filePath}";
+                            val.Add(num);
+                            argsOk = false;
+                        }
+                    }
+                    else
+                    {
+                        outString += $"XML files must have .xml extension): {filePath}";
+                        val.Add(num);
+                        argsOk = false;
+                    }
+                }
+
+                if (argsOk)
+                {
+                    //if (!localIsValidating)
+                    //{
+                    //    load the xml
+                    //}
+                    //For this command, it doesn't matter whether or not isValidating
+                    string loadReturn = LoadXml(stepArgs[1]);
+                    //LoadXml() returns an empty string if sucessful, otherwise returns an error message
+                    if (loadReturn != "")
+                    {
+                        outString += loadReturn;
+                        val.Add(num);
+                    }
                 }
             }
 
@@ -2590,6 +2649,7 @@ namespace LMSF_Scheduler
                         else
                         {
                             metaDictionary["experimentId"] = $"place-holder-experimentId";
+                            metaDictionary["metaDataFilePath"] = $"place-holder-metaDataFilePath";
                             metaDictionary["dataDirectory"] = SharedParameters.WorklistFolderPath;
                         }
 
@@ -3458,6 +3518,40 @@ namespace LMSF_Scheduler
 
         }
 
+        private string LoadXml(string filePath)
+        {
+            string retStr = "";
+            try
+            {
+                xmlDoc = new XmlDocument();
+                xmlDoc.Load(filePath);
+                metaDataFilePath = filePath;
+
+                //get the experiment node
+                XmlNodeList expNodeList = xmlDoc.SelectNodes("descendant::experiment");
+                experimentNode = expNodeList.Item(expNodeList.Count - 1);
+
+                //get the protocol node
+                XmlNodeList protocolNodeList = xmlDoc.SelectNodes("descendant::protocol");
+                protocolNode = protocolNodeList.Item(expNodeList.Count - 1);
+
+                string expIdStr = xmlDoc.SelectSingleNode("descendant::experimentId").InnerText;
+
+                //add experimentId, projectId, to metaDictionary
+                metaDictionary["experimentId"] = expIdStr;
+                metaDictionary["projectId"] = xmlDoc.SelectSingleNode("descendant::projectId").InnerText;
+                metaDictionary["metaDataFilePath"] = metaDataFilePath;
+
+                isCollectingXml = true;
+            }
+            catch (Exception e)
+            {
+                retStr = $"Error reading XML file: {e}";
+            }
+
+            return retStr;
+        }
+
         private void RunAppendXml(int num, string[] args)
         {
             string protocolTypeStr = args[1];
@@ -3494,6 +3588,7 @@ namespace LMSF_Scheduler
                 metaDictionary["projectId"] = xmlDoc.SelectSingleNode("descendant::projectId").InnerText;
                 metaDictionary["dataDirectory"] = argsBack[2];
                 metaDictionary["protocol type"] = protocolTypeStr;
+                metaDictionary["metaDataFilePath"] = metaDataFilePath;
 
                 //Save the XML document
                 try
@@ -3555,9 +3650,10 @@ namespace LMSF_Scheduler
             //Add the current experiment protocol to the XML
             AddXmlProtocol(protocolType, protocolSource);
 
-            //Also add the protocol type and projectID to the metaDictionary
+            //Also add the protocol type, metadataFilePath, and projectID to the metaDictionary
             metaDictionary["protocol type"] = protocolType;
             metaDictionary["projectId"] = projectIdNode.InnerText;
+            metaDictionary["metaDataFilePath"] = metaDataFilePath;
             //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
             metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);
             metaDictionary["startDate"] = SharedParameters.GetDateString(startDateTime);
@@ -4064,6 +4160,7 @@ namespace LMSF_Scheduler
 
             //And add the experiment ID to the metaDictionary
             metaDictionary["experimentId"] = argsBack[0];
+            metaDictionary["metaDataFilePath"] = argsBack[1];
             metaDictionary["dataDirectory"] = argsBack[2];
 
         }

@@ -171,6 +171,7 @@ Commands:
 		The project identifier is saved in both the XML document and in the Metadata Dictionary (with the key "projectId").
 		Also, adds the protocol starting date and time to the Metadata Dictionary (key = "startDateTime") in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
 		Also, adds the protocol starting date to the Metadata Dictionary (key = "startDate") in a form that is suitable for use in file names/identifiers: "yyyy-MM-dd".
+		Also, adds the XML file path to the Metadata Dictionary (key = "metaDataFilePath").
 		
 		The <protocol type> is meant to be a short, human-readable description of the function of the current protocol.
 			It is also used to distinguish protocols in a multi-protocol experiment.
@@ -185,9 +186,10 @@ Commands:
 			
 
 	AppendXML()
-		Similar to NewXML, but opens an existing XML metadata document and adds to it.
+		Similar to NewXML, but opens an existing XML metadata document and adds a new protocol to it. It opens a user dialog to choose the XML file to append to.
 		Also, adds the protocol starting date and time to the Metadata Dictionary (key = "startDateTime") in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
 		Also, adds the protocol starting date to the Metadata Dictionary (key = "startDate") in a form that is suitable for use in file names/identifiers: "yyyy-MM-dd".
+		Also, adds the XML file path to the Metadata Dictionary (key = "metaDataFilePath").
 		
 		Syntax:
 			AppendXML(<protocol type>)
@@ -208,6 +210,16 @@ Commands:
 		Examples:
 			SaveXML()
 			SaveXML(not finished)
+			
+			
+	LoadXML()
+		Loads an existing XML metadata document into memory, but does nothing else. This is useful for restartting an experiment that had to be stopped in the middle.
+		
+		Syntax:
+			LoadXML(<xml file path>)
+			
+		Examples:
+			LoadXML(C:\Shared Files\Data\LMSF-testing\2019-03-16-0804_cam_cam_iptg_2DGradients\2019-03-16-0804_cam_cam_iptg_2DGradients.xml)
 			
 			
 	AddXML()
@@ -254,7 +266,8 @@ Commands:
 			So, the default file will be saved as "<default data directory>\<default experiment ID>\<default experiment ID>.xml"
 		The user can manually override the defaults in the dialog or accept them.
 		After the user confirms, GetExpId also adds the experiment ID (key = "experimentId"), and the data directory (key = "dataDirectory") to the Metadata Dictionary
-			GetExpId() also sets the file name and directory of the XML document for the experiment to <experimentId>.xml and <dataDirectory>, respectively
+			GetExpId() also sets the file name and directory of the XML document for the experiment to <experimentId>.xml and <dataDirectory>, respectively.
+				It then also, adds the XML file path to the Metadata Dictionary (key = "metaDataFilePath").
 		
 		Syntax:
 			GetExpId(<default experiment ID>, {<default data directory (optional)>})
@@ -266,7 +279,7 @@ Commands:
 			
 	GetUserYesNo()
 		Opens a user dialog box to get a Yes/No response from the user.
-		The user's response is saved in teh Metadata Dictionary with the key given as the first argument.
+		The user's response is saved in the Metadata Dictionary with the key given as the first argument.
 			The strings saved to the Dictionary are capitalized, "Yes" or "No".
 		
 		Syntax:

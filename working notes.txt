@@ -532,14 +532,12 @@ Add ExportDictionary and ImportDictionary() commands mechanism for stop/pause, r
 Add options to handle runtime key-not-found error: user can manually enter key/value into dictionary - and re-run step-
 
 
+LoadXML() command to go with ImportDictionary() for restarting an experiment
+
+
 TODO:
 
 error log
-
-Check Timer - it seems to leave a thread running- the delegated 
-
-
-
 
 Combine metadata list/database from multiple computers
 
