@@ -823,13 +823,12 @@ namespace LMSF_Scheduler
 
             //remove leading and trailing white space from each line
             //also delete any lines that were just white space (are now empty)
-            //    any lines that start with "//" - comment lines
             List<string> newList = new List<string>();
             string listLine;
             foreach (string s in inputSteps)
             {
                 listLine = s.Trim();
-                if (!string.IsNullOrEmpty(listLine) && !listLine.StartsWith("//"))
+                if (!string.IsNullOrEmpty(listLine))
                 {
                     newList.Add(listLine);
                 }
@@ -953,6 +952,13 @@ namespace LMSF_Scheduler
 
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
+
+            //If step is a comment line, don't do anything except display it.
+            if (step.StartsWith("//"))
+            {
+                outString += $"{step}\n\n";
+                return outString;
+            }
 
             //Check for opening and closing "(" and ")"
             if (!step.EndsWith(")"))
