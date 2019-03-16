@@ -5077,8 +5077,45 @@ namespace LMSF_Scheduler
 
         private void InsertStepButton_Click(object sender, RoutedEventArgs e)
         {
-            //Validate, and execute step that is manually typed into insertStepTextBox (property: InsertStepText); during paused run.
-
+            //First make sure it is not an empty or null string
+            if (!string.IsNullOrWhiteSpace(InsertStepText))
+            {
+                //Validate, and execute step that is manually typed into insertStepTextBox (property: InsertStepText); during paused run.
+                List<int> valCheck = new List<int>();
+                string parseOut = ParseStep(1, InsertStepText, true, ref valCheck);
+                if (valCheck.Count == 0)
+                {
+                    //Insert manually inserted step to inputSteps
+                    if (inputSteps.Count <= stepNum + 1)
+                    {
+                        inputSteps.Add(InsertStepText);
+                    }
+                    else
+                    {
+                        inputSteps.Insert(stepNum + 1, InsertStepText);
+                    }
+                    
+                    //dialog to let user know it got inserted, and allow for protocol Cancel
+                    bool? oKToGo = SharedParameters.ShowPrompt($"Manually entered step validated and inserted: {InsertStepText}", "Step Inserted");
+                    if (!(oKToGo == true))
+                    {
+                        AbortCalled = true;
+                    }
+                    else
+                    {
+                        AddOutputText($"User inserted step during run: {InsertStepText}\n");
+                    }
+                }
+                else
+                {
+                    bool? oKToGo = SharedParameters.ShowPrompt($"Manually entered step failed to validate: {parseOut}.\nEdit step and retry.", "Step Validation Failed");
+                    if (!(oKToGo == true))
+                    {
+                        AbortCalled = true;
+                    }
+                }
+            }
+            
         }
     }
 

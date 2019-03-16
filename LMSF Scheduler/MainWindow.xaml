@@ -94,7 +94,7 @@
                 <TextBlock HorizontalAlignment="Left" Margin="50,0,0,1" Grid.Row="2" TextWrapping="Wrap" Text="Next Step:" VerticalAlignment="Center" Foreground="White"/>
                 <TextBox x:Name="nextStepTextBox" Height="23" Margin="109,6,50,6" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Grid.ColumnSpan="3" IsReadOnly="True" Background="#FFCBCBCB" Text="{Binding NextStep, Mode=TwoWay}"/>
                 <Button x:Name="insertStepButton" Content="Insert Step:" HorizontalAlignment="Left" Margin="45,0,0,0" VerticalAlignment="Center" Width="74" Click="InsertStepButton_Click" Grid.Row="3"/>
-                <TextBox x:Name="insertStepTextBox" Height="24" Margin="135,5.5,50,5.5" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Center" Grid.ColumnSpan="3" IsReadOnly="True" Text="{Binding InsertStepText, Mode=TwoWay}"/>
+                <TextBox x:Name="insertStepTextBox" Height="24" Margin="135,5.5,50,5.5" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Center" Grid.ColumnSpan="3" IsReadOnly="False" Text="{Binding InsertStepText, Mode=TwoWay}"/>
             </Grid>
         </DockPanel>
 
