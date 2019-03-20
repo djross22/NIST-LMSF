@@ -1,6 +1,10 @@
-Steps are entered into the "Steps Input:" text box; one step per line.
-Blank lines are ignored.
-Lines can be commented out with two forward slashes at the start of the line ("//"). Commented lines will be ignored.
+Scripts are entered into the "Steps Input:" text box; one step per line. Script files can be saved and opened using the normal set of Windows-style menus.
+Blank lines in the script are ignored.
+Lines can also be commented out with two forward slashes at the start of the line ("//"). Commented lines will be ignored.
+
+Before running a script, you can check to see if it is correctly written by clicking on the validate button (with the check-mark symbol)
+
+Basic control of running scripts is done with a familiar set of buttons for "Play", "Pause", "Single Step", and "Abort".
 
 Step syntax:
 <Command>(<parameter(s)>)
@@ -18,6 +22,9 @@ Parameters can contain key references, demarked by "{" and "}". The parser will 
 	gets parsed as:
 		UserPrompt(Test, abc testValue def testValue ghi)
 Key references that are not in the Metadata Dictionary will result in a Validation failure.
+
+
+There is a drop-down combo-box control at the top left of the LMSF Scheduler GUI window that contains all of the commands for quick access.
 
 
 Commands:
@@ -435,8 +442,21 @@ Metadata Dictionary:
 		The command parser first looks for a key in the string identifier dictionary (metaDictionary),
 		and then looks in the concentration dictionary if the key is not found in the string identifier dictionary.
 		So, it is possible to use the same key to store values in both dictionaries, but the parser will only be able to find the corresponding value in the string dictionary.
-		It is reccomended to use related, but not identical keys for matching additive identifiers and concentrations,
-			for example, "Get(additive, inducer)" followed by "Get(concentration, inducer stock)"
+		It is recommended to use related, but not identical keys for matching additive identifiers and concentrations,
+			for example, "Get(additive, inducer)" followed by "Get(concentration, inducerStock)"
 			
 		If the command parser finds the requested key in one of the dictionaries, it replaces the sub-string, "{<key>}", with the sub-string "<value>" in the parameter string.
+		
+		
+Remote connections:
+	The LMSF Scheduler uses TCP client-server communication protocols to send commands to the LMSF_Gen5 program, both when it is running on the same computer and also when it's running on a different computer in the system. For the TCP communication to work, the client-server link needs to first be connected.
+	To set up a connection, run both the LMSF Scheduler program and the LMSF_Gen5 program (again, either on the same computer or on a separate one).
+		In the LMSF_Gen5 program, click on the button labeled "Switch to Remote". Then in the LMSF Scheduler program, select the instance of LMSF_Gen5 from the drop-down combo-box at the bottom right of the GUI window. Select the 'Yes' option in the pop-up. The message "client connected" should appear in the message text box of the LMSF_Gen5 program.
+		
+	The LMSF Scheduler can also be used to control a remote connected STAR instrument. This is similar to the use of the LMSF_Gen5 program.
+	To set up a connection to a remote STAR controller, run both the LMSF Scheduler program (on the main computer) and the Hamilton Remote program (on the STAR computer).
+		In the Hamilton Remote program, click on the button labeled "Switch to Remote". Then in the LMSF Scheduler program, select the instance of the remote STAR computer from the drop-down combo-box at the bottom right of the GUI window. Select the 'Yes' option in the pop-up. The message "client connected" should appear in the message text box of the Remote Hamilton program.
+		
+	If the necessary remote connections are not established, a script that uses them will fail the validation check and so will not run.
+	
 	
