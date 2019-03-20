@@ -536,13 +536,13 @@ LoadXML() command to go with ImportDictionary() for restarting an experiment
 
 Change so that manually entered step runs when InsertStep button is clicked (if it validates)
 
+Add Math() Command
+	Enable simple math (+, -, *, /, %) with numeric quantities
+
 
 TODO:
 
 Combine metadata list/database from multiple computers
-
-Add Math() Command
-	Enable simple math (+, -, *, /, %) with numeric quantities
 	
 Take out "Validate with User input..."
 

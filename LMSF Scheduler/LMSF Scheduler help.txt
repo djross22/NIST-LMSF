@@ -373,6 +373,22 @@ Commands:
 			Set(msg1, Add bacteria to growth plate, put plate in reader, and click 'OK'.\n\n)
 			
 			
+	Math()
+		Performs basic math operations and sets an entry in the Metadata Dictionary with the result.
+		The Math() command is meant for simple things like counting plates. 
+		It can be used for the basic binary operations, '+', '-', '*', '/', and '%'.
+		It can only perform a single binary operator per step.
+		
+		Syntax:
+			Set(<key>, <expression>)
+			
+		Examples:
+			Math(count, {count} + 1)
+			Math(plateNumber, 2 * 3)
+			Math(gradNumber, {count} % 3)
+			Math(gradNumber, {gradNumber} + 1)
+			
+			
 	StartPrompt()
 		Opens a message dialog box for the start of a protocol. Lists the protocol requirements and offers 'OK' or 'Abort'.
 		The protocol title appears near the top of the dialog
