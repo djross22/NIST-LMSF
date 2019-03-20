@@ -543,6 +543,8 @@ Combine metadata list/database from multiple computers
 
 Add Math() Command
 	Enable simple math (+, -, *, /, %) with numeric quantities
+	
+Take out "Validate with User input..."
 
 Change Overlord variable setting format from "[varibale] value" to "variable = value" (wait for SDK)
 

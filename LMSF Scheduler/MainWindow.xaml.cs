@@ -2486,14 +2486,15 @@ namespace LMSF_Scheduler
                 //Math takes 2 arguments
                 //First argument is the key to be set in the metaDictionary
                 //Second argument is the expression
-                string keyString;
+                string keyString = "";
                 string expressionString;
+                double result = 0;
 
                 //string for start of output from ParseStep()
                 outString += "Math: ";
 
                 //one or more Booleans used to track validity of arguments/parameters
-                bool argsOk = false;
+                bool argsOk = true;
 
                 //If the command requires a certain number of arguments, check that first:
                 if (numArgs < 3)
@@ -2501,34 +2502,86 @@ namespace LMSF_Scheduler
                     //Message for missing argument or not enough arguments:
                     outString += "Math command requires two arguments (key and expression).";
                     val.Add(num);
+                    argsOk = false;
                 }
                 else
                 {
                     //key just has to be a non-empty string, which has already been ruled out,
                     //    so no additional validation checks needed for key
                     keyString = stepArgs[1];
-
-
                     expressionString = stepArgs[2];
+
                     //expression needs to contain exactly one occurance of a math operator (+, -, *, /, or %)
-                    string[] expressionArr = expressionString.Split(new[] { "+", "-", "*", "/", "%" }, StringSplitOptions.RemoveEmptyEntries);
+                    //    unless there are negative numbers - which are handled below
+                    string[] operatorArr = new[] { "+", "-", "*", "/", "%" };
+                    string[] expressionArr = expressionString.Split(operatorArr, StringSplitOptions.RemoveEmptyEntries);
+                    //Then clean up expressionArr by trimming white space from ends of each string, and removing empty strings.
+                    expressionArr = expressionArr.Select(s => s.Trim()).ToArray();
+                    expressionArr = expressionArr.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
                     if (expressionArr.Length == 2)
                     {
+                        string numberOneStr = expressionArr[0];
+                        string numberTwoStr = expressionArr[1];
+                        //Detect negative numbers based on how many operators and '-' characters are in the expression string
+                        int numNegatives = expressionString.Length - expressionString.Replace("-", "").Length;
+                        string tempStr = expressionString;
+                        foreach (string op in operatorArr)
+                        {
+                            tempStr = tempStr.Replace(op, "");
+                        }
+                        int numOperators = expressionString.Length - tempStr.Length;
+
+                        Because it's wrong...
+
+                        tempStr = expressionString.Replace("+", "");
+                        switch (numNegatives)
+                        {
+                            case 0:
+                            case 1:
+                                //if there are zero or one '-' characters, then the expression is parsed/split as above
+                                //so, nothing else needs to be done
+                                break;
+                            case 2:
+                                //If there are two '-' characters, then the operator is a '-' and one of the numbers is negative
+                                //Detirmine which and add '-' sign back to it
+                                if (expressionString.StartsWith("-"))
+                                {
+                                    numberOneStr = "-" + numberOneStr;
+                                }
+                                else
+                                {
+                                    numberTwoStr = "-" + numberTwoStr;
+                                }
+                                break;
+                            case 3:
+                                //If there are three '-' characters, then the operator is a '-' and both of the numbers are negative
+                                //So, before parsing, add the '-' sign back on to each
+                                numberOneStr = "-" + numberOneStr;
+                                numberTwoStr = "-" + numberTwoStr;
+                                break;
+                            default:
+                                //If there are more than three '-' characters, then send an error message
+                                outString += $"Too many negative signs. The dumb parser that Dave wrote is confused. Remember, don't use double negatives, and two wrongs don't make a right: {expressionString}.";
+                                val.Add(num);
+                                argsOk = false;
+                                break;
+                        }
+
                         //then both elements in the expressionArr need to be parsable as numbers
                         double numberOne;
                         double numberTwo;
-                        if (double.TryParse(expressionArr[0], out numberOne) && double.TryParse(expressionArr[1], out numberTwo))
+                        if (double.TryParse(numberOneStr, out numberOne) && double.TryParse(numberTwoStr, out numberTwo))
                         {
-                            double result = 0;
+                            MessageBox.Show($"{numberOneStr}: {numberOne}\n{numberTwoStr}: {numberTwo}");
+                            if (expressionString.Contains("-"))
+                            {
+                                result = numberOne - numberTwo;
+                            }
 
                             if (expressionString.Contains("+"))
                             {
                                 result = numberOne + numberTwo;
-                            }
-
-                            if (expressionString.Contains("-"))
-                            {
-                                result = numberOne - numberTwo;
                             }
 
                             if (expressionString.Contains("*"))
@@ -2547,27 +2600,28 @@ namespace LMSF_Scheduler
                             }
 
                             outString += $"{keyString} = {expressionString} = {result}.";
-
-                            //directly add the result to the dictionary here.
-                            metaDictionary[keyString] = $"{result}";
                         }
                         else
                         {
                             //Message for bad expression, terms not parsable as numbers:
                             outString += $"Expression not parsable as numbers: {expressionString}.";
                             val.Add(num);
+                            argsOk = false;
                         }
-
-                        
                     }
                     else
                     {
                         //Message for bad expression, wrong number of terms:
                         outString += "Math command requires an expression with two numbers separated by a single math operator (+, -, *, /, or %).";
                         val.Add(num);
+                        argsOk = false;
                     }
+                }
 
-                    
+                if (argsOk)
+                {
+                    //directly add the result to the dictionary here.
+                    metaDictionary[keyString] = $"{result}";
                 }
             }
 
