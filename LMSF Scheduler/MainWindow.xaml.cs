@@ -2532,18 +2532,15 @@ namespace LMSF_Scheduler
                         }
                         int numOperators = expressionString.Length - tempStr.Length;
 
-                        Because it's wrong...
-
                         tempStr = expressionString.Replace("+", "");
-                        switch (numNegatives)
+                        switch (numOperators)
                         {
-                            case 0:
                             case 1:
-                                //if there are zero or one '-' characters, then the expression is parsed/split as above
+                                //if there is just one operator, then the expression is parsed/split as above
                                 //so, nothing else needs to be done
                                 break;
                             case 2:
-                                //If there are two '-' characters, then the operator is a '-' and one of the numbers is negative
+                                //If there are two operators, then one of the numbers is negative
                                 //Detirmine which and add '-' sign back to it
                                 if (expressionString.StartsWith("-"))
                                 {
@@ -2555,58 +2552,68 @@ namespace LMSF_Scheduler
                                 }
                                 break;
                             case 3:
-                                //If there are three '-' characters, then the operator is a '-' and both of the numbers are negative
-                                //So, before parsing, add the '-' sign back on to each
+                                //If there are three operator characters, then both of the numbers are negative
+                                //    or, there are multiple operators in the middle of the expression
+                                if (!expressionString.StartsWith("-"))
+                                {
+                                    outString += $"Error in Math expression. The dumb parser that Dave wrote is confused. Remember, don't use double negatives, and two wrongs don't make a right: {expressionString}.";
+                                    val.Add(num);
+                                    argsOk = false;
+                                }
+                                //Then, before parsing, add the '-' sign back on to each
                                 numberOneStr = "-" + numberOneStr;
                                 numberTwoStr = "-" + numberTwoStr;
                                 break;
                             default:
-                                //If there are more than three '-' characters, then send an error message
-                                outString += $"Too many negative signs. The dumb parser that Dave wrote is confused. Remember, don't use double negatives, and two wrongs don't make a right: {expressionString}.";
+                                //If there are more than three operator characters, then send an error message
+                                outString += $"Too many operator charcters in Math expression. The dumb parser that Dave wrote is confused. Remember, don't use double negatives, and two wrongs don't make a right: {expressionString}.";
                                 val.Add(num);
                                 argsOk = false;
                                 break;
                         }
 
-                        //then both elements in the expressionArr need to be parsable as numbers
-                        double numberOne;
-                        double numberTwo;
-                        if (double.TryParse(numberOneStr, out numberOne) && double.TryParse(numberTwoStr, out numberTwo))
+                        if (argsOk)
                         {
-                            MessageBox.Show($"{numberOneStr}: {numberOne}\n{numberTwoStr}: {numberTwo}");
-                            if (expressionString.Contains("-"))
+                            //then both elements in the expressionArr need to be parsable as numbers
+                            double numberOne;
+                            double numberTwo;
+                            if (double.TryParse(numberOneStr, out numberOne) && double.TryParse(numberTwoStr, out numberTwo))
                             {
-                                result = numberOne - numberTwo;
-                            }
+                                MessageBox.Show($"{numberOneStr}: {numberOne}\n{numberTwoStr}: {numberTwo}");
+                                if (expressionString.Contains("-"))
+                                {
+                                    result = numberOne - numberTwo;
+                                }
 
-                            if (expressionString.Contains("+"))
+                                if (expressionString.Contains("+"))
+                                {
+                                    result = numberOne + numberTwo;
+                                }
+
+                                if (expressionString.Contains("*"))
+                                {
+                                    result = numberOne * numberTwo;
+                                }
+
+                                if (expressionString.Contains("/"))
+                                {
+                                    result = numberOne / numberTwo;
+                                }
+
+                                if (expressionString.Contains("%"))
+                                {
+                                    result = numberOne % numberTwo;
+                                }
+
+                                outString += $"{keyString} = {expressionString} = {result}.";
+                            }
+                            else
                             {
-                                result = numberOne + numberTwo;
+                                //Message for bad expression, terms not parsable as numbers:
+                                outString += $"Expression not parsable as numbers: {expressionString}.";
+                                val.Add(num);
+                                argsOk = false;
                             }
-
-                            if (expressionString.Contains("*"))
-                            {
-                                result = numberOne * numberTwo;
-                            }
-
-                            if (expressionString.Contains("/"))
-                            {
-                                result = numberOne / numberTwo;
-                            }
-
-                            if (expressionString.Contains("%"))
-                            {
-                                result = numberOne % numberTwo;
-                            }
-
-                            outString += $"{keyString} = {expressionString} = {result}.";
-                        }
-                        else
-                        {
-                            //Message for bad expression, terms not parsable as numbers:
-                            outString += $"Expression not parsable as numbers: {expressionString}.";
-                            val.Add(num);
-                            argsOk = false;
                         }
                     }
                     else
