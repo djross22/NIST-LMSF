@@ -541,7 +541,8 @@ TODO:
 
 Combine metadata list/database from multiple computers
 
-Enable simple math (+, -, *, /, %) with numeric quantities
+Add Math() Command
+	Enable simple math (+, -, *, /, %) with numeric quantities
 
 Change Overlord variable setting format from "[varibale] value" to "variable = value" (wait for SDK)
 

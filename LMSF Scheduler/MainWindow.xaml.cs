@@ -405,7 +405,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "LoadXML", "UserPrompt", "GetUserYesNo", "Set", "Get", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "LoadXML", "UserPrompt", "GetUserYesNo", "Set", "Math", "Get", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
 
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
@@ -1369,6 +1369,9 @@ namespace LMSF_Scheduler
                         break;
                     case "Set":
                         ParseSet(ref valReport);
+                        break;
+                    case "Math":
+                        ParseMath(ref valReport);
                         break;
                     case "Get":
                         ParseGet(ref valReport);
@@ -2475,6 +2478,96 @@ namespace LMSF_Scheduler
                 {
                     //Set steps need to run even when validating
                     RunSet(num, stepArgs);
+                }
+            }
+
+            void ParseMath(ref List<int> val)
+            {
+                //Math takes 2 arguments
+                //First argument is the key to be set in the metaDictionary
+                //Second argument is the expression
+                string keyString;
+                string expressionString;
+
+                //string for start of output from ParseStep()
+                outString += "Math: ";
+
+                //one or more Booleans used to track validity of arguments/parameters
+                bool argsOk = false;
+
+                //If the command requires a certain number of arguments, check that first:
+                if (numArgs < 3)
+                {
+                    //Message for missing argument or not enough arguments:
+                    outString += "Math command requires two arguments (key and expression).";
+                    val.Add(num);
+                }
+                else
+                {
+                    //key just has to be a non-empty string, which has already been ruled out,
+                    //    so no additional validation checks needed for key
+                    keyString = stepArgs[1];
+
+
+                    expressionString = stepArgs[2];
+                    //expression needs to contain exactly one occurance of a math operator (+, -, *, /, or %)
+                    string[] expressionArr = expressionString.Split(new[] { "+", "-", "*", "/", "%" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (expressionArr.Length == 2)
+                    {
+                        //then both elements in the expressionArr need to be parsable as numbers
+                        double numberOne;
+                        double numberTwo;
+                        if (double.TryParse(expressionArr[0], out numberOne) && double.TryParse(expressionArr[1], out numberTwo))
+                        {
+                            double result = 0;
+
+                            if (expressionString.Contains("+"))
+                            {
+                                result = numberOne + numberTwo;
+                            }
+
+                            if (expressionString.Contains("-"))
+                            {
+                                result = numberOne - numberTwo;
+                            }
+
+                            if (expressionString.Contains("*"))
+                            {
+                                result = numberOne * numberTwo;
+                            }
+
+                            if (expressionString.Contains("/"))
+                            {
+                                result = numberOne / numberTwo;
+                            }
+
+                            if (expressionString.Contains("%"))
+                            {
+                                result = numberOne % numberTwo;
+                            }
+
+                            outString += $"{keyString} = {expressionString} = {result}.";
+
+                            //directly add the result to the dictionary here.
+                            metaDictionary[keyString] = $"{result}";
+                        }
+                        else
+                        {
+                            //Message for bad expression, terms not parsable as numbers:
+                            outString += $"Expression not parsable as numbers: {expressionString}.";
+                            val.Add(num);
+                        }
+
+                        
+                    }
+                    else
+                    {
+                        //Message for bad expression, wrong number of terms:
+                        outString += "Math command requires an expression with two numbers separated by a single math operator (+, -, *, /, or %).";
+                        val.Add(num);
+                    }
+
+                    
                 }
             }
 
