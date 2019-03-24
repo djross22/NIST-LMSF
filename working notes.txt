@@ -557,6 +557,8 @@ Take out "Validate with User input..."
 
 
 TODO:
+
+Add output script file at end of run during SaveXML()
 	
 Add new command for Remote Hamilton, GetError(int errorIndex)
 	sends errorList[errorIndex] back as a message
