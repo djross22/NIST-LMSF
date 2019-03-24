@@ -4471,6 +4471,7 @@ namespace LMSF_Scheduler
                         timeFiniNode.Attributes.Append(statusFiniAtt);
                         dateNode.AppendChild(timeFiniNode);
                     }
+
                 }
 
                 //Save the XML document
@@ -4503,11 +4504,21 @@ namespace LMSF_Scheduler
                 }
             }
 
-            while (GetRemoteServerStatus(remoteServer) == $"{SharedParameters.ServerStatusStates.Busy}")
+            string remoteStatus = GetRemoteServerStatus(remoteServer);
+            while (remoteStatus == $"{SharedParameters.ServerStatusStates.Busy}")
             {
                 Thread.Sleep(pingInterval);
+                remoteStatus = GetRemoteServerStatus(remoteServer);
             }
 
+            //Check for errors and respond accordingly
+            if (remoteStatus.StartsWith("Error")) {
+                AddOutputText($"Remote Error on {remoteServer}.");
+                this.Dispatcher.Invoke(() => {
+                    IsPaused = true;
+                    MessageBox.Show($"Error during remote method on {remoteServer}! Check error messages, correct errors, and continue; or abort experiment", "Error!");
+                });
+            }
         }
 
         void RemoteProcessMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
