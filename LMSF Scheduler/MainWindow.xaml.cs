@@ -61,7 +61,6 @@ namespace LMSF_Scheduler
         private readonly object validatingLock = new object();
         private bool isValidating = false;
 
-        private bool isValUserInput;
         private List<int> valFailed;
         //Validation failure is signaled by adding/having one or more entires in the valFailed list
         //    valFailed is intialized to an empty list at the beginning of each run,
@@ -124,16 +123,6 @@ namespace LMSF_Scheduler
             {
                 this.insertStepText = value;
                 OnPropertyChanged("InsertStepText");
-            }
-        }
-
-        public bool IsValUserInput
-        {
-            get { return this.isValUserInput; }
-            set
-            {
-                this.isValUserInput = value;
-                OnPropertyChanged("IsValUserInput");
             }
         }
 
@@ -2086,23 +2075,15 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        //When validating, get actual user input for testing if IsValUserInput is true,
-                        // otherwise put placeholder values into dictionary
-                        if (IsValUserInput)
-                        {
-                            RunAppendXml(num, stepArgs);
-                        }
-                        else
-                        {
-                            DateTime startDt = DateTime.Now;
-                            metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
-                            metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
+                        //When validating, put placeholder values into dictionary
+                        DateTime startDt = DateTime.Now;
+                        metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDt, true);
+                        metaDictionary["startDate"] = SharedParameters.GetDateString(startDt);
 
-                            metaDictionary["experimentId"] = "place-holder-expId";
-                            metaDictionary["projectId"] = "place-holder-projectId";
-                            metaDictionary["metaDataFilePath"] = "place-holder-metaDataFilePath";
-                            metaDictionary["dataDirectory"] = SharedParameters.WorklistFolderPath;
-                        }
+                        metaDictionary["experimentId"] = "place-holder-expId";
+                        metaDictionary["projectId"] = "place-holder-projectId";
+                        metaDictionary["metaDataFilePath"] = "place-holder-metaDataFilePath";
+                        metaDictionary["dataDirectory"] = SharedParameters.WorklistFolderPath;
 
                     }
                 }
@@ -2275,16 +2256,7 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        //When validating, get actual user input for testing if IsValUserInput is true,
-                        // otherwise put placeholder value into dictionary
-                        if (IsValUserInput)
-                        {
-                            RunUserPrompt(num, stepArgs);
-                        }
-                        else
-                        {
-
-                        }
+                        //Nothing to do here when validating
                     }
                 }
             }
@@ -2341,16 +2313,8 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        //When validating, get actual user input for testing if IsValUserInput is true,
-                        // otherwise put placeholder value into dictionary
-                        if (IsValUserInput)
-                        {
-                            RunUserYesNo(num, stepArgs);
-                        }
-                        else
-                        {
-                            metaDictionary[keyString] = "place-holder-yes-no";
-                        }
+                        //When validating, put placeholder value into dictionary
+                        metaDictionary[keyString] = "place-holder-yes-no";
                     }
                 }
             }
@@ -2698,36 +2662,25 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        //When validating, get actual user input for testing if IsValUserInput is true,
-                        // otherwise put placeholder value into dictionary
-                        if (IsValUserInput)
+                        //When validating, put placeholder value into dictionary
+                        switch (typeStr)
                         {
-                            RunGet(num, stepArgs);
+                            case "concentration":
+                                concDictionary[keyStr] = new Concentration(0, SharedParameters.UnitsList[0]);
+                                metaDictionary[$"{keyStr}Conc"] = "0.00";
+                                metaDictionary[$"{keyStr}Units"] = SharedParameters.UnitsList[0];
+                                break;
+                            case "number":
+                                metaDictionary[keyStr] = "2.71828182846";
+                                break;
+                            case "integer":
+                                metaDictionary[keyStr] = "42";
+                                break;
+                            default:
+                                metaDictionary[keyStr] = $"place-holder-{typeStr}";
+                                break;
                         }
-                        else
-                        {
-                            switch (typeStr)
-                            {
-                                case "concentration":
-                                    concDictionary[keyStr] = new Concentration(0, SharedParameters.UnitsList[0]);
-                                    metaDictionary[$"{keyStr}Conc"] = "0.00";
-                                    metaDictionary[$"{keyStr}Units"] = SharedParameters.UnitsList[0];
-                                    break;
-                                case "number":
-                                    metaDictionary[keyStr] = "2.71828182846";
-                                    break;
-                                case "integer":
-                                    metaDictionary[keyStr] = "42";
-                                    break;
-                                default:
-                                    metaDictionary[keyStr] = $"place-holder-{typeStr}";
-                                    break;
-                            }
-
-                        }
-
                     }
-
                 }
             }
 
@@ -2794,19 +2747,10 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        //When validating, get actual user input for testing if IsValUserInput is true,
-                        // otherwise put placeholder value into dictionary
-                        if (IsValUserInput)
-                        {
-                            RunGetExpId(num, stepArgs);
-                        }
-                        else
-                        {
-                            metaDictionary["experimentId"] = $"place-holder-experimentId";
-                            metaDictionary["metaDataFilePath"] = $"place-holder-metaDataFilePath";
-                            metaDictionary["dataDirectory"] = SharedParameters.WorklistFolderPath;
-                        }
-
+                        //When validating, put placeholder value into dictionary
+                        metaDictionary["experimentId"] = $"place-holder-experimentId";
+                        metaDictionary["metaDataFilePath"] = $"place-holder-metaDataFilePath";
+                        metaDictionary["dataDirectory"] = SharedParameters.WorklistFolderPath;
                     }
 
                 }
@@ -2888,16 +2832,8 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        //When validating, get actual user input for testing if IsValUserInput is true,
-                        // otherwise put placeholder value into dictionary
-                        if (IsValUserInput)
-                        {
-                            RunGetFile(num, stepArgs);
-                        }
-                        else
-                        {
-                            metaDictionary[fileKey] = $"place-holder-file-path";
-                        }
+                        //When validating, put placeholder value into dictionary
+                        metaDictionary[fileKey] = $"place-holder-file-path";
 
                     }
 
@@ -2967,16 +2903,7 @@ namespace LMSF_Scheduler
                     }
                     else
                     {
-                        //When validating, get actual user input for testing if IsValUserInput is true,
-                        // otherwise put placeholder value into dictionary
-                        if (IsValUserInput)
-                        {
-                            RunStartDialog(num, stepArgs);
-                        }
-                        else
-                        {
-
-                        }
+                        //Nothing to do when validating
                     }
                 }
             }
@@ -3180,8 +3107,7 @@ namespace LMSF_Scheduler
             {
                 //if the step-runner thread is not already running, start it up
 
-                //Run validation check before running actual experiment, but without user input
-                IsValUserInput = false;
+                //Run validation check before running actual experiment
                 if (Validate())
                 {
                     //Change the IsPaused property to false
@@ -3207,8 +3133,6 @@ namespace LMSF_Scheduler
             {
                 //if the step-runner thread is not already running, start it up the same as with PlayButton_Click
                 //    but with IsPaused = true and IsOneStep = true, so that it just runs one step
-                //    and without user input
-                IsValUserInput = false;
                 if (Validate())
                 {
                     IsPaused = true;

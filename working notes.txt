@@ -538,13 +538,33 @@ Change so that manually entered step runs when InsertStep button is clicked (if 
 
 Add Math() Command
 	Enable simple math (+, -, *, /, %) with numeric quantities
+	
+Add Error status to ServerStatusStates
+
+Add error reporting (by checking log file at completion of run) to Remote Hamilton
+
+Remote Hamilton run-time error reporting:
+	When method finishes, Remote Hamilton checks log file for lines that contain "error"
+	On error, adds lines from log file to errorList
+	if errorList is not empty, status is set to Error.
+	
+	The Main Window gets status back as "Error"
+		Pause, alert user
+
+Add Basic error handling (pause and alert user) in WaitForRemote() method 
+	
+Take out "Validate with User input..."
 
 
 TODO:
+	
+Add new command for Remote Hamilton, GetError(int errorIndex)
+	sends errorList[errorIndex] back as a message
+	Need to remove all commas detected in error lines (replace with semi-colons), to avoid issues with TCP message wrapping and unwrapping (which uses commas as separators)
+			
+
 
 Combine metadata list/database from multiple computers
-	
-Take out "Validate with User input..."
 
 Change Overlord variable setting format from "[varibale] value" to "variable = value" (wait for SDK)
 
@@ -561,6 +581,7 @@ Command to read/write from/to the carousel inventory file
 Or Carousel inventory that works like Hamilton Tip Counter.
 
 Run-time error handling
+	Pause and Notify
 	Retry
 	Manually change dictionary entry, then retry
 	Edit command line then retry
