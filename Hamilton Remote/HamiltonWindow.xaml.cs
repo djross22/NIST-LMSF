@@ -45,6 +45,9 @@ namespace Hamilton_Remote
         //log file
         private string logFilePath;
 
+        //Error handlimg
+        List<string> errorList;
+
         //variables for TCP communication
         private string serverName;
         private SimpleTcpServer server;
@@ -359,7 +362,10 @@ namespace Hamilton_Remote
                     }
                 }
 
-                //This part starts the Hamiltin HxRun.exe process
+                //Clear the error list
+                errorList = new List<string>();
+
+                //This part starts the Hamilton HxRun.exe process
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.FileName = @"C:\Program Files (x86)\HAMILTON\Bin\HxRun.exe";
 
@@ -410,6 +416,78 @@ namespace Hamilton_Remote
             });
 
             AddOutputText("Hamilton Method finished.");
+
+            //Check for errors
+            //    first find log file 
+            string logDirectory = @"C:\Program Files (x86)\HAMILTON\LogFiles";
+            string logStart = System.IO.Path.GetFileNameWithoutExtension(MethodPath);
+            string[] traceFileArr = Directory.GetFiles(logDirectory, $"{logStart}*.trc", SearchOption.TopDirectoryOnly);
+
+            if (traceFileArr.Length == 0)
+            {
+                //if there are no matching trace files, something is probably wrong
+                AddOutputText("No log file found. Something is wrong.");
+                return;
+            }
+            DateTime latestTime = new DateTime(1, 1, 1);
+            string latestFile = traceFileArr[0];
+            foreach (string file in traceFileArr)
+            {
+                if (File.GetLastWriteTime(file) > latestTime)
+                {
+                    latestFile = file;
+                    latestTime = File.GetLastWriteTime(file);
+                }
+            }
+            string logFilePath = latestFile;
+
+            //    create list of lines that have error messages from log file
+            string[] lines = File.ReadAllLines(logFilePath);
+            
+            foreach (string s in lines)
+            {
+                if (!string.IsNullOrWhiteSpace(s) && s.IndexOf("error", StringComparison.OrdinalIgnoreCase) > -1)
+                {
+                    if (IsActualError(s))
+                    {
+                        errorList.Add(s);
+                        AddOutputText($"    Error in Hamilton Method: {s}");
+                    }
+                }
+            }
+        }
+
+        private bool IsActualError(string line)
+        {
+            bool isActual = true;
+
+            //This is the list of strings that contain the word "error" but don't indicate an actual error
+            List<string> notActualStrings = new List<string>();
+            notActualStrings.Add("Start error handling in walkaway mode (no dialog).");
+            notActualStrings.Add("error;  ");
+            notActualStrings.Add("Error manually recovered by user");
+            notActualStrings.Add("Error automatically recovered depending of custom error");
+            notActualStrings.Add("_Method::EASYPICKII::APPLICATION::GetApplicationStartError");
+            notActualStrings.Add("o_intApplicationStartError=0");
+            notActualStrings.Add("Error Code=\"er00\"");
+            notActualStrings.Add("Main - error;");
+            notActualStrings.Add("The error description is: Step canceled.");
+            notActualStrings.Add("complete with error;");
+            notActualStrings.Add("User-defined error handling will be used.");
+            notActualStrings.Add("o_intErrorCode=0");
+            notActualStrings.Add("Trace - error;");
+            notActualStrings.Add("o_strErrorCode = 'TEC_0'");
+            notActualStrings.Add("SmartStepCustomErrorHandling");
+
+            foreach (String s in notActualStrings)
+            {
+                if (line.Contains(s))
+                {
+                    isActual = false;
+                }
+            }
+            
+            return isActual;
         }
 
         private void SetTcpPort()
@@ -478,8 +556,16 @@ namespace Hamilton_Remote
             if (goodMsg)
             {
                 //send back status if good message
-                replyStr = $"{msgParts[0]},{statusForReply},{msgParts[2]}";
-                textOutAdd = $"reply sent, {statusForReply}.\n";
+                if (statusForReply != SharedParameters.ServerStatusStates.Error)
+                {
+                    replyStr = $"{msgParts[0]},{statusForReply},{msgParts[2]}";
+                    textOutAdd = $"reply sent, {statusForReply}.\n";
+                }
+                else
+                {
+                    replyStr = $"{msgParts[0]},{statusForReply}{errorList.Count},{msgParts[2]}";
+                    textOutAdd = $"reply sent, {statusForReply}{errorList.Count}.\n";
+                }
             }
             else
             {
@@ -569,7 +655,14 @@ namespace Hamilton_Remote
                     {
                         lock (serverStatusLock)
                         {
-                            ServerStatus = SharedParameters.ServerStatusStates.Idle;
+                            if (errorList.Count == 0)
+                            {
+                                ServerStatus = SharedParameters.ServerStatusStates.Idle;
+                            }
+                            else
+                            {
+                                ServerStatus = SharedParameters.ServerStatusStates.Error;
+                            }
                         }
                     }
                     else
