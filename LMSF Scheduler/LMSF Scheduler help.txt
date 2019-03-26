@@ -207,9 +207,11 @@ Commands:
 			
 			
 	SaveXML()
-		Saves the XML metadata document.
+		Saves the XML metadata document - in the directory set by the NewXML(), AppendXML(), or GetExpId() command.
 		By default, this command also appends the "protocol finished" node to the dateTime node in the XML document.
 		If the optional argument, "not finished" is used, the "protocol finished" node will not be appended.
+		This method also writes a .lmsf script file to the same directory with the list of steps that have been run for the protocol. 
+			This output script file also includes steps that were run manually during a pause.
 		
 		Syntax:
 			SaveXML({not finished (optional)})

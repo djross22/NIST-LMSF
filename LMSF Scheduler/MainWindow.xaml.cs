@@ -44,6 +44,7 @@ namespace LMSF_Scheduler
 
         //For parsing and running steps
         private List<string> inputSteps;
+        private List<string> outputSteps;
 
         //lock for waitingForStepCompletion
         private readonly object stepCompletionLock = new object();
@@ -756,9 +757,10 @@ namespace LMSF_Scheduler
         {
             bool initOK = true;
 
-            //Initialize metadata Dictionaries
+            //Initialize metadata Dictionaries and outputSteps list
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
+            outputSteps = new List<string>();
 
             //by default, don't collect metadata
             isCollectingXml = false;
@@ -958,6 +960,8 @@ namespace LMSF_Scheduler
             //    if a step fails a validation check, the step number is added to the valFailed/valReport list
             //Validation of single steps inserted during a pause in the run is handled similarly, 
             //    but with a different valReport target
+
+            outputSteps.Add(step);
 
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
@@ -1396,6 +1400,48 @@ namespace LMSF_Scheduler
 
             outString += "\r\n";
             outString += "\r\n";
+
+            //if there were dictionary keys that were used for the input step, also add the substituted version of the step to the outputList (commented out)
+            if (step.Contains("{"))
+            {
+                string outStep;
+                if (stepArgs[0] == "If")
+                {
+                    outStep = $"If({stepArgs[1]}(";
+                    if (numArgs > 2)
+                    {
+                        for (int i = 2; i < numArgs; i++)
+                        {
+                            outStep += stepArgs[i];
+                            if (i < numArgs - 1)
+                            {
+                                outStep += ", ";
+                            }
+                        }
+                    }
+                    outStep += "))";
+                }
+                else
+                {
+                    outStep = $"{stepArgs[0]}(";
+                    if (numArgs > 1)
+                    {
+                        for (int i = 1; i < numArgs; i++)
+                        {
+                            outStep += stepArgs[i];
+                            if (i < numArgs - 1)
+                            {
+                                outStep += ", ";
+                            }
+                        }
+                    }
+                    outStep += ")";
+                }
+
+                outputSteps.Add($"//{outStep}");
+            }
+            outputSteps.Add(""); //add blank line to make output script easier to read
+
 
             return outString;
 
@@ -3840,6 +3886,37 @@ namespace LMSF_Scheduler
             catch (Exception e)
             {
                 MessageBox.Show($"Error saving XML document: {e}");
+            }
+
+            //Also save the outputSteps list as a script file in the experiment folder
+            //    append a number to the script output file name so that multiple scripts can be run for a single experiment/folder
+            string saveDirectory = System.IO.Path.GetDirectoryName(metaDataFilePath);
+            if (Directory.Exists(saveDirectory))
+            {
+                string fileNameRoot = System.IO.Path.GetFileNameWithoutExtension(metaDataFilePath);
+                int expNum = 1;
+                string filePath = System.IO.Path.Combine(saveDirectory, $"{fileNameRoot}.output script_{expNum}.lmsf");
+                while (File.Exists(filePath))
+                {
+                    expNum++;
+                    filePath = System.IO.Path.Combine(saveDirectory, $"{fileNameRoot}.output script_{expNum}.lmsf");
+                }
+
+                try
+                {
+                    using (StreamWriter outputFile = new StreamWriter(filePath))
+                    {
+                        foreach (string line in outputSteps)
+                        {
+                            outputFile.WriteLine(line);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    AddOutputText($"Exception while writing output steps script: {e}.\n");
+                }
+
             }
 
             //turn off metadata collection
