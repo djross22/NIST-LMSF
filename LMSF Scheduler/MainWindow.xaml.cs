@@ -2589,7 +2589,6 @@ namespace LMSF_Scheduler
                             double numberTwo;
                             if (double.TryParse(numberOneStr, out numberOne) && double.TryParse(numberTwoStr, out numberTwo))
                             {
-                                MessageBox.Show($"{numberOneStr}: {numberOne}\n{numberTwoStr}: {numberTwo}");
                                 if (expressionString.Contains("-"))
                                 {
                                     result = numberOne - numberTwo;
