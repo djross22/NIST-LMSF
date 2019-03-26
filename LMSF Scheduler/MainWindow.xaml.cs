@@ -797,7 +797,7 @@ namespace LMSF_Scheduler
                             {
                                 initOK = false;
                                 string msg = $"Error reading script file, {line}, {e}";
-                                SharedParameters.ShowPrompt(msg, "Script File Error");
+                                this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(msg, "Script File Error"); });
                                 return initOK;
                             }
                         }
