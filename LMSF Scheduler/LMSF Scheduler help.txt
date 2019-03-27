@@ -1,6 +1,8 @@
 Scripts are entered into the "Steps Input:" text box; one step per line. Script files can be saved and opened using the normal set of Windows-style menus.
 Blank lines in the script are ignored.
 Lines can also be commented out with two forward slashes at the start of the line ("//"). Commented lines will be ignored.
+A line starting with "#" will also be ignored unless it is in a script file that is read and run via the ReadScript() command.
+	The "#InsertVariables" line is used to indicated where to insert variable setting commands within a script file that will be run via the ReadScript() command.
 
 Before running a script, you can check to see if it is correctly written by clicking on the validate button (with the check-mark symbol)
 
@@ -34,12 +36,15 @@ Commands:
 		ReadScript cannot be used inside an If() statement (see below)
 		The <file path> must be an existing path to a .lmsf script file.
 			The <file path> parameter cannot contain any key references.
+		Variables are set using a normal "a = b" syntax.
+			To reference an item in the Metadata Dictionaries, use curly brackets: "a = {key}"
 		
 		Syntax:
-			ReadScript(<file path>)
+			ReadScript(<file path>, {<variables to be set (optional)>})
 			
 		Examples:
 			ReadScript(C:\Program Files (x86)\HAMILTON\Methods\GSF-IMS Project\Double 2D gradient plus 1000x bacteria.lmsf)
+			ReadScript(C:\Users\djross\Documents\temp\Math test.lmsf, op = {b})
 	
 	
 	Overlord()

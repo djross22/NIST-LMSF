@@ -716,15 +716,26 @@ namespace LMSF_Scheduler
             inputTextBox.Focus();
         }
 
-        private string[] ReadScriptFile(string line)
+        private string[] ReadScriptFile(string scriptLine)
         {
             string[] lines;
+            List<string> lineList = new List<string>();
+            lineList.Add($"#{scriptLine}");
 
-            int scriptCommandEnd = line.IndexOf('(');
-            string scriptCommand = line.Substring(0, scriptCommandEnd);
-            string scriptFilePath = line.Substring(scriptCommandEnd + 1);
-            scriptFilePath = scriptFilePath.Remove(scriptFilePath.Length - 1); //remove the closing ")"
-            scriptFilePath = scriptFilePath.Trim(); //remove leading and trailing white space
+            int scriptCommandEnd = scriptLine.IndexOf('(');
+            string scriptCommand = scriptLine.Substring(0, scriptCommandEnd);
+
+            string scriptArgsStr = scriptLine.Substring(scriptCommandEnd + 1);
+            scriptArgsStr = scriptArgsStr.Remove(scriptArgsStr.Length - 1); //remove the closing ")"
+            string[] scriptArgs = scriptArgsStr.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            //Then clean up scriptArgs by trimming white space from ends of each string, and removing empty strings.
+            scriptArgs = scriptArgs.Select(s => s.Trim()).ToArray();
+            scriptArgs = scriptArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            string scriptFilePath = scriptArgs[0];
+            //string scriptFilePath = line.Substring(scriptCommandEnd + 1);
+            //scriptFilePath = scriptFilePath.Remove(scriptFilePath.Length - 1); //remove the closing ")"
+            //scriptFilePath = scriptFilePath.Trim(); //remove leading and trailing white space
 
             if (scriptCommand == "ReadScript")
             {
@@ -733,6 +744,110 @@ namespace LMSF_Scheduler
                     if (scriptFilePath.EndsWith(".lmsf"))
                     {
                         lines = File.ReadAllLines(scriptFilePath);
+
+                        //parse additional arguments to set values of variables in script
+                        if (scriptArgs.Length > 1)
+                        {
+                            Dictionary<string, string> varDict = new Dictionary<string, string>();
+                            bool varArgsOk = true;
+                            int i=0;
+                            string[] varSet;
+                            foreach (string s in scriptArgs)
+                            {
+                                if (i>0)
+                                {
+                                    //varArgs.Add(s);
+
+                                    int numberOfEquals = s.Length - s.Replace("=", "").Length;
+                                    varSet = s.Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries);
+                                    //Then clean up varSet by trimming white space from ends of each string, and removing empty strings.
+                                    varSet = varSet.Select(x => x.Trim()).ToArray();
+                                    varSet = varSet.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                                    if ( (varSet.Length == 2) && (numberOfEquals == 1) )
+                                    {
+                                        varDict[varSet[0]] = varSet[1];
+                                    }
+                                    else
+                                    {
+                                        varArgsOk = false;
+                                        break;
+                                    }
+                                }
+                                i++;
+                            }
+
+                            if (varArgsOk)
+                            {
+                                //replace variables
+                                //    by adding Set() commands
+                                //    default is to add Set() commands at beginning of script, 
+                                //        but they are also added anywhere in the script where there is a "#InsertVariables" line
+                                lineList.Add("#InsertVariables");
+                                foreach (KeyValuePair<string, string> entry in varDict)
+                                {
+                                    lineList.Add($"Set({entry.Key}, {entry.Value})");
+                                }
+                                lineList.Add("#End InsertVariables");
+
+                                if (lines != null)
+                                {
+                                    foreach (string s in lines)
+                                    {
+                                        lineList.Add(s);
+
+                                        if (s.StartsWith("#InsertVariables"))
+                                        {
+                                            foreach (KeyValuePair<string, string> entry in varDict)
+                                            {
+                                                lineList.Add($"Set({entry.Key}, {entry.Value})");
+                                            }
+
+                                            lineList.Add("#End InsertVariables");
+                                        }
+                                    }
+                                }
+
+                                //This way does a hard-write over variables in the script file. It is less flexible:
+                                //foreach (KeyValuePair<string, string> entry in varDict)
+                                //{
+                                //    //Check if each entry.Key is found in script file (with containing curly brackets, {})
+                                //    //    and replace it with entry.Value in each line where it is found
+                                //    bool keyFound = false;
+                                //    for (int j=0; j<lines.Length; j++)
+                                //    {
+                                //        string oldLine = lines[j];
+                                //        if (oldLine.Contains("{" + entry.Key + "}"))
+                                //        {
+                                //            keyFound = true;
+                                //            lines[j] = oldLine.Replace("{" + entry.Key + "}", entry.Value);
+                                //        }
+
+                                //    }
+
+                                //    if (!keyFound)
+                                //    {
+                                //        //throw error
+                                //        throw new ArgumentException($"Key, {entry.Key}, not found in script file, {scriptFilePath}");
+                                //    }
+                                //}
+                                ///////////////////////////////////////////////////////////////////////////////////////////////
+                            }
+                            else
+                            {
+                                //throw error
+                                throw new ArgumentException($"Syntax error in passing arguments to script file: {scriptLine}");
+                            }
+                        }
+                        else
+                        {
+                            if (lines != null)
+                            {
+                                foreach (string s in lines)
+                                {
+                                    lineList.Add(s);
+                                }
+                            }
+                        }
                     }
                     else
                     {
@@ -748,8 +863,11 @@ namespace LMSF_Scheduler
             {
                 throw new ArgumentException($"{scriptCommand} != ReadScript");
             }
+            
+            lineList.Add($"#End {scriptLine}");
 
-            return lines;
+            //return lines;
+            return lineList.ToArray();
         }
 
         //Breaks the InputText into steps/lines
@@ -967,7 +1085,7 @@ namespace LMSF_Scheduler
             outString += $"{SharedParameters.GetDateTimeString()}; ";
 
             //If step is a comment line, don't do anything except display it.
-            if (step.StartsWith("//"))
+            if (step.StartsWith("//") || step.StartsWith("#") )
             {
                 outString += $"{step}\n\n";
                 return outString;

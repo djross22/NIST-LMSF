@@ -555,14 +555,29 @@ Add Basic error handling (pause and alert user) in WaitForRemote() method
 	
 Take out "Validate with User input..."
 
+Add output script file saved during SaveXML() (usually at the end of the run)
+
+Add parameters to ReadScript to set dictionary values needed by the script
+	#InsertVariables to indicate where in the script file to insert Set() commands if script file is run via a ReadScript() command
+
 
 TODO:
 
-Add output script file at end of run during SaveXML()
+
+
+
+
+
+	
 	
 Add new command for Remote Hamilton, GetError(int errorIndex)
+	This is not a command that needs to be run from the script. It is part of the automated error recovery. So will only be called within the c# code.
 	sends errorList[errorIndex] back as a message
 	Need to remove all commas detected in error lines (replace with semi-colons), to avoid issues with TCP message wrapping and unwrapping (which uses commas as separators)
+	
+Walk-away error handling:
+	have a script (.lmsf) file for each error handling situation
+	new command OnError(<error code>, <error script>)
 			
 
 
@@ -576,9 +591,6 @@ error log
 
 Add additional optional parameters to Hamilton() and RemoteHam() that set dictionary keys and write values to XML
 
-Add parameters to ReadScript to set dictionary values needed by the script
-	have #Required parameters on first line of script?
-
 Command to read/write from/to the carousel inventory file
 Or Carousel inventory that works like Hamilton Tip Counter.
 
@@ -588,11 +600,11 @@ Run-time error handling
 	Manually change dictionary entry, then retry
 	Edit command line then retry
 	Ignore/Continue
-
-Copy/write script (input and/or output?) file to data directory on CopyRemoteFiles()
-
-
-
+	
+	Walk-away error handling:
+		have a script (.lmsf) file for each error handling situation
+		new command OnError(<error code>, <error script>)
+		
 
 
 
