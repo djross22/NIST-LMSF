@@ -853,7 +853,11 @@ namespace LMSF_Gen5
                             ExperimentId = expIdStr;
                             ExpFolderPath = saveFolder;
                             NewExp();
-                            CarrierIn();
+                            if (ReaderName.StartsWith("Epoch"))
+                            {
+                                CarrierIn();
+                            }
+                            
                             RunExp();
                         });
                     }
