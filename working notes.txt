@@ -560,10 +560,14 @@ Add output script file saved during SaveXML() (usually at the end of the run)
 Add parameters to ReadScript to set dictionary values needed by the script
 	#InsertVariables to indicate where in the script file to insert Set() commands if script file is run via a ReadScript() command
 
+Long identifiers, take out RegEx validation/restriction
+
+Fix bug during CopyRemoteFiles(): don't try to copy files from "local host"
+
 
 TODO:
 
-
+Issue with Neo not closing door at start of read???
 
 
 

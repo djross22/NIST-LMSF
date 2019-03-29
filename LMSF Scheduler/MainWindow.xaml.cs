@@ -3422,31 +3422,34 @@ namespace LMSF_Scheduler
                         {
                             string ip = readerIps[s];
 
-                            string localStart = @"C:\Shared Files";
-                            string remoteStart = @"\\" + ip + @"\Shared Files";
-                            string pathFromHere = saveDirectory.Replace(localStart, remoteStart);
-
-                            try
+                            if (ip != "localhost")
                             {
-                                string[] fileArray = Directory.GetFiles(pathFromHere, "*", SearchOption.AllDirectories);
-                                string localCopy;
+                                string localStart = @"C:\Shared Files";
+                                string remoteStart = @"\\" + ip + @"\Shared Files";
+                                string pathFromHere = saveDirectory.Replace(localStart, remoteStart);
 
-                                foreach (string f in fileArray)
+                                try
                                 {
-                                    localCopy = f.Replace(remoteStart, localStart);
-                                    try
+                                    string[] fileArray = Directory.GetFiles(pathFromHere, "*", SearchOption.AllDirectories);
+                                    string localCopy;
+
+                                    foreach (string f in fileArray)
                                     {
-                                        File.Copy(f, localCopy);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        MessageBox.Show($"LMSF Scheduler is not able to the file, {f} on the remote {s} computer (IP adress: {ip}) to the local computer. Manually copy the file and click 'OK' to continue");
+                                        localCopy = f.Replace(remoteStart, localStart);
+                                        try
+                                        {
+                                            File.Copy(f, localCopy);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            MessageBox.Show($"LMSF Scheduler is not able to the file, {f} on the remote {s} computer (IP adress: {ip}) to the local computer. Manually copy the file and click 'OK' to continue");
+                                        }
                                     }
                                 }
-                            }
-                            catch (Exception e)
-                            {
-                                MessageBox.Show($"LMSF Scheduler is not able to copy files from {saveDirectory} on the remote {s} computer (IP adress: {ip}). Manually copy files and click 'OK' to continue");
+                                catch (Exception e)
+                                {
+                                    MessageBox.Show($"LMSF Scheduler is not able to copy files from {saveDirectory} on the remote {s} computer (IP adress: {ip}). Manually copy files and click 'OK' to continue");
+                                }
                             }
                         }
                     }
