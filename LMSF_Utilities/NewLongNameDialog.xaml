@@ -24,9 +24,6 @@
         <TextBox x:Name="newLongNameTextBox" Height="25" TextWrapping="Wrap" VerticalAlignment="Top" Margin="60,85,60,0">
             <TextBox.Text>
                 <Binding Path="NewLongName" UpdateSourceTrigger="PropertyChanged">
-                    <Binding.ValidationRules>
-                        <local:RegexValidationRule RegexText = "^[-a-zA-Z0-9\u0370-\u03ff() ]+$" ErrorMessage="Long names can only contain letters, numbers, spaces, or '-'." ValidationOptions="None"/>
-                    </Binding.ValidationRules>
                 </Binding>
             </TextBox.Text>
         </TextBox>
