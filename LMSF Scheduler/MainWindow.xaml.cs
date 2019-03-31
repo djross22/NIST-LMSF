@@ -2754,8 +2754,21 @@ namespace LMSF_Scheduler
 
                 if (argsOk)
                 {
-                    //directly add the result to the dictionary here.
-                    metaDictionary[keyString] = $"{result}";
+                    if (!localIsValidating)
+                    {
+                        //directly add the result to the dictionary here.
+                        metaDictionary[keyString] = $"{result}";
+                    }
+                    else
+                    {
+                        //When validating, don't actually replace existing dictionary values;
+                        //    this is necesary to avoid running a manually entered Math() step twice.
+                        if (!metaDictionary.ContainsKey(keyString))
+                        {
+                            metaDictionary[keyString] = $"{result}";
+                        }
+                        
+                    }
                 }
             }
 
