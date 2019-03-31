@@ -567,8 +567,6 @@ Fix bug during CopyRemoteFiles(): don't try to copy files from "local host"
 
 TODO:
 
-Issue with Neo not closing door at start of read???
-
 
 
 

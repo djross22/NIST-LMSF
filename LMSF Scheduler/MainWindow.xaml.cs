@@ -2567,7 +2567,7 @@ namespace LMSF_Scheduler
                     }
                     
                     argsOk = true;
-                    outString += $"{valueString} -> {keyString} ";
+                    outString += "{" + $"{keyString}" + "}" + $" = {valueString}";
                 }
 
                 if (argsOk)
