@@ -779,15 +779,7 @@ namespace LMSF_Scheduler
                             if (varArgsOk)
                             {
                                 //replace variables
-                                //    by adding Set() commands
-                                //    default is to add Set() commands at beginning of script, 
-                                //        but they are also added anywhere in the script where there is a "#InsertVariables" line
-                                lineList.Add("#InsertVariables");
-                                foreach (KeyValuePair<string, string> entry in varDict)
-                                {
-                                    lineList.Add($"Set({entry.Key}, {entry.Value})");
-                                }
-                                lineList.Add("#End InsertVariables");
+                                //    by adding Set() commands whenever a "#InsertVariables" line is found in the script file
 
                                 if (lines != null)
                                 {
@@ -807,30 +799,6 @@ namespace LMSF_Scheduler
                                     }
                                 }
 
-                                //This way does a hard-write over variables in the script file. It is less flexible:
-                                //foreach (KeyValuePair<string, string> entry in varDict)
-                                //{
-                                //    //Check if each entry.Key is found in script file (with containing curly brackets, {})
-                                //    //    and replace it with entry.Value in each line where it is found
-                                //    bool keyFound = false;
-                                //    for (int j=0; j<lines.Length; j++)
-                                //    {
-                                //        string oldLine = lines[j];
-                                //        if (oldLine.Contains("{" + entry.Key + "}"))
-                                //        {
-                                //            keyFound = true;
-                                //            lines[j] = oldLine.Replace("{" + entry.Key + "}", entry.Value);
-                                //        }
-
-                                //    }
-
-                                //    if (!keyFound)
-                                //    {
-                                //        //throw error
-                                //        throw new ArgumentException($"Key, {entry.Key}, not found in script file, {scriptFilePath}");
-                                //    }
-                                //}
-                                ///////////////////////////////////////////////////////////////////////////////////////////////
                             }
                             else
                             {
