@@ -46,7 +46,7 @@ namespace Hamilton_Remote
         private string logFilePath;
 
         //Error handlimg
-        List<string> errorList;
+        List<string> errorList = new List<string>();
 
         //variables for TCP communication
         private string serverName;
@@ -664,6 +664,7 @@ namespace Hamilton_Remote
                                 ServerStatus = SharedParameters.ServerStatusStates.Error;
                             }
                         }
+
                     }
                     else
                     {
@@ -679,7 +680,6 @@ namespace Hamilton_Remote
 
                 Thread.Sleep(100);
             }
-
         }
 
         void ParseAndRunCommand(string msg)
