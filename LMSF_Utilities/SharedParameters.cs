@@ -721,7 +721,7 @@ namespace LMSF_Utilities
 
                     if (metaType=="media")
                     {
-                        GetAndSaveMediaIngredients(newIdent);
+                        //GetAndSaveMediaIngredients(newIdent);
                     }
                     else
                     {
