@@ -1230,21 +1230,22 @@ namespace LMSF_Scheduler
             }
 
             bool ifResult = true;
+            string ifTestStr = "";
             if (stepArgs[0] == "If")
             {
                 //this is an if statement, so the next argment needs to be the logical test
                 if (stepArgs.Length > 2)
                 {
+                    ifTestStr = stepArgs[1].Trim();
                     if (stepArgs[1].Contains("==") || stepArgs[1].Contains("!="))
                     {
-                        string stringToSplit = stepArgs[1].Trim();
-                        string[] logicStrings = stringToSplit.Split(new[] { "==", "!=" }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] logicStrings = ifTestStr.Split(new[] { "==", "!=" }, StringSplitOptions.RemoveEmptyEntries);
                         if (logicStrings.Length == 2)
                         {
                             string firstStr = logicStrings[0].Trim();
                             string secondStr = logicStrings[1].Trim();
-                            outString += $"If: {stringToSplit}, ";
-                            if (stringToSplit.Contains("=="))
+                            outString += $"If: {ifTestStr}, ";
+                            if (ifTestStr.Contains("=="))
                             {
                                 ifResult = (firstStr == secondStr);
                             }
@@ -1278,8 +1279,7 @@ namespace LMSF_Scheduler
                     {
                         if (stepArgs[1].Contains(">=") || stepArgs[1].Contains("<="))
                         {
-                            string stringToSplit = stepArgs[1].Trim();
-                            string[] logicStrings = stringToSplit.Split(new[] { ">=", "<=" }, StringSplitOptions.RemoveEmptyEntries);
+                            string[] logicStrings = ifTestStr.Split(new[] { ">=", "<=" }, StringSplitOptions.RemoveEmptyEntries);
                             if (logicStrings.Length == 2)
                             {
                                 string firstStr = logicStrings[0].Trim();
@@ -1288,8 +1288,8 @@ namespace LMSF_Scheduler
                                 double secondDbl;
                                 if (double.TryParse(firstStr, out firstDbl) && double.TryParse(secondStr, out secondDbl))
                                 {
-                                    outString += $"If: {stringToSplit}, ";
-                                    if (stringToSplit.Contains(">="))
+                                    outString += $"If: {ifTestStr}, ";
+                                    if (ifTestStr.Contains(">="))
                                     {
                                         ifResult = (firstDbl >= secondDbl);
                                     }
@@ -1331,8 +1331,7 @@ namespace LMSF_Scheduler
                         {
                             if (stepArgs[1].Contains(">") || stepArgs[1].Contains("<"))
                             {
-                                string stringToSplit = stepArgs[1].Trim();
-                                string[] logicStrings = stringToSplit.Split(new[] { ">", "<" }, StringSplitOptions.RemoveEmptyEntries);
+                                string[] logicStrings = ifTestStr.Split(new[] { ">", "<" }, StringSplitOptions.RemoveEmptyEntries);
                                 if (logicStrings.Length == 2)
                                 {
                                     string firstStr = logicStrings[0].Trim();
@@ -1341,8 +1340,8 @@ namespace LMSF_Scheduler
                                     double secondDbl;
                                     if (double.TryParse(firstStr, out firstDbl) && double.TryParse(secondStr, out secondDbl))
                                     {
-                                        outString += $"If: {stringToSplit}, ";
-                                        if (stringToSplit.Contains(">"))
+                                        outString += $"If: {ifTestStr}, ";
+                                        if (ifTestStr.Contains(">"))
                                         {
                                             ifResult = (firstDbl > secondDbl);
                                         }
@@ -1491,15 +1490,16 @@ namespace LMSF_Scheduler
             if (step.Contains("{"))
             {
                 string outStep;
-                if (stepArgs[0] == "If")
+                //if (stepArgs[0] == "If")
+                if (scriptCommand == "If")
                 {
-                    outStep = $"If({stepArgs[1]}(";
-                    if (numArgs > 2)
+                    outStep = $"If({ifTestStr}, {stepArgs[0]}(";
+                    if (stepArgs.Length > 1)
                     {
-                        for (int i = 2; i < numArgs; i++)
+                        for (int i = 1; i < stepArgs.Length; i++)
                         {
                             outStep += stepArgs[i];
-                            if (i < numArgs - 1)
+                            if (i < stepArgs.Length - 1)
                             {
                                 outStep += ", ";
                             }
@@ -1510,12 +1510,12 @@ namespace LMSF_Scheduler
                 else
                 {
                     outStep = $"{stepArgs[0]}(";
-                    if (numArgs > 1)
+                    if (stepArgs.Length > 1)
                     {
-                        for (int i = 1; i < numArgs; i++)
+                        for (int i = 1; i < stepArgs.Length; i++)
                         {
                             outStep += stepArgs[i];
-                            if (i < numArgs - 1)
+                            if (i < stepArgs.Length - 1)
                             {
                                 outStep += ", ";
                             }
