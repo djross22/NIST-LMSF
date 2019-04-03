@@ -708,9 +708,9 @@ namespace LMSF_Utilities
                     case "plasmid":
                         parentMessage = "To create a new plasmid definition, you will need to specify the parent plasmid, or 'none'.\n\nThe parent plasmid is the plasmid that the new plasmid was derived from.";
                         break;
-                    case "media":
-                        parentMessage = "To create a new media definition, you will need a list of the ingredients.\nFor each ingredient, you will also need the concentration and units.";
-                        break;
+                    //case "media":
+                    //    parentMessage = "To create a new media definition, you will need a list of the ingredients.\nFor each ingredient, you will also need the concentration and units.";
+                    //    break;
                     default:
                         break;
                 }
@@ -752,22 +752,6 @@ namespace LMSF_Utilities
                             string notesPrompt = "Enter Notes for New " + ToTitleCase(metaType) + ": ";
                             titleText = "New " + ToTitleCase(metaType) + " Notes";
 
-                            string newDefinitionFilePath;
-                            switch (metaType)
-                            {
-                                case "strain":
-                                    newDefinitionFilePath = StrainFolderPath;
-                                    break;
-                                case "plasmid":
-                                    newDefinitionFilePath = PlasmidFolderPath;
-                                    break;
-                                default:
-                                    newDefinitionFilePath = MetadataFolderPath;
-                                    break;
-                            }
-                            newDefinitionFilePath += newIdent + "-" + metaType + ".txt";
-                            string newDefinitionString = ToTitleCase(metaType) + " identifier: \t" + newIdent;
-
                             notesPrompt += newIdent;
 
                             // Instantiate the dialog box
@@ -784,13 +768,6 @@ namespace LMSF_Utilities
                             {
                                 newNotes = notesDlg.Notes;
                             }
-
-                            newDefinitionString += "\n\n";
-                            newDefinitionString += "Parent identifier: \t" + parentID + "\n\n";
-                            newDefinitionString += "Notes:\n" + newNotes + "\n";
-
-                            //Write out newDefinitionString to text file (newDefinitionFilePath)
-                            System.IO.File.WriteAllText(newDefinitionFilePath, newDefinitionString);
                         }
                     }
                     
