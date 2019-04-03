@@ -1107,7 +1107,8 @@ namespace LMSF_Scheduler
                 scriptArgStr = scriptArgStr.Insert(scriptCommandEnd, ",");
             }
 
-            string[] scriptArgArr = scriptArgStr.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            //string[] scriptArgArr = scriptArgStr.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            string[] scriptArgArr = scriptArgStr.Split(new[] { "," }, StringSplitOptions.None);
 
             string[] stepArgs = new string[1 + scriptArgArr.Length];
             stepArgs[0] = scriptCommand;
@@ -1115,7 +1116,7 @@ namespace LMSF_Scheduler
 
             //Then clean up stepArgs by trimming white space from ends of each string, and removing empty strings.
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
-            stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            //stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
             //Check for {key} entries in stepArgs and replace with dictionary values, or fail validation
             //Note keys are replaced here.
