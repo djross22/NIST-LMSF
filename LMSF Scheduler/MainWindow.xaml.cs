@@ -3683,7 +3683,15 @@ namespace LMSF_Scheduler
             //return string[0] = experimentId
             //return string[1] = XML file path
             //return string[2] = saveDirectory
-            string[] getIdStrings = SharedParameters.XmlDocForAppend("");
+            string[] getIdStrings;// = SharedParameters.XmlDocForAppend("");
+            if (metaDictionary.ContainsKey("dataDirectory"))
+            {
+                getIdStrings = SharedParameters.XmlDocForAppend(metaDictionary["dataDirectory"]);
+            }
+            else
+            {
+                getIdStrings = SharedParameters.XmlDocForAppend("");
+            }
             string expIdStr = getIdStrings[0];
             string metaDataFilePath = getIdStrings[1];
             string saveDirectory = getIdStrings[2];
