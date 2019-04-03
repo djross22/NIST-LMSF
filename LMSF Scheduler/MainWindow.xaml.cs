@@ -942,11 +942,12 @@ namespace LMSF_Scheduler
                 OutputText = $"Running {ExperimentFileName}\n\n";
                 File.WriteAllText(logFilePath, OutputText);
 
+                //move setting of the metaDataFilePath to the RunNewXml() method, so that multiple experiments can be run from the same script
                 //if the log file got created ok, set the temporary path for the metadata output file
-                if (initOK)
-                {
-                    metaDataFilePath = SharedParameters.LogFileFolderPath + "temp.xml";
-                }
+                //if (initOK)
+                //{
+                //    metaDataFilePath = SharedParameters.LogFileFolderPath + "temp.xml";
+                //}
             }
 
             return initOK;
@@ -3834,6 +3835,9 @@ namespace LMSF_Scheduler
 
             //New XML document
             xmlDoc = new XmlDocument();
+            //New file path for saving the XML
+            metaDataFilePath = SharedParameters.LogFileFolderPath + "temp.xml";
+
             //create and configure the root node
             rootNode = xmlDoc.CreateElement("metadata");
             XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
