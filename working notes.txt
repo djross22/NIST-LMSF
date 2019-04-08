@@ -567,7 +567,9 @@ Fix bug during CopyRemoteFiles(): don't try to copy files from "local host"
 
 TODO:
 
+Do not output comments with #?
 
+Add IfKeyExists() or IfNoKey() command
 
 
 	
@@ -612,13 +614,13 @@ Run-time error handling
 
 Nested keys
 
-Add else to If(...
+Not necesary: Add else to If(...
 	
 Change step list (inputSteps) to Queue or Stack?
 
 Add automatic generation of database with run times for Hamilton and Gen5 methods?
 
-Nested If()
+Not necesary: Nested If()
 
 Change arguments passed to BackgroundWorkers to dictionaries, instead of lists.
 
