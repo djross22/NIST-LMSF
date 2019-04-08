@@ -1,4 +1,4 @@
-Scripts are entered into the "Steps Input:" text box; one step per line. Script files can be saved and opened using the normal set of Windows-style menus.
+Scripts are entered into the "Steps Input:" text box; one step per line. Script files can be saved and opened using the normal Windows-style menus at the top of the application.
 Blank lines in the script are ignored.
 Lines can also be commented out with two forward slashes at the start of the line ("//"). Commented lines will be ignored.
 A line starting with "#" will also be ignored unless it is in a script file that is read and run via the ReadScript() command.
