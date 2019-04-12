@@ -2013,17 +2013,7 @@ namespace LMSF_Scheduler
                         {
                             //argument is a DateTime string, so wait until the specified time
                             waitTime = (int)Math.Round((waitUntil - DateTime.Now).TotalSeconds);
-                            if (waitTime > 0)
-                            {
-                                argsOk = true;
-                            }
-                            else
-                            {
-                                argsOk = false;
-                                outString += "Timer date-time parameter is in the past: ";
-                                outString += stepArgs[1];
-                                val.Add(num);
-                            }
+                            argsOk = true;
                         }
                         else
                         {
