@@ -295,7 +295,7 @@ Commands:
 			
 			
 	GetTimeNow()
-		Writes the current date-time into the metaDictionary using the format: "yyyy-MM-dd HH:mm:ss".
+		Writes the current date-time into the metaDictionary using the format: "yyyy/MM/dd HH:mm:ss".
 		
 		Syntax:
 			GetTimeNow(<date-time key>)
@@ -395,9 +395,15 @@ Commands:
 			
 	Math()
 		Performs basic math operations and sets an entry in the Metadata Dictionary with the result.
-		The Math() command is meant for simple things like counting plates. 
-		It can be used for the basic binary operations, '+', '-', '*', '/', and '%'.
-		It can only perform a single binary operator per step.
+		The Math() command is meant for simple things like counting plates or keeping track of time intervals. 
+		With numbers as inputs, it can be used for the basic binary operations, '+', '-', '*', '/', and '%'.
+		Math() can also be used with date-time strings and/or time spans expressed in seconds.
+			For this, the first argument in the math expression must be a parsable date-time string,
+				and the second argument must be either a parsable date-time string or a number (in seconds).
+			Only addition and subtraction are allowed with date-time arguments.
+			The result of subtration of two parsable date-time strings is a time span in seconds
+			The result of addition of a date-time string and a number is a new date time string with the number of seconds added (format: "yyyy/MM/dd HH:mm:ss")
+		Math() can only perform a single binary operator per step.
 		
 		Syntax:
 			Set(<key>, <expression>)
@@ -407,6 +413,9 @@ Commands:
 			Math(plateNumber, 2 * 3)
 			Math(gradNumber, {count} % 3)
 			Math(gradNumber, {gradNumber} + 1)
+			Math(endTime, {startTime} + 3600)
+			Math(timeInterval, {endTime} - {startTime})
+			Math(time42, 10/06/2019 - 10/06/1969)
 			
 			
 	StartPrompt()

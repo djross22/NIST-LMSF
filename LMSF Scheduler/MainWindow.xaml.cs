@@ -2591,6 +2591,9 @@ namespace LMSF_Scheduler
                 string expressionString;
                 double result = 0;
 
+                //String for output result
+                string resultStr = "";
+
                 //string for start of output from ParseStep()
                 outString += "Math: ";
 
@@ -2619,6 +2622,21 @@ namespace LMSF_Scheduler
                     //Then clean up expressionArr by trimming white space from ends of each string, and removing empty strings.
                     expressionArr = expressionArr.Select(s => s.Trim()).ToArray();
                     expressionArr = expressionArr.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+                    //If expressionArr.Length > 2, check to see if it has date-time strings, with two or four "/"s
+                    //   then if it does look like a date-time string, redo Split() with just "+" and "-"
+                    if (expressionArr.Length > 2)
+                    {
+                        int numSlashes = expressionString.Length - expressionString.Replace("/", "").Length;
+                        if (numSlashes == 2 || numSlashes == 4)
+                        {
+                            operatorArr = new[] { "+", "-" };
+                            expressionArr = expressionString.Split(operatorArr, StringSplitOptions.RemoveEmptyEntries);
+                            //Then clean up expressionArr by trimming white space from ends of each string, and removing empty strings.
+                            expressionArr = expressionArr.Select(s => s.Trim()).ToArray();
+                            expressionArr = expressionArr.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                        }
+                    }
 
                     if (expressionArr.Length == 2)
                     {
@@ -2675,7 +2693,7 @@ namespace LMSF_Scheduler
 
                         if (argsOk)
                         {
-                            //then both elements in the expressionArr need to be parsable as numbers
+                            //then both elements in the expressionArr need to be parsable as numbers or date-time strings
                             double numberOne;
                             double numberTwo;
                             if (double.TryParse(numberOneStr, out numberOne) && double.TryParse(numberTwoStr, out numberTwo))
@@ -2705,21 +2723,86 @@ namespace LMSF_Scheduler
                                     result = numberOne % numberTwo;
                                 }
 
-                                outString += $"{keyString} = {expressionString} = {result}.";
+                                resultStr = $"{result}";
+
+                                outString += $"{keyString} = {expressionString} = {resultStr}.";
                             }
                             else
                             {
-                                //Message for bad expression, terms not parsable as numbers:
-                                outString += $"Expression not parsable as numbers: {expressionString}.";
-                                val.Add(num);
-                                argsOk = false;
+                                DateTime timeOne;
+                                DateTime timeTwo;
+                                //If numberOneStr does not parse as a double, it must parse as a DateTime string
+                                if (DateTime.TryParse(numberOneStr, out timeOne))
+                                {
+                                    if (double.TryParse(numberTwoStr, out numberTwo))
+                                    {
+                                        //If numberTwoStr is parsable as a double, treat is as a TimeSpan in seconds
+                                        TimeSpan spanTwo = TimeSpan.FromSeconds(numberTwo);
+                                        DateTime dateTimeResult;
+                                        if (expressionString.Contains("-"))
+                                        {
+                                            dateTimeResult = timeOne.Subtract(spanTwo);
+
+                                            resultStr = dateTimeResult.ToString("yyyy/MM/dd HH:mm:ss");
+                                            outString += $"{keyString} = {expressionString} = {resultStr}.";
+                                        }
+                                        else if (expressionString.Contains("+"))
+                                        {
+                                            dateTimeResult = timeOne.Add(spanTwo);
+
+                                            resultStr = dateTimeResult.ToString("yyyy/MM/dd HH:mm:ss");
+                                            outString += $"{keyString} = {expressionString} = {resultStr}.";
+                                        }
+                                        else
+                                        {
+                                            //Message for bad expression, can only do "+" or "-" operations with DateTime and TimeSpan:
+                                            outString += $"Only addition and subtration operations are allowed for date-time and time span: {expressionString}.";
+                                            val.Add(num);
+                                            argsOk = false;
+                                        }
+                                    }
+                                    else if (DateTime.TryParse(numberTwoStr, out timeTwo))
+                                    {
+                                        //If numberTwoStr is not parsable as a double, but is parsable as a DateTime
+                                        TimeSpan timeSpanResult;
+                                        if (expressionString.Contains("-"))
+                                        {
+                                            timeSpanResult = timeOne.Subtract(timeTwo);
+
+                                            resultStr = $"{timeSpanResult.TotalSeconds}";
+                                            outString += $"{keyString} = {expressionString} = {resultStr}.";
+                                        }
+                                        else
+                                        {
+                                            //Message for bad expression, can only do "-" operations with two DateTime parameters:
+                                            outString += $"Only subtration operations are allowed for two date-time parameters: {expressionString}.";
+                                            val.Add(num);
+                                            argsOk = false;
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        //Message for bad expression, terms not parsable as numbers or date-time strgins:
+                                        outString += $"Expression not parsable as numbers or date-time strings: {expressionString}.";
+                                        val.Add(num);
+                                        argsOk = false;
+                                    }
+                                }
+                                else
+                                {
+                                    //Message for bad expression, terms not parsable as numbers or date-time strgins:
+                                    outString += $"Expression not parsable as numbers or date-time strings: {expressionString}.";
+                                    val.Add(num);
+                                    argsOk = false;
+                                }
                             }
                         }
                     }
                     else
                     {
                         //Message for bad expression, wrong number of terms:
-                        outString += "Math command requires an expression with two numbers separated by a single math operator (+, -, *, /, or %).";
+                        outString += $"Math command requires an expression with two numbers or date-time strings separated by a single math operator (+, -, *, /, or %): {expressionString}";
                         val.Add(num);
                         argsOk = false;
                     }
@@ -2730,7 +2813,7 @@ namespace LMSF_Scheduler
                     if (!localIsValidating)
                     {
                         //directly add the result to the dictionary here.
-                        metaDictionary[keyString] = $"{result}";
+                        metaDictionary[keyString] = resultStr;
                     }
                     else
                     {
@@ -2738,7 +2821,7 @@ namespace LMSF_Scheduler
                         //    this is necesary to avoid running a manually entered Math() step twice.
                         if (!metaDictionary.ContainsKey(keyString))
                         {
-                            metaDictionary[keyString] = $"{result}";
+                            metaDictionary[keyString] = resultStr;
                         }
                         
                     }
@@ -3019,7 +3102,7 @@ namespace LMSF_Scheduler
                 if (argsOk)
                 {
                     //for this command, take the same action if validating or actually running the script
-                    metaDictionary[timeDateKey] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    metaDictionary[timeDateKey] = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
                 }
             }
 

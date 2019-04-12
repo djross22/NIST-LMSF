@@ -564,8 +564,14 @@ Long identifiers, take out RegEx validation/restriction
 
 Fix bug during CopyRemoteFiles(): don't try to copy files from "local host"
 
+Add GetTimeNow() command to get the current date-time, using DateTime.Now.ToString("HH:mm:ss");
+
+Add date-time handling to Math command - for "+" and "-" operations.
+
 
 TODO:
+
+Add Get(dateTime, timeKey) to get date-time from user
 
 Do not output comments with #?
 
