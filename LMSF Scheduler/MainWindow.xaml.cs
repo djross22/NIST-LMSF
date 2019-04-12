@@ -395,7 +395,7 @@ namespace LMSF_Scheduler
 
             DataContext = this;
 
-            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "LoadXML", "UserPrompt", "GetUserYesNo", "Set", "Math", "Get", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
+            CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "LoadXML", "UserPrompt", "GetUserYesNo", "Set", "Math", "Get", "GetTimeNow", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
 
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
@@ -1458,6 +1458,9 @@ namespace LMSF_Scheduler
                         break;
                     case "GetExpID":
                         ParseGetExpId(ref valReport);
+                        break;
+                    case "GetTimeNow":
+                        ParseGetTimeNow(ref valReport);
                         break;
                     case "GetFile":
                         ParseGetFile(ref valReport);
@@ -2983,6 +2986,40 @@ namespace LMSF_Scheduler
 
                     }
 
+                }
+            }
+
+            void ParseGetTimeNow(ref List<int> val)
+            {
+                //ParseGetTimeNow takes one argument
+                //The first argument is the file key for saving the time-date string in the metaDictionary
+                string timeDateKey = "";
+
+                //string for start of output from ParseStep()
+                outString += $"Getting Current date and time: ";
+
+                //one or more Booleans used to track validity of arguments/parameters
+                bool argsOk = true;
+
+                //If the command requires a certain number of arguments, check that first:
+                if (numArgs < 2)
+                {
+                    argsOk = false;
+                    //Message for missing argument or not enough arguments:
+                    outString += "GetTimeNow command requries one argument (date-time key).";
+                    val.Add(num);
+                }
+                //Then check the validity of the arguments
+                else
+                {
+                    //no validity check for the argument, any string is allowed
+                    timeDateKey = stepArgs[1];
+                }
+
+                if (argsOk)
+                {
+                    //for this command, take the same action if validating or actually running the script
+                    metaDictionary[timeDateKey] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 }
             }
 
