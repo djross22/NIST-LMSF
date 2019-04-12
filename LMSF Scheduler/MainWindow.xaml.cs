@@ -5328,13 +5328,14 @@ namespace LMSF_Scheduler
                 {
                     //argument is a DateTime string, so wait until the specified time
                     waitTime = (int)Math.Round((waitUntil - DateTime.Now).TotalSeconds);
-                    if (waitTime<0)
-                    {
-                        waitTime = 0;
-                    }
                 }
 
                 //TODO: add that code here
+            }
+
+            if (waitTime < 0)
+            {
+                waitTime = 1;
             }
 
             if (!(stepTimerDialog is null))
