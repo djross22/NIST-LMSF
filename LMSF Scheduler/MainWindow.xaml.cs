@@ -847,6 +847,7 @@ namespace LMSF_Scheduler
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
             outputSteps = new List<string>();
+            outputSteps.Add($"//Input Script: {ExperimentFileName}");
 
             //by default, don't collect metadata
             isCollectingXml = false;
@@ -3603,6 +3604,10 @@ namespace LMSF_Scheduler
                 XmlAttribute sourceAtt = xmlDoc.CreateAttribute("source");
                 sourceAtt.Value = sourceStr;
                 protocolNode.Attributes.Append(sourceAtt);
+
+                XmlNode scriptFileNode = xmlDoc.CreateElement("scriptFile");
+                scriptFileNode.InnerText = ExperimentFileName;
+                protocolNode.AppendChild(scriptFileNode);
 
                 startDateTime = DateTime.Now;
                 AddDateTimeNodes(startDateTime, protocolNode, "protocol started");

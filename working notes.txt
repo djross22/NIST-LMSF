@@ -568,8 +568,12 @@ Add GetTimeNow() command to get the current date-time, using DateTime.Now.ToStri
 
 Add date-time handling to Math command - for "+" and "-" operations.
 
+When adding protocol node to XML, add lmsf script file name/path
+Also add Input script file-path as comment on first line of output script file
+
 
 TODO:
+
 
 Add Get(dateTime, timeKey) to get date-time from user
 
