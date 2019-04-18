@@ -3552,7 +3552,7 @@ namespace LMSF_Scheduler
             
         }
 
-        private void AddXmlProtocol(string typeStr, string sourceStr)
+        private void AddXmlProtocol(string typeStr, string sourceStr, bool isUser = true)
         {
             //First check if there is already a protocol of this type attached to the experiment,
             //    and if so, give a warning
@@ -3560,7 +3560,7 @@ namespace LMSF_Scheduler
             XmlNode existingNode;
 
             AbortAppendOverwriteDialog.Response dlgResponse = AbortAppendOverwriteDialog.Response.Abort;
-            if (nodeList.Count == 0)
+            if (nodeList.Count == 0 || !isUser)
             {
                 dlgResponse = AbortAppendOverwriteDialog.Response.Append;
             }
@@ -3820,6 +3820,27 @@ namespace LMSF_Scheduler
             return new string[] { expIdStr, metaDataFilePath, saveDirectory };
         }
 
+        private string[] AutoXmlDocForAppend()
+        {
+            //return string[0] = experimentId
+            //return string[1] = XML file path
+            //return string[2] = saveDirectory
+            string[] getIdStrings;// = SharedParameters.XmlDocForAppend("");
+
+            getIdStrings = SharedParameters.AutoXmlDocForAppend(metaDictionary["dataDirectory"]);
+
+            string expIdStr = getIdStrings[0];
+            string metaDataFilePath = getIdStrings[1];
+            string saveDirectory = getIdStrings[2];
+
+            if (expIdStr == "")
+            {
+                AbortCalled = true;
+            }
+
+            return new string[] { expIdStr, metaDataFilePath, saveDirectory };
+        }
+
         private string SelectFile(string filePrompt, string fileFilter, string initialDir)
         {
             //examples for fileFilter: 
@@ -3906,11 +3927,27 @@ namespace LMSF_Scheduler
         {
             string protocolTypeStr = args[1];
 
+            bool isUser = true;
+            if (args.Length > 2)
+            {
+                if (args[2] == "NoUser" && metaDictionary.ContainsKey("dataDirectory"))
+                {
+                    isUser = false;
+                }
+            }
+
             string[] argsBack = new string[] { "", "", "" };
-            //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
-            this.Dispatcher.Invoke(() => {
-                argsBack = SelectXmlDocForAppend();
-            });
+            if (isUser)
+            {
+                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                this.Dispatcher.Invoke(() => {
+                    argsBack = SelectXmlDocForAppend();
+                });
+            }
+            else
+            {
+                argsBack = AutoXmlDocForAppend();
+            }
 
             //auto-detect and/or prompt user to select existing XML file to append to
             metaDataFilePath = argsBack[1];
@@ -3928,7 +3965,7 @@ namespace LMSF_Scheduler
                 string expIdStr = xmlDoc.SelectSingleNode("descendant::experimentId").InnerText;
 
                 //Add the current experiment protocol to the XML
-                AddXmlProtocol(protocolTypeStr, protocolSource);
+                AddXmlProtocol(protocolTypeStr, protocolSource, isUser);
 
                 //also add the startDateTime to the metaDictionary, as a string formatted for use as part of an experimentId
                 metaDictionary["startDateTime"] = SharedParameters.GetDateTimeString(startDateTime, true);

@@ -571,6 +571,8 @@ Add date-time handling to Math command - for "+" and "-" operations.
 When adding protocol node to XML, add lmsf script file name/path
 Also add Input script file-path as comment on first line of output script file
 
+Add "NoUser" optional parameter to AppendXML() so that it can run without user intervention
+
 
 TODO:
 

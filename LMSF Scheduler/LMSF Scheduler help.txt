@@ -201,13 +201,16 @@ Commands:
 			
 
 	AppendXML()
-		Similar to NewXML, but opens an existing XML metadata document and adds a new protocol to it. It opens a user dialog to choose the XML file to append to.
+		Similar to NewXML, but opens an existing XML metadata document and adds a new protocol to it. By default, AppendXML() opens a user dialog to choose the XML file to append to.
 		Also, adds the protocol starting date and time to the Metadata Dictionary (key = "startDateTime") in a form that is suitable for use as an identifier: "yyyy-MM-dd-HHmm".
 		Also, adds the protocol starting date to the Metadata Dictionary (key = "startDate") in a form that is suitable for use in file names/identifiers: "yyyy-MM-dd".
 		Also, adds the XML file path to the Metadata Dictionary (key = "metaDataFilePath").
+		If the second (optional) parameter is "NoUser", then the default XML metadata document is used without getting input from the user.
+			The default XML metadata document can be set before calling AppendXML() by setting the "dataDirectory" entry in the Metadata Dictionary.
+				For example: Set(dataDirectory, {newDefaultDirectory})
 		
 		Syntax:
-			AppendXML(<protocol type>)
+			AppendXML(<protocol type>, {NoUser (optional)})
 			
 		Examples:
 			AppendXML(growth plate prep)
@@ -246,7 +249,7 @@ Commands:
 		The inner text of the new node is set to <innerText>.
 		
 		Syntax:
-			AddXML(<parentNode>, <newNode>, {<innerText (opyional)>})
+			AddXML(<parentNode>, <newNode>, {<innerText (optional)>})
 			
 		Examples:
 			AddXML(additive, newNode)
