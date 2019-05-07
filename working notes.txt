@@ -576,6 +576,8 @@ Add "NoUser" optional parameter to AppendXML() so that it can run without user i
 
 TODO:
 
+Fix validation slowness
+
 
 Add Get(dateTime, timeKey) to get date-time from user
 
