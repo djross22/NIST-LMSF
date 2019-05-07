@@ -954,6 +954,7 @@ namespace LMSF_Scheduler
             return initOK;
         }
 
+        //Iniitalize the script steps, and then loop over steps until script is completed.
         private void StepsThreadProc()
         {
             bool okToGo = InitSteps();
@@ -986,6 +987,7 @@ namespace LMSF_Scheduler
 
         }
 
+        //Set up and run the StepsThreadProc() in an independent thread
         private void RunSteps()
         {
             testTextBox.Text = "RunSteps()...";
@@ -998,6 +1000,7 @@ namespace LMSF_Scheduler
             //Todo: add save log file here
         }
 
+        //Step() method runs a single line (i.e. step) of the input script
         private void Step()
         {
             if (AbortCalled)
@@ -1040,17 +1043,32 @@ namespace LMSF_Scheduler
 
         }
 
+        //The ParseStep() method reads a line of script and checks its validity.
+        //    Then, if the line is valid and the system is in run mode, it calls the appropriate method
+        //    to execute the action associated with the script command.
         private string ParseStep(int num, string step, bool localIsValidating, ref List<int> valReport)
         {
+            //Input parameters:
+            //    int num; the line number of the current line within the script (ignoring empty lines)
+            //    string step; the inpt text of the current line
+            //    bool localIsValidating; variable used within this method to indicate when
+            //        the line is just being validated, but not actaully run
+            //    ref List<int> valReport; list used to hold line numbers that fail to validate
+            //
+            //==============================================================================
             //Note on step validation:
             //    valFailed is intialized to an empty list at the beginning of each run, 
             //        and then passed to this method as valReport
             //    if a step fails a validation check, the step number is added to the valFailed/valReport list
             //Validation of single steps inserted during a pause in the run is handled similarly, 
             //    but with a different valReport target
+            //===============================================================================
 
+            //Add to outputSteps list to keep record of what was actually run
             outputSteps.Add(step);
 
+            //string for output/return to display in outputTextBox
+            //  start by adding line number and date-time
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
 
@@ -1077,15 +1095,18 @@ namespace LMSF_Scheduler
                 return outString;
             }
 
+            //Identify the script command for the current line (before the first '('
+            //    and separate it from the parameters enclosed in the '(' and ')'
             int scriptCommandEnd = step.IndexOf('(');
-            //int scriptLineLength = step.Length;
             string scriptCommand = step.Substring(0, scriptCommandEnd);
             string scriptArgStr = step.Substring(scriptCommandEnd + 1);
             scriptArgStr = scriptArgStr.Remove(scriptArgStr.Length - 1); //remove the closing ")"
             scriptArgStr = scriptArgStr.Trim(); //remove leading and trailing white space
 
-            //If the script command is "If(...)" check that the opening and closing "(" and ")" is there
-            //    then replace the first "(" with "," so that things get separated properly in the string.Split step, and delete the closing ")"
+            //If the script command is "If(...)", then it should contain another set of 
+            //    opening and closing '(' and ')'; check for those, 
+            //    then replace the first "(" with "," so that things get separated properly in the string.Split step, 
+            //    and delete the closing ")"
             if (scriptCommand == "If")
             {
                 if (!scriptArgStr.Contains("("))
@@ -1098,29 +1119,32 @@ namespace LMSF_Scheduler
                 if (!scriptArgStr.EndsWith(")"))
                 {
                     valReport.Add(num);
-                    //exit the method early if the opening "(" is missing
+                    //exit the method early if the closing ")" is missing
                     outString += "Syntax error: If command missing closing \")\"\n\n";
                     return outString;
                 }
-                scriptArgStr = scriptArgStr.Remove(scriptArgStr.Length - 1); //remove the closing ")"
+                //remove the closing ")"
+                scriptArgStr = scriptArgStr.Remove(scriptArgStr.Length - 1); 
+                //replace first '(' with ','
                 scriptCommandEnd = scriptArgStr.IndexOf('(');
                 scriptArgStr = scriptArgStr.Remove(scriptCommandEnd, 1);
                 scriptArgStr = scriptArgStr.Insert(scriptCommandEnd, ",");
             }
 
-            //string[] scriptArgArr = scriptArgStr.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            //Split command arguments into an array, usingn commas as separators
             string[] scriptArgArr = scriptArgStr.Split(new[] { "," }, StringSplitOptions.None);
 
+            //first elecment of stepArgs is the script command; remaining elements are the parameters/arguments
             string[] stepArgs = new string[1 + scriptArgArr.Length];
             stepArgs[0] = scriptCommand;
             scriptArgArr.CopyTo(stepArgs, 1);
 
-            //Then clean up stepArgs by trimming white space from ends of each string, and removing empty strings.
+            //Then clean up stepArgs by trimming white space from ends of each string
             stepArgs = stepArgs.Select(s => s.Trim()).ToArray();
-            //stepArgs = stepArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
-            //Check for {key} entries in stepArgs and replace with dictionary values, or fail validation
-            //Note keys are replaced here.
+            //Next, check for {key} entries in stepArgs and replace with dictionary values, or fail validation
+            //    if dictionary does not contain the necessary key
+            //Note: keys are replaced here with values from the metaDictionary.
             bool keysOk = true;
             for (int j = 0; j < stepArgs.Length; j++)
             {
@@ -1232,6 +1256,9 @@ namespace LMSF_Scheduler
                 return outString;
             }
 
+            //If the script line is an If() command, validate that the 2nd element of stepArgs is a logical/Boolean test;
+            //    then run the test, and assign the result to ifResult.
+            //If the script line is NOT an If() command, then ifResult is always set to true.
             bool ifResult = true;
             string ifTestStr = "";
             if (stepArgs[0] == "If")
@@ -1407,6 +1434,7 @@ namespace LMSF_Scheduler
             {
                 string stepType = stepArgs[0];
 
+                //Run the specific script parsing code for each script command
                 switch (stepType)
                 {
                     case "Overlord":
