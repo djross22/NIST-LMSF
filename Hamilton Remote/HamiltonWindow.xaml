@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Hamilton_Remote"
         mc:Ignorable="d"
-        Title="LMSF-Hamilton" Background="{DynamicResource PurpleBackgroundBrush}" SizeToContent="Width"  MinWidth="745" MinHeight="200">
+        Title="LMSF-Hamilton" Background="{DynamicResource PurpleBackgroundBrush}" SizeToContent="Width"  MinWidth="745" MinHeight="200" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="200"/>

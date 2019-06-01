@@ -573,10 +573,12 @@ Also add Input script file-path as comment on first line of output script file
 
 Add "NoUser" optional parameter to AppendXML() so that it can run without user intervention
 
+Fix slow validation with remote connections
+
 
 TODO:
 
-Fix validation slowness
+Add Gen5 command to get mean OD from the last read?
 
 
 Add Get(dateTime, timeKey) to get date-time from user

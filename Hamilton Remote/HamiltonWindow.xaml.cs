@@ -729,5 +729,19 @@ namespace Hamilton_Remote
                 UpdateControlEnabledStatus();
             });
         }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            var messageBoxResult = MessageBox.Show("Are you sure you want to exit LMSF-Hamilton?\nClick 'Yes' to abort or 'No' to continue.", "Abort Read?", MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
+                AddOutputText("Closing LMSF-Hamilton.");
+            }
+            else
+            {
+                // If user doesn't want to close, cancel closure
+                e.Cancel = true;
+            }
+        }
     }
 }

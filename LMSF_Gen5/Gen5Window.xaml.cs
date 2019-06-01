@@ -377,16 +377,27 @@ namespace LMSF_Gen5
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            try
+            var messageBoxResult = MessageBox.Show("Are you sure you want to exit LMSF-Gen5? Any read in progress will be aborted.\nClick 'Yes' to abort or 'No' to continue.", "Abort Read?", MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes)
             {
-                if (gen5Reader.IsGen5Active())
+                AddOutputText("Closing LMSF-Gen5.");
+
+                try
                 {
-                    AddOutputText(gen5Reader.TerminateGen5());
+                    if (gen5Reader.IsGen5Active())
+                    {
+                        AddOutputText(gen5Reader.TerminateGen5());
+                    }
+                }
+                catch (Exception exc)
+                {
+                    AddOutputText($"Error at termination of Gen5, {exc}./n");
                 }
             }
-            catch (Exception exc)
+            else
             {
-                AddOutputText($"Error at termination of Gen5, {exc}./n");
+                // If user doesn't want to close, cancel closure
+                e.Cancel = true;
             }
         }
 
@@ -761,6 +772,7 @@ namespace LMSF_Gen5
                     oldMessageQueue.Clear();
                     StartTcpServer();
                     StartRemoteControl();
+                    AddOutputText("Remote control started.");
                 }
                 else
                 {
@@ -768,6 +780,7 @@ namespace LMSF_Gen5
                     {
                         server.Stop();
                     }
+                    AddOutputText("Remote control ended.");
                 }
             }
         }
