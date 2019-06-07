@@ -4943,7 +4943,9 @@ namespace LMSF_Scheduler
                     //outputFile.WriteLine(values);
                     foreach (string key in metaDictionary.Keys)
                     {
-                        outputFile.WriteLine($"{key},{metaDictionary[key]}");
+                        string value = metaDictionary[key];
+                        value = value.Replace(Environment.NewLine, "; ");
+                        outputFile.WriteLine($"{key},{value}");
                     }
                 }
             }
