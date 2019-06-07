@@ -397,6 +397,7 @@ namespace LMSF_Scheduler
 
             CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "LoadXML", "UserPrompt", "GetUserYesNo", "Set", "Math", "Get", "GetTimeNow", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
 
+            //ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "Epoch5", "S-Cell-STAR" };
             ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
             foreach (string s in ReaderList)
@@ -413,6 +414,7 @@ namespace LMSF_Scheduler
             readerIps["Epoch2"] = "129.6.167.37";
             readerIps["Epoch3"] = "129.6.167.38";
             readerIps["Epoch4"] = "129.6.167.39";
+            //readerIps["Epoch5"] = "129.6. ";
             readerIps["S-Cell-STAR"] = "129.6.167.35";
 
             metaDictionary = new Dictionary<string, string>();

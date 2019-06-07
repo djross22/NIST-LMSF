@@ -56,6 +56,9 @@ namespace LMSF_Gen5_Reader
                 case ("DESKTOP-7IA5AOQ"):
                     ReaderName = "Epoch4";
                     break;
+                case ("PG901099"):
+                    ReaderName = "Epoch5";
+                    break;
             }
         }
 
