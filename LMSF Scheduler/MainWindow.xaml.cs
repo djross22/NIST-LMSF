@@ -5470,7 +5470,16 @@ namespace LMSF_Scheduler
             }
             else
             {
-                // go ahead and close-
+                var messageBoxResult = MessageBox.Show("Are you sure you want to exit LMSF Scheduler?\nClick 'Yes' to abort or 'No' to continue.", "Exit LMSF?", MessageBoxButton.YesNo);
+                if (messageBoxResult == MessageBoxResult.Yes)
+                {
+                    AddOutputText("Closing LMSF.");
+                }
+                else
+                {
+                    // If user doesn't want to close, cancel closure
+                    e.Cancel = true;
+                }
             }
             inputTextBox.Focus();
         }
