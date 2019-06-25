@@ -578,6 +578,11 @@ Fix slow validation with remote connections
 
 TODO:
 
+Check Timer code; the "Time remining" display is not accurate
+
+Add "Hamilton Only/Simulation Mode" - with check box, for running only the Hamilton and RemoteHam steps
+	Add 2nd checkbox for "Convert RemoteHam to local Hamilton"
+
 Add Gen5 command to get mean OD from the last read?
 
 

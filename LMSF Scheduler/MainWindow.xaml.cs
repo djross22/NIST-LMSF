@@ -4813,7 +4813,10 @@ namespace LMSF_Scheduler
                 AddOutputText($"Remote Error on {remoteServer}.");
                 this.Dispatcher.Invoke(() => {
                     IsPaused = true;
-                    MessageBox.Show($"Error during remote method on {remoteServer}! Check error messages, correct errors, and continue; or abort experiment", "Error!");
+                    //MessageBox.Show($"Error during remote method on {remoteServer}! Check error messages, correct errors, and continue; or abort experiment", "Error!");
+                    string title = "Error!";
+                    string msg = $"Error during remote method on {remoteServer}! Check error messages, correct errors, and continue; or abort experiment";
+                    SharedParameters.ShowPrompt(msg, title);
                 });
             }
         }
