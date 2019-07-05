@@ -61,11 +61,12 @@ namespace LMSF_Scheduler
 
         private readonly object validatingLock = new object();
         private bool isValidating = false;
-
         private List<int> valFailed;
         //Validation failure is signaled by adding/having one or more entires in the valFailed list
         //    valFailed is intialized to an empty list at the beginning of each run,
         //    if a step fails a validation check, the step number is added to the valFailed list
+        private List<string> validatedSubScripts; //List of sub-scripts that have already been validated - so they don't need to be re-validated (to reduce validationb time)
+        private List<string> skipSubScriptVal; // list of file-paths for sub-script to be skipped for validation check
 
         //Background worker to run steps
         private Thread runStepsThread;
@@ -961,6 +962,10 @@ namespace LMSF_Scheduler
         {
             bool okToGo = InitSteps();
 
+            //make sure no sub-scripts are initially set as validated
+            skipSubScriptVal = new List<string>();
+            validatedSubScripts = new List<string>();
+
             if (okToGo)
             {
                 while (IsRunning)
@@ -1074,10 +1079,66 @@ namespace LMSF_Scheduler
             string outString = $"{num}. ";
             outString += $"{SharedParameters.GetDateTimeString()}; ";
 
-            //If step is a comment line, don't do anything except display it.
+            //If step is a comment line, don't do anything except display it (except for sub-script markers that affect validation).
             if (step.StartsWith("//") || step.StartsWith("#") )
             {
+                //During validation, avoid repeated validation of sub-scripts
+                if (localIsValidating)
+                {
+                    int readScriptEnd;
+                    string readScriptArgsStr;
+                    string[] readScriptArgs;
+                    string scriptFilePath;
+
+                    if (step.StartsWith("#End ReadScript") || step.StartsWith("#ReadScript"))
+                    {
+                        readScriptEnd = step.IndexOf('(');
+                        readScriptArgsStr = step.Substring(readScriptEnd + 1);
+                        readScriptArgsStr = readScriptArgsStr.Remove(readScriptArgsStr.Length - 1); //remove the closing ")"
+                        readScriptArgs = readScriptArgsStr.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                        //Then clean up scriptArgs by trimming white space from ends of each string, and removing empty strings.
+                        readScriptArgs = readScriptArgs.Select(s => s.Trim()).ToArray();
+                        readScriptArgs = readScriptArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+                        scriptFilePath = readScriptArgs[0];
+
+                        //If step is the start of a sub-script, only validate if it is not in the validatedSubScripts list
+                        if (step.StartsWith("#ReadScript"))
+                        {
+                            if (validatedSubScripts.Contains(scriptFilePath))
+                            {
+                                skipSubScriptVal.Add(scriptFilePath);
+                            }
+
+                        }
+
+                        //If step is the end of a sub-script, mark that sub-script as already checked for validation
+                        if (step.StartsWith("#End ReadScript"))
+                        {
+                            if (!validatedSubScripts.Contains(scriptFilePath))
+                            {
+                                validatedSubScripts.Add(scriptFilePath);
+                            }
+
+                            //if the script file-path of the #END step is one of the sub-scripts that is being skipped, remove it from the skipSubScriptVal list
+                            if (skipSubScriptVal.Contains(scriptFilePath))
+                            {
+                                skipSubScriptVal.Remove(scriptFilePath);
+                            }
+
+                        }
+
+                    }
+                }
+                
                 outString += $"{step}\n\n";
+                return outString;
+            }
+
+            //during validation, do nothin but output lines if skipSubScriptVal is not an empty list
+            if (localIsValidating && (skipSubScriptVal.Count>0))
+            {
+                outString += $"Already validated: {step}\n\n";
                 return outString;
             }
 
