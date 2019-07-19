@@ -559,21 +559,20 @@ namespace Hamilton_Remote
                 if (statusForReply != SharedParameters.ServerStatusStates.Error)
                 {
                     replyStr = $"{msgParts[0]},{statusForReply},{msgParts[2]}";
-                    textOutAdd = $"reply sent, {statusForReply}.\n";
                 }
                 else
                 {
                     replyStr = $"{msgParts[0]},{statusForReply}{errorList.Count},{msgParts[2]}";
-                    textOutAdd = $"reply sent, {statusForReply}{errorList.Count}.\n";
                 }
             }
             else
             {
                 //send back "fail" if bad message
                 replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
-                textOutAdd = $"reply sent, fail.\n";
             }
             msg.ReplyLine(replyStr);
+
+            textOutAdd = $"reply sent: {replyStr}\n";
             this.Dispatcher.Invoke(() =>
             {
                 AddOutputText(textOutAdd);

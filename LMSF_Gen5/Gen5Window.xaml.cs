@@ -718,17 +718,15 @@ namespace LMSF_Gen5
             {
                 //send back status if good message
                 replyStr = $"{msgParts[0]},{statusForReply},{msgParts[2]}";
-                textOutAdd = $"reply sent, {statusForReply}.\n";
             }
             else
             {
                 //send back "fail" if bad message
                 replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
-                textOutAdd = $"reply sent, fail.\n";
             }
             msg.ReplyLine(replyStr);
 
-
+            textOutAdd = $"reply sent: {replyStr}\n";
             this.Dispatcher.Invoke(() =>
             {
                 AddOutputText(textOutAdd);
