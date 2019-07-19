@@ -555,12 +555,13 @@ namespace LMSF_Gen5
                 AddOutputText($"Error at ReaderMonitor_RunWorkerCompleted, {exc}./n");
             }
 
+            AddOutputText("... Done.\n\n");
+
+            //Setting IsExperimentQueuedOrRunning to false should always be the last step in this RunWorkerCompleted method
             this.Dispatcher.Invoke(() => {
                 //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
                 IsExperimentQueuedOrRunning = false;
             });
-
-            AddOutputText("... Done.\n\n");
         }
 
         private void CarrierInButton_Click(object sender, RoutedEventArgs e)

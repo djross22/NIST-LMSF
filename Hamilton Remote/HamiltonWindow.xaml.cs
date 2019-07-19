@@ -410,11 +410,6 @@ namespace Hamilton_Remote
 
         void OutsideProcessMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.Dispatcher.Invoke(() => {
-                //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
-                IsVenusBusy = false;
-            });
-
             AddOutputText("Hamilton Method finished.");
 
             //Check for errors
@@ -455,6 +450,15 @@ namespace Hamilton_Remote
                     }
                 }
             }
+
+            Thread.Sleep(100);
+
+
+            //Setting IsVenusBusy to false should always be the last step in this RunWorkerCompleted method
+            this.Dispatcher.Invoke(() => {
+                //Property change calls UpdateControlEnabledStatus(), which sets relevant controls enabled
+                IsVenusBusy = false;
+            });
         }
 
         private bool IsActualError(string line)
