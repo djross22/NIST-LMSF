@@ -367,14 +367,21 @@ namespace LMSF_Gen5_Reader
                 return retStr;
             }
 
-            try
+            int numTries = 0;
+            while (numTries <= 3)
             {
-                Gen5App.CarrierOut();
-                retStr += "CarrierOut Successful. ";
-            }
-            catch (COMException exception)
-            {
-                retStr += $"CarrierOut Failed, {exception}. ";
+                numTries++;
+                try
+                {
+                    Gen5App.CarrierOut();
+                    retStr += "CarrierOut Successful. ";
+                    break;
+                }
+                catch (COMException exception)
+                {
+                    retStr += $"CarrierOut Failed on try number {numTries}, {exception}. ";
+                    Thread.Sleep(500);
+                }
             }
 
             retStr += "\n";
