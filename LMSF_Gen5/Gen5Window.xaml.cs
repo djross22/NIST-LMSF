@@ -19,6 +19,7 @@ using LMSF_Utilities;
 using LMSF_Gen5_Reader;
 using Gen5;
 using SimpleTCP;
+using LMSF_Gen5_Reader.RealTimeData;
 
 namespace LMSF_Gen5
 {
@@ -64,6 +65,10 @@ namespace LMSF_Gen5
         public SharedParameters.ServerStatusStates ServerStatus { get; private set; }
         public static List<string> Gen5CommandList = new List<string> { "CarrierIn", "CarrierOut", "RunExp" };
 
+        private RealTimeData realTimeData;
+        private RealTimeDataHandler realTimeDataHandler;
+        private RealTimeDataUI realTimeDataUI;
+
         public Gen5Window()
         {
             InitializeComponent();
@@ -89,6 +94,11 @@ namespace LMSF_Gen5
                 AddOutputText($"Error at initilization of Gen5, {exc}./n");
             }
             NewLogFile();
+
+            realTimeData = new RealTimeData();
+            realTimeDataUI = new RealTimeDataUI(RealTimeDataCanvas, RealTimeDataComboBox);
+            realTimeDataUI.UpdateSelections(null);
+            realTimeDataUI.DrawPlotterCells();
         }
 
         #region Properties Getters and Setters
@@ -504,6 +514,10 @@ namespace LMSF_Gen5
             Gen5ReadStatus status = Gen5ReadStatus.eReadInProgress;
             try
             {
+                gen5Reader.Gen5App.DataExportEnabled = true;
+                realTimeData = new RealTimeData();
+                realTimeDataHandler = gen5Reader.GetNewRealTimeDataHandler();
+
                 bool liveData = gen5Reader.Gen5App.DataExportEnabled;
             }
             catch (Exception exc)
@@ -518,18 +532,24 @@ namespace LMSF_Gen5
                 try
                 {
                     gen5Reader.PlateReadStatus(ref status); //Note: the PlateReadStatus sets the IsReading Property according to state of reader.
+                    realTimeDataHandler.PollForData(realTimeData);
                 }
                 catch (Exception exc)
                 {
                     AddOutputText($"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n");
                 }
 
-                //TODO: Handle live data stream
-
                 this.Dispatcher.Invoke(() => {
                     if (status == Gen5ReadStatus.eReadInProgress)
                     {
                         IsReaderBusy = true;
+
+                        if (realTimeDataHandler.HasNewData())
+                        {
+                            realTimeDataUI.UpdateSelections(realTimeData);
+                            realTimeDataUI.DrawPlotterCells();
+                            realTimeDataUI.PlotSelectedParameterData(realTimeData);
+                        }
                     }
                     else
                     {
@@ -825,7 +845,7 @@ namespace LMSF_Gen5
                         ParseAndRunCommand(nextMsg);
                     }
                 }
-                
+
                 Thread.Sleep(100);
             }
 
@@ -869,7 +889,7 @@ namespace LMSF_Gen5
                             {
                                 CarrierIn();
                             }
-                            
+
                             RunExp();
                         });
                     }
@@ -888,7 +908,7 @@ namespace LMSF_Gen5
                 UpdateControlEnabledStatus();
             });
         }
-        
+
         private void InstrCntrlButton_Click(object sender, RoutedEventArgs e)
         {
             AddOutputText(gen5Reader.RunReaderControlCommand());
@@ -918,6 +938,36 @@ namespace LMSF_Gen5
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             AddOutputText(gen5Reader.ExpSave());
+        }
+
+        /// <summary>
+        ///     Handles the "selection changed" event when the user clicks on the data set ComboBox control.
+        ///     Calls the methods that will update the selected data and render that data in the UI.
+        /// </summary>
+        /// <param name="sender">The control that raised this event.</param>
+        /// <param name="e">The event of the selection being changed.</param>
+        private void RealTimeDataComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                realTimeDataUI.UpdateClickedSelection();
+                realTimeDataUI.DrawPlotterCells();
+                realTimeDataUI.PlotSelectedParameterData(realTimeData);
+            });
+        }
+
+        /// <summary>
+        ///     Handles the main window getting resized event.
+        ///     Resizes the canvas of the real-time data and then redraws it at the new dimensions.
+        /// </summary>
+        /// <param name="sender">The control that raised this event.</param>
+        /// <param name="e">The event of the window being resized.</param>
+        private void Gen5AppMainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RealTimeDataCanvas.Width = VisualTreeHelper.GetOffset(RealTimeDataComboBox).X + RealTimeDataComboBox.Width;
+            RealTimeDataCanvas.Height = VisualTreeHelper.GetOffset(Gen5AppMainWindow).Y + Gen5AppMainWindow.Height - 360;
+            realTimeDataUI.DrawPlotterCells();
+            realTimeDataUI.PlotSelectedParameterData(realTimeData);
         }
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //===============================================================

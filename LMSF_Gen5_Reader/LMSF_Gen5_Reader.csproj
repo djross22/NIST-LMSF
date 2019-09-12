@@ -31,6 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,6 +47,13 @@
     <Compile Include="Gen5Reader.cs" />
     <Compile Include="IReaderTextOut.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RealTimeData\GetRawDataModel.cs" />
+    <Compile Include="RealTimeData\GetRawDataVariantModel.cs" />
+    <Compile Include="RealTimeData\RawDataModel.cs" />
+    <Compile Include="RealTimeData\RawDataSetModel.cs" />
+    <Compile Include="RealTimeData\RealTimeData.cs" />
+    <Compile Include="RealTimeData\RealTimeDataHandler.cs" />
+    <Compile Include="RealTimeData\RealTimeDataUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Gen5">

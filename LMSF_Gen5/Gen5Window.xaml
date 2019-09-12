@@ -1,4 +1,4 @@
-﻿<Window x:Class="LMSF_Gen5.Gen5Window"
+﻿<Window x:Name="Gen5AppMainWindow" x:Class="LMSF_Gen5.Gen5Window"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:LMSF_Gen5"
         xmlns:LMSF_Utilities="clr-namespace:LMSF_Utilities;assembly=LMSF_Utilities"
         mc:Ignorable="d"
-        Title="LMSF-Gen5" Height="750" Width="1250" Background="{DynamicResource PurpleBackgroundBrush}" MinWidth="1250" MinHeight="750" Closing="Window_Closing">
+        Title="LMSF-Gen5" Height="750" Width="1250" Background="{DynamicResource PurpleBackgroundBrush}" MinWidth="1250" MinHeight="750" Closing="Window_Closing" SizeChanged="Gen5AppMainWindow_SizeChanged">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
@@ -46,6 +46,9 @@
                 </Border>
                 <Button x:Name="remoteButton" Content="Switch to Remote" Width="120" Margin="20,0,0,0" Click="RemoteButton_Click"/>
             </StackPanel>
+            <Canvas x:Name="RealTimeDataCanvas" HorizontalAlignment="Left" Height="390" Margin="10,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="725" Background="White" Grid.ColumnSpan="2"/>
+            <TextBlock x:Name="RealTimeDataLabel" HorizontalAlignment="Left" Margin="50,279,0,0" TextWrapping="Wrap" Text="Real Time Data:" VerticalAlignment="Top" Foreground="White" FontSize="16" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
+            <ComboBox x:Name="RealTimeDataComboBox" HorizontalAlignment="Right" Margin="0,278,35,0" VerticalAlignment="Top" Width="410" SelectionChanged="RealTimeDataComboBox_SelectionChanged" IsSynchronizedWithCurrentItem="True" Grid.Column="1"/>
 
         </Grid>
         <Grid Grid.Column="1" Margin="0">

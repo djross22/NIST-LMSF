@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using Gen5;
 using System.Threading;
 using System.ComponentModel;
+using LMSF_Gen5_Reader.RealTimeData;
 
 namespace LMSF_Gen5_Reader
 {
@@ -664,7 +665,7 @@ namespace LMSF_Gen5_Reader
             {
                 expPath += ".xpt";
             }
-            
+
             return expPath;
         }
 
@@ -1013,5 +1014,14 @@ namespace LMSF_Gen5_Reader
         //    return retStr;
         //}
 
+        /// <summary>
+        ///     Returns a new instance of the <see cref="RealTimeDataHandler" /> class populated to use the
+        ///     current plate instance to interface with the microplate scanner.
+        /// </summary>
+        /// <returns>
+        ///     A new instance of the RealTimeDataHandler class populated with the current plate instance.
+        /// </returns>
+        public RealTimeDataHandler GetNewRealTimeDataHandler()
+            => new RealTimeDataHandler(plate);
     }
 }
