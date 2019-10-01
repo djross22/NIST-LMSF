@@ -5132,8 +5132,9 @@ namespace LMSF_Scheduler
                     ExportDictionary(remoteFrontEndpath, "parameters.csv");
                     exportSucess = true;
                 }
-                catch
+                catch (Exception e)
                 {
+                    AddOutputText($"Error trying to write parameters.csv file: {e}.\n      Retrying...\n");
                     Thread.Sleep(3000);
                 }
             }
