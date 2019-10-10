@@ -482,6 +482,7 @@ namespace Hamilton_Remote
             notActualStrings.Add("Trace - error;");
             notActualStrings.Add("o_strErrorCode = 'TEC_0'");
             notActualStrings.Add("SmartStepCustomErrorHandling");
+            notActualStrings.Add("Running ThermoShakeErrorCheck()");
 
             foreach (String s in notActualStrings)
             {
