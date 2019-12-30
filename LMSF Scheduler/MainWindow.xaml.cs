@@ -399,7 +399,7 @@ namespace LMSF_Scheduler
             CommandList = new ObservableCollection<string>() { "If", "Overlord", "Hamilton", "RemoteHam", "Gen5", "Timer", "WaitFor", "StartPrompt", "NewXML", "AppendXML", "AddXML", "LoadXML", "UserPrompt", "GetUserYesNo", "Set", "Math", "Get", "GetTimeNow", "GetExpID", "GetFile", "CopyRemoteFiles", "ReadScript", "ImportDictionary", "ExportDictionary" }; //SharedParameters.UnitsList;
 
             //ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "Epoch5", "S-Cell-STAR" };
-            ReaderList = new List<string>() { "Neo", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
+            ReaderList = new List<string>() { "Neo", "Neo2", "Epoch1", "Epoch2", "Epoch3", "Epoch4", "S-Cell-STAR" };
             ReaderBlockList = new ObservableCollection<TextBlock>();
             foreach (string s in ReaderList)
             {
@@ -411,6 +411,7 @@ namespace LMSF_Scheduler
             }
             //Set IPs for each remote server
             readerIps["Neo"] = "localhost";
+            readerIps["Neo2"] = "129.6.167.144";
             readerIps["Epoch1"] = "129.6.167.36";
             readerIps["Epoch2"] = "129.6.167.37";
             readerIps["Epoch3"] = "129.6.167.38";

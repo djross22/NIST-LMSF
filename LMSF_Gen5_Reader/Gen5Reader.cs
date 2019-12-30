@@ -45,6 +45,9 @@ namespace LMSF_Gen5_Reader
                 case ("DESKTOP-D44787E"):
                     ReaderName = "Neo";
                     break;
+                case ("PG902256"):
+                    ReaderName = "Neo2";
+                    break;
                 case ("DESKTOP-PTVORQ9"):
                     ReaderName = "Epoch1";
                     break;
