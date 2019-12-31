@@ -575,7 +575,16 @@ namespace Hamilton_Remote
                 //send back "fail" if bad message
                 replyStr = $"{msgParts[0]},fail,{msgParts[2]}";
             }
-            msg.ReplyLine(replyStr);
+            
+            try
+            {
+                msg.ReplyLine(replyStr);
+            }
+            catch (Exception ex)
+            {
+                string errMsg = $"Error in ReplyLine call from Hamilton Remote: {ex}\n";
+                AddOutputText(errMsg);
+            }
 
             textOutAdd = $"reply sent: {replyStr}\n";
             this.Dispatcher.Invoke(() =>
