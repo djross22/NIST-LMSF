@@ -4494,7 +4494,11 @@ namespace LMSF_Scheduler
                 //this has to be delegated becasue it interacts with the GUI by calling up a dialog box
                 this.Dispatcher.Invoke(() => {
                     valueStr = GetNotes(promptStr);
-                    metaDictionary[keyStr] = valueStr;
+                    if (!(valueStr is null))
+                    {
+                        metaDictionary[keyStr] = valueStr;
+                    }
+                    
                 });
 
                 //Then save to XML document if...
@@ -5006,21 +5010,39 @@ namespace LMSF_Scheduler
                 {
                     //outputFile.WriteLine(header);
                     //outputFile.WriteLine(values);
+                    if (metaDictionary is null)
+                    {
+                        AddOutputText("metaDictionary is null");
+                    }
+                    if (outputFile is null)
+                    {
+                        AddOutputText("outputFile is null");
+                    }
+                    if (Environment.NewLine is null)
+                    {
+                        AddOutputText("Environment.NewLine is null");
+                    }
                     foreach (string key in metaDictionary.Keys)
                     {
                         string value = metaDictionary[key];
-                        value = value.Replace(Environment.NewLine, "; ");
-                        outputFile.WriteLine($"{key},{value}");
+                        if (value is null)
+                        {
+                            AddOutputText($"value is null for key: {key}");
+                        }
+                        else
+                        {
+                            value = value.Replace(Environment.NewLine, "; ");
+                            outputFile.WriteLine($"{key},{value}");
+                        }
                     }
                 }
             }
             catch (UnauthorizedAccessException e)
             {
                 MessageBox.Show(e.Message);
-                //this has to be delegated becasue it interacts with the GUI by callin up a dialog box
+                //this has to be delegated becasue it interacts with the GUI by calling up a dialog box
                 this.Dispatcher.Invoke(() => { AbortCalled = true; });
             }
-
         }
 
         private void ImportDictionary(string filePath)
@@ -5135,7 +5157,7 @@ namespace LMSF_Scheduler
                 }
                 catch (Exception e)
                 {
-                    AddOutputText($"Error trying to write parameters.csv file: {e}.\n      Retrying...\n");
+                    AddOutputText($"Error trying to write parameters.csv file for {name} at {remoteFrontEndpath}: {e}.\n      Retrying...\n");
                     Thread.Sleep(3000);
                 }
             }
