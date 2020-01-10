@@ -630,6 +630,7 @@ namespace Hamilton_Remote
                     oldMessageQueue.Clear();
                     StartTcpServer();
                     StartRemoteControl();
+                    AddOutputText("Remote control started.\n");
                 }
                 else
                 {
@@ -637,6 +638,7 @@ namespace Hamilton_Remote
                     {
                         server.Stop();
                     }
+                    AddOutputText("Remote control ended.\n");
                 }
             }
         }

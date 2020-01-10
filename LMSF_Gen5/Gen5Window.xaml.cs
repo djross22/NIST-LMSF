@@ -800,7 +800,7 @@ namespace LMSF_Gen5
                     oldMessageQueue.Clear();
                     StartTcpServer();
                     StartRemoteControl();
-                    AddOutputText("Remote control started.");
+                    AddOutputText("Remote control started.\n");
                 }
                 else
                 {
@@ -808,7 +808,7 @@ namespace LMSF_Gen5
                     {
                         server.Stop();
                     }
-                    AddOutputText("Remote control ended.");
+                    AddOutputText("Remote control ended.\n");
                 }
             }
         }
