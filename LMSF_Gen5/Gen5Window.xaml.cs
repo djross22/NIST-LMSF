@@ -20,6 +20,7 @@ using LMSF_Gen5_Reader;
 using Gen5;
 using SimpleTCP;
 using LMSF_Gen5_Reader.RealTimeData;
+using LMSF_Gen5_Reader.AbortTrigger;
 
 namespace LMSF_Gen5
 {
@@ -69,6 +70,8 @@ namespace LMSF_Gen5
         private RealTimeDataHandler realTimeDataHandler;
         private RealTimeDataUI realTimeDataUI;
 
+        private AbortTriggerHandler abortTriggerHandler;
+
         public Gen5Window()
         {
             InitializeComponent();
@@ -95,10 +98,8 @@ namespace LMSF_Gen5
             }
             NewLogFile();
 
-            realTimeData = new RealTimeData();
-            realTimeDataUI = new RealTimeDataUI(RealTimeDataCanvas, RealTimeDataComboBox);
-            realTimeDataUI.UpdateSelections(null);
-            realTimeDataUI.DrawPlotterCells();
+            SetupNewRealTimeData();
+            SetupNewAbortTriggers();
         }
 
         #region Properties Getters and Setters
@@ -457,6 +458,8 @@ namespace LMSF_Gen5
 
         private void RunExpButton_Click(object sender, RoutedEventArgs e)
         {
+            SetupNewRealTimeData();
+            SetupNewAbortTriggers();
             RunExp();
         }
 
@@ -539,7 +542,7 @@ namespace LMSF_Gen5
                     AddOutputText($"Error at ReaderMonitor_DoWork.PlateReadStatus, {exc}./n");
                 }
 
-                this.Dispatcher.Invoke(() => {
+                this.Dispatcher.BeginInvoke(new Action(() => {
                     if (status == Gen5ReadStatus.eReadInProgress)
                     {
                         IsReaderBusy = true;
@@ -550,12 +553,18 @@ namespace LMSF_Gen5
                             realTimeDataUI.DrawPlotterCells();
                             realTimeDataUI.PlotSelectedParameterData(realTimeData);
                         }
+
+                        if (abortTriggerHandler.ShouldRunAbort(realTimeData))
+                        {
+                            AddOutputText(abortTriggerHandler.LastErrorMessage);
+                            AddOutputText(gen5Reader.PlateAbortRead());
+                        }
                     }
                     else
                     {
                         IsReaderBusy = false;
                     }
-                });
+                }), System.Windows.Threading.DispatcherPriority.Background);
             }
 
         }
@@ -962,6 +971,11 @@ namespace LMSF_Gen5
                 realTimeDataUI.UpdateClickedSelection();
                 realTimeDataUI.DrawPlotterCells();
                 realTimeDataUI.PlotSelectedParameterData(realTimeData);
+
+                if (abortTriggerHandler != null)
+                {
+                    abortTriggerHandler.HandleLoad(realTimeDataUI.SelectedParameter);
+                }
             });
         }
 
@@ -980,5 +994,39 @@ namespace LMSF_Gen5
         }
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //===============================================================
+
+        private void SetupNewRealTimeData()
+        {
+            realTimeData = new RealTimeData();
+            realTimeDataUI = new RealTimeDataUI(RealTimeDataCanvas, RealTimeDataComboBox);
+            realTimeDataUI.UpdateSelections(null);
+            realTimeDataUI.DrawPlotterCells();
+        }
+
+        /// <summary>
+        ///     Creates a new <see cref="AbortTriggerHandler"/> instance with references to the abort trigger
+        ///     UI elements and no <see cref="AbortTriggerProfile"/>s.
+        /// </summary>
+        private void SetupNewAbortTriggers()
+        {
+            var abortTriggerUI = new AbortTriggerUI
+            {
+                AverageCheckBox = Triggers_Average_CheckBox,
+                AverageTextBox = Triggers_Average_TextBox,
+                MaximumCheckBox = Triggers_Maximum_CheckBox,
+                MaximumTextBox = Triggers_Maximum_TextBox
+            };
+            abortTriggerHandler = new AbortTriggerHandler(abortTriggerUI);
+        }
+
+        private void Triggers_SaveTriggers_Button_Click(object sender, RoutedEventArgs e)
+        {
+            abortTriggerHandler.HandleSave(realTimeDataUI.SelectedParameter);
+        }
+
+        private void Triggers_LoadTriggers_Button_Click(object sender, RoutedEventArgs e)
+        {
+            abortTriggerHandler.HandleLoad(realTimeDataUI.SelectedParameter);
+        }
     }
 }

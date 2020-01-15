@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbortTrigger\AbortTriggerHandler.cs" />
+    <Compile Include="AbortTrigger\AbortTriggerProfile.cs" />
+    <Compile Include="AbortTrigger\AbortTriggerUI.cs" />
     <Compile Include="BTIStatusCodes.cs" />
     <Compile Include="Gen5Reader.cs" />
     <Compile Include="IReaderTextOut.cs" />

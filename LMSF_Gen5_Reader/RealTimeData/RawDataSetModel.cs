@@ -7,8 +7,8 @@ namespace LMSF_Gen5_Reader.RealTimeData
     /// </summary>
     public sealed class RawDataSetModel
     {
-        private const int PlateRows = 8;
-        private const int PlateColumns = 12;
+        public const int PlateRows = 8;
+        public const int PlateColumns = 12;
 
         public string DataSetName { get; set; } = string.Empty;
 

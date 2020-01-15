@@ -19,6 +19,8 @@ namespace LMSF_Gen5_Reader.RealTimeData
     /// </summary>
     public sealed class RealTimeDataUI
     {
+        public string SelectedParameter { get; private set; } = string.Empty;
+
         private const int Rows = 8;
         private const int Columns = 12;
         private const string NoDataParameter = "---No data---";
@@ -26,7 +28,6 @@ namespace LMSF_Gen5_Reader.RealTimeData
         private readonly Canvas plotterUI;
         private readonly ComboBox parameterUI;
         private readonly ObservableCollection<string> parameters = new ObservableCollection<string>();
-        private string selectedParameter = string.Empty;
 
         private double cellHeight, cellWidth;
         private long allCellsWidth, allCellsHeight;
@@ -149,13 +150,14 @@ namespace LMSF_Gen5_Reader.RealTimeData
 
             if (parameters.Count == 0)
             {
-                selectedParameter = NoDataParameter;
+                selectedIndex = 0;
+                SelectedParameter = NoDataParameter;
                 parameters.Add(NoDataParameter);
                 parameterUI.ItemsSource = parameters;
                 parameterUI.SelectedIndex = selectedIndex;
             }
 
-            selectedParameter = parameters[selectedIndex];
+            SelectedParameter = parameters[selectedIndex];
         }
 
         /// <summary>
@@ -189,7 +191,7 @@ namespace LMSF_Gen5_Reader.RealTimeData
                         parameters.Remove(NoDataParameter);
 
                         var selectionIndex = (parameterUI.SelectedIndex < 0) ? 0 : parameterUI.SelectedIndex;
-                        selectedParameter = parameters[selectionIndex];
+                        SelectedParameter = parameters[selectionIndex];
                     }
                 }
             }
@@ -226,7 +228,7 @@ namespace LMSF_Gen5_Reader.RealTimeData
         ///     null if no match is found.
         /// </returns>
         private RawDataSetModel GetSelectedParameterData(RealTimeData realTimeData)
-            => realTimeData.DataSets.FirstOrDefault(x => x.ParameterName.Equals(selectedParameter));
+            => realTimeData.DataSets.FirstOrDefault(x => x.ParameterName.Equals(SelectedParameter));
 
         /// <summary>
         ///     Plots the data as dots from a given <see cref="RawDataSetModel" /> onto the
