@@ -23,7 +23,7 @@ namespace LMSF_Gen5_Reader.RealTimeData
 
         private const int Rows = 8;
         private const int Columns = 12;
-        private const string NoDataParameter = "---No data---";
+        public const string NoDataParameter = "---No data---";
 
         private readonly Canvas plotterUI;
         private readonly ComboBox parameterUI;

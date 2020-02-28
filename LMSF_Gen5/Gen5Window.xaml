@@ -80,7 +80,7 @@
                 <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Right" Margin="0,128,10,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" Grid.Row="1" Focusable="False"/>
                 <TextBlock HorizontalAlignment="Left" Margin="20,10,0,0" TextWrapping="Wrap" Text="Status Monitor:" VerticalAlignment="Top" Foreground="White" Grid.Row="1"/>
             </Grid>
-            <Grid x:Name="Triggers_Grid" HorizontalAlignment="Left" Height="144" Margin="10,0.2,0,0" Grid.Row="1" VerticalAlignment="Top" Width="204">
+            <Grid x:Name="Triggers_Grid" HorizontalAlignment="Left" Height="190" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Top" Width="204">
                 <CheckBox x:Name="Triggers_Average_CheckBox" Content="Average OD Threshold:" HorizontalAlignment="Left" Margin="9,32,0,0" VerticalAlignment="Top" Foreground="White"/>
                 <CheckBox x:Name="Triggers_Maximum_CheckBox" Content="Maximum OD Threshold:" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Foreground="White"/>
                 <TextBlock x:Name="Triggers_Title_Text" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Abort Trigger Settings:" VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Center"/>
@@ -88,7 +88,18 @@
                 <TextBox x:Name="Triggers_Maximum_TextBox" HorizontalAlignment="Left" Height="23" Margin="10,87,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="138"/>
                 <Button x:Name="Triggers_SaveTriggers_Button" Content="Save Triggers" HorizontalAlignment="Left" Margin="10,117,0,0" VerticalAlignment="Top" Width="90" Click="Triggers_SaveTriggers_Button_Click"/>
                 <Button x:Name="Triggers_LoadTriggers_Button" Content="Load Triggers" HorizontalAlignment="Left" Margin="105,117,0,0" VerticalAlignment="Top" Width="90" Click="Triggers_LoadTriggers_Button_Click"/>
+                <Button x:Name="Triggers_PersistTriggers_Button" Content="Apply Trigger to Future Runs" HorizontalAlignment="Left" Margin="10,147,0,0" VerticalAlignment="Top" Width="185" Click="Triggers_PersistTrigger_Button_Click" Height="23"/>
             </Grid>
+            <Grid x:Name="Triggers_Message_Grid" HorizontalAlignment="Left" Height="190" Margin="260,0,0,0" Grid.Row="1" VerticalAlignment="Top" Width="204">
+                <TextBlock x:Name="Persisted_Trigger_Title_Text" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Multi-run trigger:" VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Center"/>
+                <TextBlock x:Name="Persisted_Trigger_Title_Dataset" HorizontalAlignment="Left" Margin="10,35,0,0" TextWrapping="Wrap" Text="Data Set: " VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Left"/>
+                <TextBlock x:Name="Persisted_Trigger_Title_Average" HorizontalAlignment="Left" Margin="10,55,0,0" TextWrapping="Wrap" Text="Average: " VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Left"/>
+                <TextBlock x:Name="Persisted_Trigger_Title_Maximum" HorizontalAlignment="Left" Margin="10,75,0,0" TextWrapping="Wrap" Text="Max: " VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Left"/>
+                <TextBlock x:Name="Persisted_Trigger_Data_Dataset" HorizontalAlignment="Left" Margin="10,35,0,0" TextWrapping="Wrap" Text="None" VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Right"/>
+                <TextBlock x:Name="Persisted_Trigger_Data_Average" HorizontalAlignment="Left" Margin="10,55,0,0" TextWrapping="Wrap" Text="None" VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Right"/>
+                <TextBlock x:Name="Persisted_Trigger_Data_Maximum" HorizontalAlignment="Left" Margin="10,75,0,0" TextWrapping="Wrap" Text="None" VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Right"/>
+                <TextBlock x:Name="Persisted_Trigger_Applied_Text" HorizontalAlignment="Left" Margin="10,105,0,0" TextWrapping="Wrap" Text="APPLIED TO CURRENT RUN" VerticalAlignment="Top" Foreground="White" FontSize="14" Width="185" TextAlignment="Center" Visibility="Hidden"/>
+            </Grid>            
         </Grid>
     </Grid>
 </Window>

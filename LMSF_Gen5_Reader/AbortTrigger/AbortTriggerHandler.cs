@@ -53,6 +53,16 @@ namespace LMSF_Gen5_Reader.AbortTrigger
         }
 
         /// <summary>
+        ///     returns Abort Trigger Profile for currently selected dataset or null.
+        /// </summary>
+        /// <param name="dataSetName">The data set name used to lookup which abort trigger is relevant.</param>
+        public AbortTriggerProfile getAbortTriggerProfileByDataset(string dataSetName)
+        {
+            return GetMatchingAbortTriggerProfile(dataSetName);
+                
+        }
+
+        /// <summary>
         ///     Determines if a run should be aborted by querying the abort triggers with the given
         ///     <see cref="RealTimeData.RealTimeData"/>.
         /// </summary>
@@ -91,6 +101,22 @@ namespace LMSF_Gen5_Reader.AbortTrigger
 
             return selectedProfile;
         }
+
+        public void addPersistedAbortProfile(AbortTriggerProfile persistedProfile)
+        {
+            if(persistedProfile == null)
+            {
+                return;
+            }
+            //confirm the profile isn't already in the list
+            var selectedProfile = abortTriggerProfiles.FirstOrDefault(x => x.DataSetName.Equals(persistedProfile.DataSetName));
+            if(selectedProfile != null)
+            {
+                throw new System.ArgumentException("ERROR Profile for " + persistedProfile.DataSetName + "already exists./ n");
+            }
+            abortTriggerProfiles.Add(persistedProfile);
+        }
+
 
         /// <summary>
         ///     Parses the text from a TextBox UI element intended to hold type <see cref="double"/> numbers.

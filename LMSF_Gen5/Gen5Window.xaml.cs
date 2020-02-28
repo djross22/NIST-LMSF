@@ -51,6 +51,8 @@ namespace LMSF_Gen5
 
         private Brush startingButtonBackground;
 
+        private AbortTriggerProfile persistedTrigger;
+
         //log file
         private string logFilePath;
 
@@ -71,6 +73,8 @@ namespace LMSF_Gen5
         private RealTimeDataUI realTimeDataUI;
 
         private AbortTriggerHandler abortTriggerHandler;
+
+        private const String PERSISTED_TRIGGER_EMPTY_TEXT = "None";
 
         public Gen5Window()
         {
@@ -460,6 +464,19 @@ namespace LMSF_Gen5
         {
             SetupNewRealTimeData();
             SetupNewAbortTriggers();
+            if(persistedTrigger != null)
+            {
+                try
+                {
+                    abortTriggerHandler.addPersistedAbortProfile(persistedTrigger);
+                    AddOutputText($"Loaded Abort Trigger details for dataset {persistedTrigger.DataSetName} from previous run./n");
+                    updatePersistedTriggerInfoBox(true);
+                }
+                catch (Exception exc)
+                {
+                    AddOutputText($"Error at loading persisted trigger profile: , {exc}./n");
+                }
+            }
             RunExp();
         }
 
@@ -554,11 +571,42 @@ namespace LMSF_Gen5
                             realTimeDataUI.PlotSelectedParameterData(realTimeData);
                         }
 
-                        if (abortTriggerHandler.ShouldRunAbort(realTimeData))
+
+                        //lets get the data for the last cell and the first cell and see if they match.  We only want to test if a read is copmlete
+                        //NOTE: this will trigger testing after the first read of the first dataset which is undesired, but because the trigger code block
+                        //requires a minium of two entires in the data set before a trigger is considered it will be ignored there.
+                        if (realTimeData != null)
                         {
-                            AddOutputText(abortTriggerHandler.LastErrorMessage);
-                            AddOutputText(gen5Reader.PlateAbortRead());
+                            if (realTimeData.DataSets.Count > 0)
+                            {
+                                RawDataSetModel firstDataSet = realTimeData.DataSets[0];
+                                RawDataSetModel lastDataSet = realTimeData.DataSets[realTimeData.DataSets.Count - 1];
+
+                                List<RawDataModel> firstDataSetFirstCell = firstDataSet.RawDataPlate[0, 0];
+                                List<RawDataModel> firstDataSetLastCell = firstDataSet.RawDataPlate[RawDataSetModel.PlateRows - 1, RawDataSetModel.PlateColumns - 1];
+
+                                List<RawDataModel> firstCell = lastDataSet.RawDataPlate[0, 0];
+                                List<RawDataModel> lastCell = lastDataSet.RawDataPlate[RawDataSetModel.PlateRows - 1, RawDataSetModel.PlateColumns - 1];
+
+                                //if the counts don't match we're in mid scan.
+                                if (firstCell.Count != 0 & 
+                                firstCell.Count == lastCell.Count & 
+                                firstCell.Count == firstDataSetLastCell.Count & 
+                                firstDataSetFirstCell.Count == lastCell.Count & 
+                                firstDataSetFirstCell.Count == firstDataSetLastCell.Count)
+                                {
+
+
+                                    if (abortTriggerHandler.ShouldRunAbort(realTimeData))
+                                    {
+                                        AddOutputText(abortTriggerHandler.LastErrorMessage);
+                                        AddOutputText(gen5Reader.PlateAbortRead());
+                                    }
+                                }
+                            }
                         }
+
+
                     }
                     else
                     {
@@ -1027,6 +1075,72 @@ namespace LMSF_Gen5
         private void Triggers_LoadTriggers_Button_Click(object sender, RoutedEventArgs e)
         {
             abortTriggerHandler.HandleLoad(realTimeDataUI.SelectedParameter);
+        }
+
+        private void Triggers_PersistTrigger_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(realTimeDataUI.SelectedParameter == null || realTimeDataUI.SelectedParameter == RealTimeDataUI.NoDataParameter)
+            {
+                AddOutputText("No Trigger Data to save");
+                return;
+            }
+
+            //only apply the trigger if it's got checked values, otherwise erase it.
+            AbortTriggerProfile profile = abortTriggerHandler.getAbortTriggerProfileByDataset(realTimeDataUI.SelectedParameter);
+            if(profile.EnabledAverageTrigger || profile.EnabledMaximumTrigger)
+            {
+                persistedTrigger = profile;
+            }
+            else
+            {
+                persistedTrigger = null;
+            }
+            updatePersistedTriggerInfoBox(false);
+        }
+
+        /// <summary>
+        ///    This method updates the persisted trigger data display based on the persisted trigger.
+        ///    The argument controls wether to display the APPLIED text.
+        /// </summary>
+        /// <param name="applied"></param>
+        private void updatePersistedTriggerInfoBox(bool applied)
+        {
+            if (applied)
+            {
+                Persisted_Trigger_Applied_Text.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Persisted_Trigger_Applied_Text.Visibility = Visibility.Hidden;
+            }
+
+            //if there is no persisted trigger, or we have a trigger with no meaningful data clear the fields and kick out.
+            if(persistedTrigger == null || persistedTrigger.EnabledMaximumTrigger == false && persistedTrigger.EnabledAverageTrigger == false)
+                {
+                Persisted_Trigger_Data_Average.Text = PERSISTED_TRIGGER_EMPTY_TEXT;
+                Persisted_Trigger_Data_Maximum.Text = PERSISTED_TRIGGER_EMPTY_TEXT;
+                Persisted_Trigger_Data_Dataset.Text = PERSISTED_TRIGGER_EMPTY_TEXT;
+                return;
+            }
+
+            Persisted_Trigger_Data_Dataset.Text = persistedTrigger.DataSetName;
+            if (persistedTrigger.EnabledAverageTrigger)
+            {
+                Persisted_Trigger_Data_Average.Text = persistedTrigger.ValueAverageTrigger.ToString("F30").TrimEnd('0');
+            }
+            else
+            {
+                Persisted_Trigger_Data_Average.Text = PERSISTED_TRIGGER_EMPTY_TEXT;
+            }
+
+            if (persistedTrigger.EnabledMaximumTrigger)
+            {
+                Persisted_Trigger_Data_Maximum.Text = persistedTrigger.ValueMaximumTrigger.ToString("F30").TrimEnd('0');
+            }
+            else
+            {
+                Persisted_Trigger_Data_Maximum.Text = PERSISTED_TRIGGER_EMPTY_TEXT;
+            }
         }
     }
 }

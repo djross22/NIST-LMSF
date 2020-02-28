@@ -30,6 +30,28 @@ namespace LMSF_Gen5_Reader.AbortTrigger
         }
 
         /// <summary>
+        ///     Inatliizes a new instance of the <see cref="AbortTriggerProfile"/> class as a clone of the origional.
+        /// </summary>
+        /// <param name="profile"></param>
+        private AbortTriggerProfile(AbortTriggerProfile profile)
+        {
+            DataSetName = profile.DataSetName;
+            EnabledAverageTrigger = profile.EnabledAverageTrigger;
+            EnabledMaximumTrigger = profile.EnabledMaximumTrigger;
+            ValueAverageTrigger = profile.ValueAverageTrigger;
+            ValueMaximumTrigger = profile.ValueMaximumTrigger;
+        }
+
+        /// <summary>
+        ///     Returns a clone of this instance.
+        /// </summary>
+        /// <returns></returns>
+        public AbortTriggerProfile getClone()
+        {
+            return new AbortTriggerProfile(this);
+        }
+
+        /// <summary>
         ///     Determines if this class' average or maximum abort trigger thresholds have been passed
         ///     from a given <see cref="RealTimeData.RealTimeData"/> class.
         ///     If triggered, the property LastErrorMessage will contain the specific reason.
