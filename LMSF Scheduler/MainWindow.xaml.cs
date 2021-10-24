@@ -5452,6 +5452,9 @@ namespace LMSF_Scheduler
             int num = (int)argsList[0];
             Process outside_Process = argsList[1] as Process;
 
+            // Add 1 s wait to make sure process gets started
+            Thread.Sleep(1000);
+
             while (!outside_Process.HasExited)
             {
                 Thread.Sleep(100);
