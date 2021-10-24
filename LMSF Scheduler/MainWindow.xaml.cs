@@ -4930,6 +4930,8 @@ namespace LMSF_Scheduler
             }
             
             ovProcess = Process.Start(startInfo);
+            AddOutputText("... starting new Overlord Process:\n");
+            AddOutputText("        " + startInfo.Arguments + "\n");
 
             //Send info to metadata if collecting
             if (isCollectingXml && !AbortCalled)
