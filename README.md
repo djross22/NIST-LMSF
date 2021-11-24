@@ -11,6 +11,8 @@ NIST-LMSF has three components:
 ## Getting Started
 Build the solution in Visual Studio and use the installer (`\NIST LMSF\LMSF Controls\Release\LMSF Controls.msi`) to install the software components on the main and remote computers. Or, email me (david.ross@nist.gov), and I'll send you the latest installer.
 
+The examples folder has an example script (`Sample user interaction script.lmsf`) that can be run without any instruments (Hamilton, Gen5, etc.).
+
 
 Much of the following material was written in plain text, and has not yet been formatted nicely into .md format. Sorry.
 
