@@ -1,0 +1,86 @@
+
+//This script gives an example of the user interaction commands and some timing control commands. 
+//It should work on any windows computer, without the need for Overlord, Hamilton Venus, or Gen5
+
+// Start new experiment .xml file
+NewXML(growth plate prep)
+
+// Get the user ID (from the user)
+Get(user, user)
+
+// Get the media identifier (from the user)
+Get(media, media)
+
+// Get strain and plasmid identifiers
+Get(strain, strain1, Select the bacteria strain used for the protocol:)
+Get(plasmid, plasmid1, Select the plasmid used for the protocol:)
+
+// Get inducer identifier
+Get(additive, inducer)
+Get(concentration, inducerStock, Enter the concentration of the {inducer} starting stock:)
+
+// Get general note
+Get(note, note)
+
+// Propose and get user approval (or edits) for an experiment identifier
+// Note that the startDateTime is automatically set by the NewXML() command
+GetExpID({startDateTime}_{inducer}_growth-plate)
+
+// Output info/instructions to user
+UserPrompt(User Instruction, Make sure the plate reader is empty.)
+
+// Multi-line user instructions
+Set(msg1, Close the front cover on the STAR.\n)
+Set(msg2, Ensure that the Robot arm is in a safe position and that the Guard Override key is in the 'Off' position.\n)
+Set(msg3, Check that all the doors of the S-Cell system are closed.\n)
+Set(msg4, Then click 'OK' to start the experiment.\n)
+UserPrompt(Ready to Start, {msg1}{msg2}{msg3}{msg4})
+
+// UserPrompt commands can also be used to display an image:
+//UserPrompt(Ready to Start, {msg1}{msg2}{msg3}{msg4}, path_to_image_file.png)
+
+//Run timer for 20 s, and wait for timer to finish
+Timer(20)
+WaitFor(Timer)
+
+//Get current time and save to variable, readStartTime
+GetTimeNow(readStartTime)
+// Calculate end time (numbers are in seconds, so a real read would take more than 120 s.
+Math(readEndTime, {readStartTime} + 120)
+//Run timer that ends at calculated time
+Timer({readEndTime})
+
+//Get more user input while timer is running
+Get(integer, numberOfPlates, Enter the number of plates to run (max = 5).)
+If({numberOfPlates} > 5, Set(numberOfPlates, 5))
+
+//Set initial value for plate numberOfPlates
+Set(plateNumber, 1)
+UserPrompt(Plates, Plate number {plateNumber})
+
+// Next plate
+Math(plateNumber, {plateNumber} + 1)
+UserPrompt(Plates, Plate number {plateNumber})
+
+// Here's an example where a Python-like syntax and flow control would be better
+Set(needAnotherPlate, no)
+If({plateNumber} < {numberOfPlates}, Set(needAnotherPlate, yes))
+If({needAnotherPlate} == yes, Math(plateNumber, {plateNumber} + 1))
+If({needAnotherPlate} == yes, UserPrompt(Plates, Plate number {plateNumber}))
+
+Set(needAnotherPlate, no)
+If({plateNumber} < {numberOfPlates}, Set(needAnotherPlate, yes))
+If({needAnotherPlate} == yes, Math(plateNumber, {plateNumber} + 1))
+If({needAnotherPlate} == yes, UserPrompt(Plates, Plate number {plateNumber}))
+
+Set(needAnotherPlate, no)
+If({plateNumber} < {numberOfPlates}, Set(needAnotherPlate, yes))
+If({needAnotherPlate} == yes, Math(plateNumber, {plateNumber} + 1))
+If({needAnotherPlate} == yes, UserPrompt(Plates, Plate number {plateNumber}))
+
+
+// Wait for the timer to finish
+WaitFor(Timer)
+
+// Save experiment finishing time to .xml file 
+SaveXML()
