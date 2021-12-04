@@ -1713,7 +1713,19 @@ namespace LMSF_Scheduler
 
                 if (isOvpFileName & varArgsOk)
                 {
-                    bool ovpExists = File.Exists(stepArgs[1]);
+                    bool overlordInstalled = File.Exists(@"C:\Program Files (x86)\PAA\Overlord3\Overlord.Main.exe");
+                    bool ovpExists;
+                    //If Overlord is installed locally, make sure .ovp file exists 
+                    if (overlordInstalled)
+                    {
+                        ovpExists = File.Exists(stepArgs[1]);
+                    }
+                    //Or, pass validation only in Sim Mode
+                    else
+                    {
+                        ovpExists = IsSimMode;
+                    }
+
                     if (ovpExists)
                     {
                         outString += stepArgs[1];
@@ -4924,6 +4936,10 @@ namespace LMSF_Scheduler
             ProcessStartInfo startInfo = new ProcessStartInfo();
             //startInfo.FileName = @"C:\Users\djross\source\repos\NIST LMSF\Overlord Simulator\bin\Release\Overlord.Main.exe";
             startInfo.FileName = @"C:\Program Files (x86)\PAA\Overlord3\Overlord.Main.exe";
+            if (IsSimMode)
+            {
+                startInfo.FileName = @"C:\Program Files (x86)\LMSF\LMSF Controls\Overlord.Main.exe";
+            }
 
             if (args.Length > 2)
             {
