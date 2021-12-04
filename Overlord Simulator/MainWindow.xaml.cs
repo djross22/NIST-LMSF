@@ -36,7 +36,7 @@ namespace Overlord_Simulator
             InitializeComponent();
 
             //Simulation time i seconds
-            float simTime = 10;
+            float simTime = 30;
             
             //Variables for parsing input arguments
             string[] args = App.commandLineArgs;
