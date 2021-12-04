@@ -1985,8 +1985,8 @@ namespace LMSF_Scheduler
                     // Check if 1st argument is valid reader name 
                     if (ReaderList.Contains(name))
                     {
-                        //Check if reader is connected
-                        if (GetConnectedReadersList().Contains(name))
+                        //Check if reader is connected or if in Sim Mode
+                        if ((IsSimMode) || (GetConnectedReadersList().Contains(name)))
                         {
                             //Check if 2nd argument is valid reader command
                             if (commandList.Contains(command))
@@ -2045,7 +2045,8 @@ namespace LMSF_Scheduler
                                 val.Add(num);
                                 argsOk = false;
                             }
-                            if (!File.Exists(protocolPath))
+                            //Check that protocol file actually exists or that run is in Sim Mode
+                            if (!IsSimMode && !File.Exists(protocolPath))
                             {
                                 outString += $"Protocol file/path does not exist: {protocolPath} ";
                                 val.Add(num);
@@ -2092,7 +2093,25 @@ namespace LMSF_Scheduler
                     if (!localIsValidating)
                     {
                         //Run the step
-                        RunGen5(num, stepArgs);
+                        //In Sim Mode, run a User prompt instead
+                        if (IsSimMode)
+                        {
+                            string[] simArgs = new string[3];
+                            simArgs[0] = stepArgs[0];
+                            simArgs[1] = "Simulated Gen5";
+                            string msg = "";
+                            foreach (string s in stepArgs)
+                            {
+                                msg += s;
+                                msg += "\n";
+                            }
+                            simArgs[2] = msg;
+                            RunUserPrompt(num, simArgs);
+                        }
+                        else
+                        {
+                            RunGen5(num, stepArgs);
+                        }
                     }
                     else
                     {
@@ -2205,7 +2224,10 @@ namespace LMSF_Scheduler
                             }
                             break;
                         default:
-                            if (GetConnectedReadersList().Contains(processWaitingFor))
+                            if (IsSimMode) {
+                                outString += $"Simulation Mode, doesn't wait for {processWaitingFor}.";
+                            }
+                            else if (GetConnectedReadersList().Contains(processWaitingFor))
                             {
                                 outString += $"{processWaitingFor}, Done.";
                                 if (!localIsValidating)
