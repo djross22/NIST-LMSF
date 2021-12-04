@@ -48,7 +48,7 @@
                         <Image Source="checkmark-128.png" Height="25"/>
                     </Button>
                     <StackPanel Margin="20,10,10,0" VerticalAlignment="Top">
-                        <CheckBox x:Name="simModeCheckBox" Content="Simulation Mode"/>
+                        <CheckBox x:Name="simModeCheckBox" Content="Simulation Mode" IsChecked="{Binding IsSimMode}"/>
                     </StackPanel>
                     <Border VerticalAlignment="Center" Width="10" Margin="0,0,20,0"/>
                     <Separator Height="31" Margin="0" VerticalAlignment="Top" Width="2"/>

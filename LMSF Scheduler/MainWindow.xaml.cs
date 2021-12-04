@@ -118,6 +118,7 @@ namespace LMSF_Scheduler
         Dictionary<string, SimpleTcpClient> readerClients = new Dictionary<string, SimpleTcpClient>();
 
         #region Properties Getters and Setters
+        public bool IsSimMode { get; set; }
         public string InsertStepText
         {
             get { return this.insertStepText; }
@@ -333,6 +334,8 @@ namespace LMSF_Scheduler
                 readerComboBox.IsEnabled = false;
                 testButton.IsEnabled = false;
 
+                simModeCheckBox.IsEnabled = false;
+
                 if (isPaused)
                 {
                     statusBorder.Background = Brushes.Yellow; //new SolidColorBrush(Colors.Yellow);
@@ -374,6 +377,8 @@ namespace LMSF_Scheduler
                 selectComboBox.IsEnabled = true;
                 readerComboBox.IsEnabled = true;
                 testButton.IsEnabled = true;
+
+                simModeCheckBox.IsEnabled = true;
             }
         }
 
@@ -482,6 +487,7 @@ namespace LMSF_Scheduler
 
         private void TestWriteButton_Click(object sender, RoutedEventArgs e)
         {
+            /*
             string name = "kan";
 
             //OutputText = "";
@@ -496,7 +502,8 @@ namespace LMSF_Scheduler
             {
                 OutputText += con + "\n";
             }
-
+            */
+            AddOutputText($"IsSimMode: {IsSimMode}\n");
         }
 
         private void UpdateTitle()
