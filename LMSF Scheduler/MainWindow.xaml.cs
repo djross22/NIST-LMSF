@@ -59,6 +59,8 @@ namespace LMSF_Scheduler
 
         private bool isOneStep = false;
 
+        private bool isSimMode = false;
+
         private readonly object validatingLock = new object();
         private bool isValidating = false;
         private List<int> valFailed;
@@ -118,7 +120,22 @@ namespace LMSF_Scheduler
         Dictionary<string, SimpleTcpClient> readerClients = new Dictionary<string, SimpleTcpClient>();
 
         #region Properties Getters and Setters
-        public bool IsSimMode { get; set; }
+        public bool IsSimMode 
+        { 
+            get => isSimMode; 
+            set
+            {
+                isSimMode = value;
+                if (value)
+                {
+                    readerIps["S-Cell-STAR"] = "localhost";
+                }
+                else
+                {
+                    readerIps["S-Cell-STAR"] = "129.6.167.35";
+                }
+            }
+        }
         public string InsertStepText
         {
             get { return this.insertStepText; }
