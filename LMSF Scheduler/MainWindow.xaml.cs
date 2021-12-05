@@ -120,6 +120,8 @@ namespace LMSF_Scheduler
         Dictionary<string, SimpleTcpClient> readerClients = new Dictionary<string, SimpleTcpClient>();
 
         #region Properties Getters and Setters
+
+        public string SimRoot { get; set; }
         public bool IsSimMode 
         { 
             get => isSimMode; 
@@ -443,6 +445,8 @@ namespace LMSF_Scheduler
 
             metaDictionary = new Dictionary<string, string>();
             concDictionary = new Dictionary<string, Concentration>();
+
+            SimRoot = @"C:\Users\djross\Documents\LMSF stuff\lmsf-scripts";
         }
 
         public void SecondCommandRun(IList<string> args)
@@ -899,7 +903,8 @@ namespace LMSF_Scheduler
                     //Kludge- replace directory for scripts in SimMode
                     if (IsSimMode)
                     {
-                        run_line = run_line.Replace(@"C:\Users\PAA\Documents\LMSF Scheduler", @"C:\Users\djross\Documents\LMSF stuff\lmsf-scripts");
+                        //run_line = run_line.Replace(@"C:\Users\PAA\Documents\LMSF Scheduler", @"C:\Users\djross\Documents\LMSF stuff\lmsf-scripts");
+                        run_line = run_line.Replace(@"C:\Users\PAA\Documents\LMSF Scheduler", SimRoot);
                     }
 
                     if (run_line.StartsWith("ReadScript"))

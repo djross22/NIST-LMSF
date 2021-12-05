@@ -59,17 +59,19 @@
             </ToolBarTray>
             <Grid Margin="0,0,0,5" DockPanel.Dock="Bottom" Height="40" >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="450"/>
+                    <ColumnDefinition Width="320"/>
+                    <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal" Height="30" FocusManager.IsFocusScope="False" HorizontalAlignment="Left" Width="430" Margin="0,5">
+                <StackPanel Orientation="Horizontal" FocusManager.IsFocusScope="False" HorizontalAlignment="Left" Width="320" Margin="0,5">
 
                     <TextBox x:Name="testTextBox" TextWrapping="Wrap" Margin="0,0,0,10" Width="223"/>
                     <Button x:Name="testWriteButton" Content="Write" Width="75" Margin="10,0,0,10" Click="TestWriteButton_Click"/>
                 </StackPanel>
-                <ComboBox x:Name="readerComboBox" Width="120" Height="25" VerticalAlignment="Center" Margin="20,0,50,0" ItemsSource="{Binding ReaderBlockList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedReaderBlock, Mode=TwoWay}" DropDownClosed="RemoteComboBox_DropDownClosed" Grid.Column="1" HorizontalAlignment="Right"/>
-                <TextBlock Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,180,0" TextWrapping="Wrap" Text="Remote Connections:" VerticalAlignment="Center" Foreground="White" FontWeight="Bold"/>
-                <Button x:Name="testButton" Content="Test Remote" Width="80" Click="TestButton_Click" Margin="328,0,337,0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <TextBox x:Name="simModeRootTextBox" Grid.Column="1" Margin="20,5" Text="{Binding SimRoot, Mode=TwoWay}" />
+                <ComboBox x:Name="readerComboBox" Width="120" Height="24" VerticalAlignment="Center" Margin="0,8,50,8" ItemsSource="{Binding ReaderBlockList}" IsSynchronizedWithCurrentItem="True" SelectedItem="{Binding SelectedReaderBlock, Mode=TwoWay}" DropDownClosed="RemoteComboBox_DropDownClosed" Grid.Column="2" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="2" HorizontalAlignment="Right" Margin="0,12,180,12" TextWrapping="Wrap" Text="Remote Connections:" VerticalAlignment="Center" Foreground="White" FontWeight="Bold" Height="16" Width="120"/>
+                <Button x:Name="testButton" Content="Test Remote" Width="80" Click="TestButton_Click" Margin="0,10,337,10" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Height="20"/>
 
             </Grid>
 
