@@ -2248,7 +2248,7 @@ namespace LMSF_Scheduler
                             }
                             break;
                         default:
-                            if (IsSimMode) {
+                            if (IsSimMode && (processWaitingFor != "S-Cell-STAR")) {
                                 outString += $"Simulation Mode, doesn't wait for {processWaitingFor}.";
                             }
                             else if (GetConnectedReadersList().Contains(processWaitingFor))
