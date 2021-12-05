@@ -895,13 +895,20 @@ namespace LMSF_Scheduler
 
                 foreach (string line in inputSteps)
                 {
-                    if (line.StartsWith("ReadScript"))
+                    string run_line = line;
+                    //Kludge- replace directory for scripts in SimMode
+                    if (IsSimMode)
+                    {
+                        run_line = run_line.Replace(@"C:\Users\PAA\Documents\LMSF Scheduler", @"C:\Users\djross\Documents\LMSF stuff\lmsf-scripts");
+                    }
+
+                    if (run_line.StartsWith("ReadScript"))
                     {
                         if (recursion < maxRecursion)
                         {
                             try
                             {
-                                scriptSteps = ReadScriptFile(line);
+                                scriptSteps = ReadScriptFile(run_line);
                                 checkReadScript = true;
                                 foreach (string scriptLine in scriptSteps)
                                 {
@@ -911,19 +918,19 @@ namespace LMSF_Scheduler
                             catch (Exception e)
                             {
                                 initOK = false;
-                                string msg = $"Error reading script file, {line}, {e}";
+                                string msg = $"Error reading script file, {run_line}, {e}";
                                 this.Dispatcher.Invoke(() => { SharedParameters.ShowPrompt(msg, "Script File Error"); });
                                 return initOK;
                             }
                         }
                         else
                         {
-                            notReadLine = line;
+                            notReadLine = run_line;
                         }
                     }
                     else
                     {
-                        stepsList.Add(line);
+                        stepsList.Add(run_line);
                     }
                 }
 
