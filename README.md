@@ -530,4 +530,13 @@ The LMSF Scheduler can also be used to control a remote connected STAR instrumen
 		
 	If the necessary remote connections are not established, a script that uses them will fail the validation check and so will not run.
 	
+
+### Permissions on remote computers
+For the RemoteHam() command, the following folders need to exist (on the Hamilton STAR computer) and need to be shared:
+1. C:\Program Files (x86)\HAMILTON\Methods, read-only
+2. C:\Program Files (x86)\HAMILTON\LMSF_FrontEnd, read and write permission
+3. C:\Shared Files, read and write permission
+   * The C:\Shared Files folder must also have the following sub-folder: C:\Shared Files\LMSF Scheduler\Hamilton
+
+	
 	
