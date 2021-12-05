@@ -18,7 +18,7 @@ Much of the following material was written in plain text, and has not yet been f
 
 ## Writing scripts
 Scripts can be written in any text editor. The `LMSF Scheduler.exe` has a very basic text editor on the left side of the window (the "Steps Input:" filed).
-Script files can be saved and opened using the normal Windows-style menus at the top of the application. For most editing, though, I reccomend an alternate text editor, like Notepad++.
+Script files can be saved and opened using the normal Windows-style menus at the top of the application. For most editing, though, I recommend an alternate text editor, like Notepad++.
 
 Scripts are written with one command (i.e., automation step) per line. 
 Blank lines in the script are ignored.
@@ -83,7 +83,7 @@ Overlord()
 Hamilton()
 	Runs a Hamilton method (on the local computer with Hamilton Venus installed).
 	Also saves the Metadata Dictionary (metaDictionary) to a parameters file that can be read by a Hamilton Venus program (C:\Program Files (x86)\HAMILTON\LMSF_FrontEnd\parameters.csv).
-	The method file parameter shuold point to the .hsl file associated with the Hamitlon Venus method.
+	The method file parameter should point to the .hsl file associated with the Hamilton Venus method.
 
 	Syntax:
 		Hamilton(<method file path>)
@@ -147,7 +147,7 @@ Gen5()
 		For the RunExp command, three additional arguments are required:
 			The path to the protocol file to be run.
 				The path is read from the point of view of the computer controlling the reader.
-				So, to use a protocol from the master Protocols directroy on the main computer, the protocol path will have to start with the IP adddress: "\\127.6.167.34\..."
+				So, to use a protocol from the master Protocols directory on the main computer, the protocol path will have to start with the IP address: "\\127.6.167.34\..."
 			The experiment ID. This is used to automatically generate file names for the Gen5 experiment file (.xpt) and the data export file (.txt).
 				The LMSF_Gen5 program automatically appends the reader name to the experiment ID to create the .xpt and export file names.
 					Note that if more than one read needs to be run with the same experiment ID, then use "{experimentId}-read 1", "{experimentId}-read 2", etc. for the <experiment ID> argument.
@@ -185,8 +185,8 @@ WaitFor()
 	The <process to wait for> argument can be either "Overlord", "Hamilton", "Timer", or the name of a remote instrument that is connected (see the Gen5() and RemoteHam() command descriptions).
 	If the <process to wait for>  is a remote instrument, there are two additional optional parameters, <write end time> and <ping interval>.
 		The <write end time> is a boolean used to set whether or not the finish time of the remote process is appended to the XML node for that process.
-			Some remote processes don't have XML nodes, (e.g. CarrierIn), so it is not appropiate to try to append a finish time.
-			If <write end time> is any string other than "false" or "False", or if there is no second paramter, the finish time will be appended.
+			Some remote processes don't have XML nodes, (e.g. CarrierIn), so it is not appropriate to try to append a finish time.
+			If <write end time> is any string other than "false" or "False", or if there is no second parameter, the finish time will be appended.
 		The <ping interval> parameter is an integer that sets the time (in milli-seconds) between "pings" to the remote process to check it's status.
 			If no <ping interval> is set in the WaitFor command, the default value (1000) will be used.
 
@@ -255,7 +255,7 @@ SaveXML()
 
 
 LoadXML()
-	Loads an existing XML metadata document into memory, but does nothing else. This is useful for restartting an experiment that had to be stopped in the middle.
+	Loads an existing XML metadata document into memory, but does nothing else. This is useful for restarting an experiment that had to be stopped in the middle.
 
 	Syntax:
 		LoadXML(<xml file path>)
@@ -280,8 +280,8 @@ AddXML()
 
 UserPrompt()
 	Opens a message dialog box to prompt the user.
-	The <message> string parameter is interpretted using string escape sequences ("\t" for tab, "\n" for new line).
-		So, multi-line messages can be formateed and displayed.
+	The <message> string parameter is interpreted using string escape sequences ("\t" for tab, "\n" for new line).
+		So, multi-line messages can be formated and displayed.
 
 	Syntax:
 		UserPrompt(<title>, <message>, {<image file path (optional)>, <image width (optional)>})
@@ -369,7 +369,7 @@ Get()
 
 	The list of valid metadata types is: "user", "media", "strain", "plasmid", "additive", "antibiotic", "project", "concentration", "note", "number", and "integer"
 
-	The <key> parameter is meant to be a short, human-readable indentifier of the function of the media, strain, plasmid, etc. in the current experiment.
+	The <key> parameter is meant to be a short, human-readable identifier of the function of the media, strain, plasmid, etc. in the current experiment.
 	It is also used as the key for storage of Get() result in the metaDictionary.
 
 	For metadata type "concentration", the user dialog gets the numeric value and units for the concentration.
@@ -393,7 +393,7 @@ Get()
 
 
 	Syntax:
-		Get(<metadata type>, <key>, {<message prompt(optinal)>, <note (optional)>})
+		Get(<metadata type>, <key>, {<message prompt(optional)>, <note (optional)>})
 
 	Examples:
 		Get(strain, strain1)
@@ -426,7 +426,7 @@ Math()
 		For this, the first argument in the math expression must be a parsable date-time string,
 			and the second argument must be either a parsable date-time string or a number (in seconds).
 		Only addition and subtraction are allowed with date-time arguments.
-		The result of subtration of two parsable date-time strings is a time span in seconds
+		The result of subtraction of two parsable date-time strings is a time span in seconds
 		The result of addition of a date-time string and a number is a new date time string with the number of seconds added (format: "yyyy/MM/dd HH:mm:ss")
 	Math() can only perform a single binary operator per step.
 
@@ -494,7 +494,7 @@ ImportDictionary()
 
 ExportDictionary()
 	Writes data from  the Metadata Dictionary to a text file (extension .txt).
-	For each entry in the dictionay the method writes a line in the text file with the format, "<key>,<value>".
+	For each entry in the dictionary the method writes a line in the text file with the format, "<key>,<value>".
 
 	Syntax:
 		ExportDictionary(<file path>)
